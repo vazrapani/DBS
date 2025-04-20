@@ -101,7 +101,10 @@ main {
 
 /* 고추가루 카테고리 카드 배경 */
 [data-category="red-pepper"] .product-card {
-    background: white url('images/bg_card_red.png') no-repeat center/cover;
+    background-image: url('images/bg_card_red.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
 
 /* 들깨가루 카테고리 카드 배경 */
