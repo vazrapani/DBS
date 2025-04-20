@@ -66,14 +66,13 @@
                     // 모든 카테고리 섹션 숨기기
                     const categorySections = document.querySelectorAll('.category-section');
                     categorySections.forEach(section => {
-                        section.style.display = 'none';
-                        section.classList.remove('active');
+                        section.style.cssText = 'display: none;';
                     });
                     
                     // 선택된 카테고리 섹션 보이기
                     const selectedSection = document.querySelector(`.category-section[data-category="${selectedCategory}"]`);
                     if (selectedSection) {
-                        selectedSection.style.display = 'block';
+                        selectedSection.style.cssText = 'display: flex; flex-direction: column; gap: 16px;';
                         selectedSection.classList.add('active');
                     }
                 });
