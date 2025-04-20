@@ -74,6 +74,12 @@
                     if (selectedSection) {
                         selectedSection.style.cssText = 'display: flex; flex-direction: column; gap: 16px;';
                         selectedSection.classList.add('active');
+                        
+                        // 스크롤 위치를 상단으로 자동 이동
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
                     }
                 });
             });
