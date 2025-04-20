@@ -520,6 +520,7 @@ main {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding-top: 0;
 }
 
 .category-section + .category-section {
@@ -528,8 +529,6 @@ main {
 
 .category-section.active {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
 }
 
 /* 이미지 오버레이 스타일 */
