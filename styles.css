@@ -482,39 +482,29 @@ main {
 }
 
 .menu-link {
-    color: rgba(247, 249, 244, 0.4);
+    color: rgba(247, 249, 244, 0.2);
     font-size: 16px;
     font-weight: 400;
     text-decoration: none;
     display: block;
     width: 100%;
-    transition: all 0.3s ease;
+    transition: color 0.3s ease;
     cursor: pointer;
     padding: 0;
     white-space: nowrap;
 }
 
 .menu-link:hover {
-    color: rgba(247, 249, 244, 1);
-    transform: translateY(-1px);
+    color: rgba(247, 249, 244, 0.9);
 }
 
 .menu-item.active .menu-link {
-    color: rgba(247, 249, 244, 1);
-    font-weight: 600;
-    position: relative;
+    color: rgba(247, 249, 244, 0.9);
+    font-weight: 400;
 }
 
-.menu-item.active .menu-link::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 4px;
-    background-color: rgba(247, 249, 244, 1);
-    border-radius: 50%;
+.menu-item.active::after {
+    display: none;
 }
 
 .app {
