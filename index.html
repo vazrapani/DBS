@@ -44,6 +44,42 @@
         }
     }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 모든 메뉴 링크에 클릭 이벤트 리스너 추가
+            const menuLinks = document.querySelectorAll('.menu-link');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 모든 메뉴 항목에서 active 클래스 제거
+                    menuLinks.forEach(item => {
+                        item.parentElement.classList.remove('active');
+                    });
+                    
+                    // 클릭된 메뉴 항목에 active 클래스 추가
+                    this.parentElement.classList.add('active');
+                    
+                    // 선택된 카테고리 가져오기
+                    const selectedCategory = this.getAttribute('data-category');
+                    
+                    // 모든 카테고리 섹션 숨기기
+                    const categorySections = document.querySelectorAll('.category-section');
+                    categorySections.forEach(section => {
+                        section.style.display = 'none';
+                        section.classList.remove('active');
+                    });
+                    
+                    // 선택된 카테고리 섹션 보이기
+                    const selectedSection = document.querySelector(`.category-section[data-category="${selectedCategory}"]`);
+                    if (selectedSection) {
+                        selectedSection.style.display = 'block';
+                        selectedSection.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="app">
