@@ -45,7 +45,7 @@ body {
 
 /* 타이틀 영역 */
 .top-app-bar {
-    height: 64px;
+    height: 72px;
     padding: 0 20px;
     display: flex;
     align-items: center;
@@ -67,7 +67,7 @@ body {
 /* 컨텐츠 영역 */
 main {
     position: relative;
-    padding-top: 124px; /* 64px + 60px */
+    padding-top: 132px; /* 72px + 60px */
     z-index: 1;
     width: 100%;
     min-height: 100vh;
