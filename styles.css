@@ -80,8 +80,8 @@ main {
     z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
+    gap: 0;
+    padding: 0;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -517,14 +517,10 @@ main {
 }
 
 .category-section {
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 16px;
-    padding-top: 0;
-}
-
-.category-section + .category-section {
-    margin-top: 16px;
+    padding: 16px;
 }
 
 .category-section.active {
