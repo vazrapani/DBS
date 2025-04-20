@@ -1004,10 +1004,8 @@
                 const phoneNumber = '010-9002-0797';
                 
                 if (isMobile) {
-                    // 모바일에서는 바로 전화 앱 실행
                     window.location.href = `tel:${phoneNumber}`;
                 } else {
-                    // PC에서는 클립보드에 복사
                     navigator.clipboard.writeText(phoneNumber)
                         .then(() => alert(`전화번호가 복사되었습니다: ${phoneNumber}`));
                 }
@@ -1020,21 +1018,8 @@
                 e.preventDefault();
                 const kakaoUrl = 'https://open.kakao.com/o/shaHxdsh';
                 
-                if (isIOS) {
-                    // iOS에서는 새 창에서 열기
-                    window.open(kakaoUrl, '_blank');
-                } else if (isAndroid) {
-                    // 안드로이드에서는 intent 스키마 사용
-                    window.location.href = `intent://open.kakao.com/o/shaHxdsh#Intent;scheme=https;package=com.kakao.talk;end`;
-                    
-                    // 실패시 브라우저에서 열기
-                    setTimeout(() => {
-                        window.location.href = kakaoUrl;
-                    }, 500);
-                } else {
-                    // PC에서는 새 창에서 열기
-                    window.open(kakaoUrl, '_blank');
-                }
+                // 새 창에서 열기 (하이브리드 앱 환경 고려)
+                window.open(kakaoUrl, '_system');
             });
         });
     });
