@@ -67,7 +67,7 @@ body {
 /* 컨텐츠 영역 */
 main {
     position: relative;
-    padding-top: 132px; /* 헤더 높이(132px = 72px + 60px) */
+    padding-top: 132px;
     z-index: 1;
     width: 100%;
     min-height: 100vh;
@@ -76,7 +76,7 @@ main {
 }
 
 #product-list {
-    padding: 32px 0 0 0; /* 상단에 32px 패딩 추가 */
+    padding: 0;
     margin: 0;
     width: 100%;
     display: flex;
@@ -175,7 +175,7 @@ main {
     background-image: url('images/img_product_goods_01.png');
 }
 
-[data-category="processed"] .product-card:nth-child(2) .product-image {
+[data-category="processed"] .product-card:nth-category(2) .product-image {
     background-image: url('images/img_product_goods_02.png');
 }
 
@@ -511,23 +511,22 @@ main {
 }
 
 .category-section {
-    display: flex;
+    display: none; /* 기본적으로 숨김 */
     flex-direction: column;
     gap: 16px;
-    padding: 0;
+    padding: 32px 0 0 0; /* 모든 카테고리 섹션에 동일한 상단 패딩 적용 */
     margin: 0;
     scroll-snap-type: y mandatory;
     overflow-y: visible;
     height: auto;
 }
 
-/* 카테고리 섹션의 첫 번째 카드 여백 */
-.category-section .product-card:first-child {
-    margin-top: 32px;
+.category-section.active {
+    display: flex; /* 활성화된 카테고리만 표시 */
 }
 
-/* 첫 번째 카테고리 섹션의 첫 번째 카드는 여백 없음 */
-.category-section:first-child .product-card:first-child {
+/* 카테고리 섹션의 첫 번째 카드 여백 제거 */
+.category-section .product-card:first-child {
     margin-top: 0;
 }
 
