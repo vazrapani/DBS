@@ -46,34 +46,88 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 모든 메뉴 링크에 클릭 이벤트 리스너 추가
+            // 초기 설정
+            const productList = document.getElementById('product-list');
+            const verticalNav = document.querySelector('.vertical-nav');
+            const categorySections = document.querySelectorAll('.category-section');
             const menuLinks = document.querySelectorAll('.menu-link');
+            let currentSectionIndex = 0;
+            let currentCategory = 'red-pepper';
+
+            // 네비게이션 닷 업데이트 함수
+            function updateNavigationDots(category) {
+                // 기존 닷 제거
+                verticalNav.innerHTML = '';
+                
+                // 현재 카테고리의 상품 카드 수 확인
+                const currentSection = document.querySelector(`.category-section[data-category="${category}"]`);
+                const productCards = currentSection.querySelectorAll('.product-card');
+                
+                // 상품 카드 수만큼 닷 생성
+                productCards.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot';
+                    if (index === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => {
+                        const targetCard = productCards[index];
+                        targetCard.scrollIntoView({ behavior: 'smooth' });
+                    });
+                    verticalNav.appendChild(dot);
+                });
+            }
+
+            // 초기 네비게이션 닷 생성
+            updateNavigationDots('red-pepper');
+
+            // 스크롤 이벤트 처리
+            window.addEventListener('scroll', function() {
+                const activeSection = document.querySelector('.category-section.active');
+                if (!activeSection) return;
+
+                const cards = activeSection.querySelectorAll('.product-card');
+                const dots = document.querySelectorAll('.nav-dot');
+                let activeFound = false;
+                
+                cards.forEach((card, index) => {
+                    const rect = card.getBoundingClientRect();
+                    const cardTop = rect.top;
+                    const cardBottom = rect.bottom;
+                    const windowCenter = window.innerHeight / 2;
+
+                    if (cardTop <= windowCenter && cardBottom >= windowCenter) {
+                        dots.forEach(dot => dot.classList.remove('active'));
+                        dots[index]?.classList.add('active');
+                        activeFound = true;
+                    }
+                });
+
+                // 활성화된 카드가 없으면 모든 닷 비활성화
+                if (!activeFound) {
+                    dots.forEach(dot => dot.classList.remove('active'));
+                }
+            });
+
+            // 메뉴 링크 클릭 이벤트 수정
             menuLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     
-                    // 모든 메뉴 항목에서 active 클래스 제거
-                    menuLinks.forEach(item => {
-                        item.parentElement.classList.remove('active');
-                    });
-                    
-                    // 클릭된 메뉴 항목에 active 클래스 추가
-                    this.parentElement.classList.add('active');
-                    
-                    // 선택된 카테고리 가져오기
                     const selectedCategory = this.getAttribute('data-category');
+                    currentCategory = selectedCategory;
                     
-                    // 모든 카테고리 섹션 숨기기
-                    const categorySections = document.querySelectorAll('.category-section');
+                    // 모든 카테고리 섹션 표시
                     categorySections.forEach(section => {
-                        section.style.cssText = 'display: none;';
+                        section.style.display = 'none';
                     });
                     
                     // 선택된 카테고리 섹션 보이기
                     const selectedSection = document.querySelector(`.category-section[data-category="${selectedCategory}"]`);
                     if (selectedSection) {
-                        selectedSection.style.cssText = 'display: flex; flex-direction: column; gap: 16px;';
+                        selectedSection.style.display = 'flex';
                         selectedSection.classList.add('active');
+                        
+                        // 네비게이션 닷 업데이트
+                        updateNavigationDots(selectedCategory);
                         
                         // 스크롤 위치를 상단으로 자동 이동
                         window.scrollTo({
@@ -83,6 +137,12 @@
                     }
                 });
             });
+
+            // 초기 카테고리 표시
+            const firstSection = document.querySelector('.category-section');
+            if (firstSection) {
+                firstSection.classList.add('active');
+            }
         });
     </script>
 </head>
