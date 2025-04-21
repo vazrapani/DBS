@@ -383,9 +383,9 @@ main {
 }
 
 .nav-dot.active {
-    height: 24px;
+    height: 16px;
     border-radius: 12px;
-    background-color: #EFF6EE; /* #EFF6EE with 100% opacity */
+    background-color: #EFF6EE;
 }
 
 .nav-dot:hover:not(.active) {
