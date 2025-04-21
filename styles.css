@@ -98,6 +98,8 @@ main {
     scroll-snap-align: center;
     scroll-snap-stop: always;
     margin-bottom: 16px;
+    touch-action: pan-y; /* 수직 스크롤만 허용 */
+    user-select: none; /* 텍스트 선택 방지 */
 }
 
 /* 고추가루 카테고리 카드 배경 */
@@ -123,6 +125,7 @@ main {
     height: 310px;
     background: no-repeat bottom/contain;
     cursor: pointer;
+    touch-action: none; /* 이미지 영역에서 모든 브라우저 기본 터치 동작 비활성화 */
 }
 
 .product-card:nth-child(1) .product-image {
@@ -564,4 +567,17 @@ main {
     width: 390px;
     height: 512px;
     background: no-repeat center/contain;
+}
+
+.product-card.dragging {
+    transition: transform 0.3s ease;
+}
+
+/* 드래그 방향 표시를 위한 스타일 */
+.product-card.drag-left {
+    transform: translateX(-50px);
+}
+
+.product-card.drag-right {
+    transform: translateX(50px);
 } 

@@ -1180,5 +1180,122 @@
         });
     });
     </script>
+    <script>
+    // 드래그 관련 변수
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let currentCard = null;
+    let isHorizontalDrag = false;
+    const DRAG_THRESHOLD = 50;
+    const DIRECTION_LOCK_THRESHOLD = 10;
+
+    // 터치 시작
+    function handleTouchStart(e) {
+        const card = e.target.closest('.product-card');
+        if (!card) return;
+
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        currentCard = card;
+        isHorizontalDrag = false;
+        
+        // 트랜지션 일시 제거
+        currentCard.style.transition = 'none';
+    }
+
+    // 터치 이동
+    function handleTouchMove(e) {
+        if (!currentCard || !touchStartX) return;
+
+        const touchCurrentX = e.touches[0].clientX;
+        const touchCurrentY = e.touches[0].clientY;
+        const diffX = touchCurrentX - touchStartX;
+        const diffY = touchCurrentY - touchStartY;
+
+        // 스크롤 방향 결정
+        if (!isHorizontalDrag) {
+            if (Math.abs(diffX) > DIRECTION_LOCK_THRESHOLD || Math.abs(diffY) > DIRECTION_LOCK_THRESHOLD) {
+                isHorizontalDrag = Math.abs(diffX) > Math.abs(diffY);
+                if (!isHorizontalDrag) {
+                    // 수직 스크롤로 판단되면 드래그 취소
+                    resetDrag();
+                    return;
+                }
+            }
+        }
+
+        // 수평 드래그로 판단된 경우
+        if (isHorizontalDrag) {
+            e.preventDefault();
+            currentCard.style.transform = `translateX(${diffX}px)`;
+        }
+    }
+
+    // 터치 종료
+    function handleTouchEnd(e) {
+        if (!currentCard || !isHorizontalDrag) return;
+
+        const touchEndX = e.changedTouches[0].clientX;
+        const diffX = touchEndX - touchStartX;
+
+        // 트랜지션 복원
+        currentCard.style.transition = 'transform 0.3s ease';
+
+        if (Math.abs(diffX) > DRAG_THRESHOLD) {
+            // 드래그 방향에 따라 카테고리 전환
+            const direction = diffX > 0 ? 'prev' : 'next';
+            const currentCategory = getCurrentCategory();
+            const categories = ['red-pepper', 'perilla', 'processed'];
+            const currentIndex = categories.indexOf(currentCategory);
+            
+            let targetCategory;
+            if (direction === 'prev' && currentIndex > 0) {
+                targetCategory = categories[currentIndex - 1];
+            } else if (direction === 'next' && currentIndex < categories.length - 1) {
+                targetCategory = categories[currentIndex + 1];
+            }
+
+            if (targetCategory) {
+                // 카테고리 전환 애니메이션
+                currentCard.classList.add(diffX > 0 ? 'drag-right' : 'drag-left');
+                setTimeout(() => {
+                    switchCategory(targetCategory);
+                    resetDrag();
+                }, 300);
+            } else {
+                resetDrag();
+            }
+        } else {
+            resetDrag();
+        }
+    }
+
+    // 드래그 상태 초기화
+    function resetDrag() {
+        if (!currentCard) return;
+        currentCard.style.transform = '';
+        currentCard.style.transition = '';
+        currentCard.classList.remove('drag-left', 'drag-right');
+        currentCard = null;
+        touchStartX = 0;
+        isHorizontalDrag = false;
+    }
+
+    // 현재 카테고리 가져오기
+    function getCurrentCategory() {
+        const activeSection = document.querySelector('.category-section.active');
+        return activeSection ? activeSection.getAttribute('data-category') : null;
+    }
+
+    // 이벤트 리스너 등록
+    document.addEventListener('DOMContentLoaded', () => {
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach(card => {
+            card.addEventListener('touchstart', handleTouchStart, { passive: true });
+            card.addEventListener('touchmove', handleTouchMove, { passive: false });
+            card.addEventListener('touchend', handleTouchEnd, { passive: true });
+        });
+    });
+    </script>
 </body>
 </html> 
