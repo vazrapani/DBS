@@ -81,7 +81,7 @@ main {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 32px;
 }
 
 .product-card {
@@ -514,21 +514,26 @@ main {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding-top: 32px;
-    margin-top: 0;
+    padding: 0;
+    margin: 0;
     scroll-snap-type: y mandatory;
     overflow-y: visible;
     height: auto;
 }
 
-/* 첫 번째 카테고리 섹션의 상단 여백 제거 */
-.category-section:first-child {
-    padding-top: 0;
+/* 카테고리 섹션의 첫 번째 카드 여백 */
+.category-section .product-card:first-child {
+    margin-top: 32px;
 }
 
-/* 카테고리 섹션 사이 여백 */
-.category-section + .category-section {
-    margin-top: 32px;
+/* 첫 번째 카테고리 섹션의 첫 번째 카드는 여백 없음 */
+.category-section:first-child .product-card:first-child {
+    margin-top: 0;
+}
+
+/* 마지막 카드의 여백 */
+.product-card:last-child {
+    margin-bottom: 32px;
 }
 
 /* 이미지 오버레이 스타일 */
@@ -569,9 +574,4 @@ main {
     width: 390px;
     height: 512px;
     background: no-repeat center/contain;
-}
-
-/* 마지막 카드의 여백 조정 */
-.product-card:last-child {
-    margin-bottom: 32px;
 } 
