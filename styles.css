@@ -361,7 +361,7 @@ main {
     gap: 0;
 }
 
-/* 세로 네비게이션 */
+/* 네비게이션 닷 스타일 */
 .vertical-nav {
     position: fixed;
     right: 20px;
@@ -386,6 +386,47 @@ main {
     height: 16px;
     border-radius: 12px;
     background-color: #EFF6EE;
+}
+
+/* 메뉴 영역 스타일 */
+.menu-list {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.menu-item {
+    position: relative;
+    flex: 1;
+    max-width: 100px;
+    text-align: center;
+}
+
+.menu-link {
+    color: rgba(247, 249, 244, 0.2);
+    font-size: 16px;
+    font-weight: 400;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    transition: color 0.3s ease;
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap;
+}
+
+.menu-item.active .menu-link {
+    color: rgba(247, 249, 244, 0.9);
+    font-weight: 400;
+}
+
+.menu-link:hover {
+    color: rgba(247, 249, 244, 0.9);
 }
 
 /* Top App Bar */
@@ -458,50 +499,6 @@ main {
 
 .menu-button:active {
     background-color: rgba(255, 255, 255, 0.2);
-}
-
-.menu-list {
-    display: flex;
-    gap: 24px;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-.menu-item {
-    position: relative;
-    flex: 1;
-    max-width: 100px;
-    text-align: center;
-}
-
-.menu-link {
-    color: rgba(247, 249, 244, 0.2);
-    font-size: 16px;
-    font-weight: 400;
-    text-decoration: none;
-    display: block;
-    width: 100%;
-    transition: color 0.3s ease;
-    cursor: pointer;
-    padding: 0;
-    white-space: nowrap;
-}
-
-.menu-link:hover {
-    color: rgba(247, 249, 244, 0.9);
-}
-
-.menu-item.active .menu-link {
-    color: rgba(247, 249, 244, 0.9);
-    font-weight: 400;
-}
-
-.menu-item.active::after {
-    display: none;
 }
 
 .app {
