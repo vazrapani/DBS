@@ -67,7 +67,7 @@ body {
 /* 컨텐츠 영역 */
 main {
     position: relative;
-    padding-top: 150px; /* 상단 여백 150px로 수정 */
+    padding-top: 150px;
     z-index: 1;
     width: 100%;
     min-height: 100vh;
@@ -514,15 +514,21 @@ main {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding-top: 0;
+    padding-top: 32px;
     margin-top: 0;
     scroll-snap-type: y mandatory;
     overflow-y: visible;
     height: auto;
 }
 
-.category-section.active {
-    display: flex;
+/* 첫 번째 카테고리 섹션의 상단 여백 제거 */
+.category-section:first-child {
+    padding-top: 0;
+}
+
+/* 카테고리 섹션 사이 여백 */
+.category-section + .category-section {
+    margin-top: 32px;
 }
 
 /* 이미지 오버레이 스타일 */
@@ -568,9 +574,4 @@ main {
 /* 마지막 카드의 여백 조정 */
 .product-card:last-child {
     margin-bottom: 32px;
-}
-
-/* 카테고리 섹션 사이 여백 */
-.category-section + .category-section {
-    margin-top: 32px;
 } 
