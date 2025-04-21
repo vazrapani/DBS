@@ -521,11 +521,6 @@ main {
     height: auto;
 }
 
-/* 첫 번째 카테고리 섹션의 패딩 제거 */
-.category-section:first-child {
-    padding-top: 0;
-}
-
 /* 마지막 카드의 여백 */
 .product-card:last-child {
     margin-bottom: 32px;
