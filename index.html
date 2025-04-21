@@ -68,6 +68,11 @@
                     dot.className = 'nav-dot';
                     if (index === 0) dot.classList.add('active');
                     dot.addEventListener('click', () => {
+                        // 모든 닷 비활성화
+                        document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
+                        // 클릭한 닷 활성화
+                        dot.classList.add('active');
+                        // 해당 카드로 스크롤
                         const targetCard = productCards[index];
                         targetCard.scrollIntoView({ behavior: 'smooth' });
                     });
@@ -87,6 +92,9 @@
                 const dots = document.querySelectorAll('.nav-dot');
                 let activeFound = false;
                 
+                // 모든 닷 비활성화
+                dots.forEach(dot => dot.classList.remove('active'));
+                
                 cards.forEach((card, index) => {
                     const rect = card.getBoundingClientRect();
                     const cardTop = rect.top;
@@ -94,18 +102,12 @@
                     const windowCenter = window.innerHeight / 2;
 
                     if (cardTop <= windowCenter && cardBottom >= windowCenter) {
-                        dots.forEach(dot => dot.classList.remove('active'));
                         if (dots[index]) {
                             dots[index].classList.add('active');
                             activeFound = true;
                         }
                     }
                 });
-
-                // 활성화된 카드가 없으면 모든 닷 비활성화
-                if (!activeFound) {
-                    dots.forEach(dot => dot.classList.remove('active'));
-                }
             });
 
             // 메뉴 링크 클릭 이벤트
