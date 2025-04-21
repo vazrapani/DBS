@@ -53,6 +53,20 @@
             const menuLinks = document.querySelectorAll('.menu-link');
             let currentCategory = 'red-pepper';
 
+            // 메뉴 활성화 함수
+            function updateMenuActive(selectedCategory) {
+                // 모든 메뉴 아이템 비활성화
+                menuLinks.forEach(link => {
+                    link.parentElement.classList.remove('active');
+                });
+                
+                // 선택된 메뉴 아이템 활성화
+                const selectedLink = document.querySelector(`.menu-link[data-category="${selectedCategory}"]`);
+                if (selectedLink) {
+                    selectedLink.parentElement.classList.add('active');
+                }
+            }
+
             // 네비게이션 닷 업데이트 함수
             function updateNavigationDots(category) {
                 // 기존 닷 제거
@@ -82,6 +96,8 @@
 
             // 초기 네비게이션 닷 생성
             updateNavigationDots('red-pepper');
+            // 초기 메뉴 활성화
+            updateMenuActive('red-pepper');
 
             // 스크롤 이벤트 처리
             window.addEventListener('scroll', function() {
@@ -130,6 +146,8 @@
                         
                         // 네비게이션 닷 업데이트
                         updateNavigationDots(selectedCategory);
+                        // 메뉴 활성화 상태 업데이트
+                        updateMenuActive(selectedCategory);
                         
                         // 스크롤 위치를 상단으로 자동 이동
                         window.scrollTo({
