@@ -51,7 +51,6 @@
             const verticalNav = document.querySelector('.vertical-nav');
             const categorySections = document.querySelectorAll('.category-section');
             const menuLinks = document.querySelectorAll('.menu-link');
-            let currentSectionIndex = 0;
             let currentCategory = 'red-pepper';
 
             // 네비게이션 닷 업데이트 함수
@@ -96,8 +95,10 @@
 
                     if (cardTop <= windowCenter && cardBottom >= windowCenter) {
                         dots.forEach(dot => dot.classList.remove('active'));
-                        dots[index]?.classList.add('active');
-                        activeFound = true;
+                        if (dots[index]) {
+                            dots[index].classList.add('active');
+                            activeFound = true;
+                        }
                     }
                 });
 
@@ -107,7 +108,7 @@
                 }
             });
 
-            // 메뉴 링크 클릭 이벤트 수정
+            // 메뉴 링크 클릭 이벤트
             menuLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -115,15 +116,14 @@
                     const selectedCategory = this.getAttribute('data-category');
                     currentCategory = selectedCategory;
                     
-                    // 모든 카테고리 섹션 표시
+                    // 모든 카테고리 섹션 숨기기
                     categorySections.forEach(section => {
-                        section.style.display = 'none';
+                        section.classList.remove('active');
                     });
                     
                     // 선택된 카테고리 섹션 보이기
                     const selectedSection = document.querySelector(`.category-section[data-category="${selectedCategory}"]`);
                     if (selectedSection) {
-                        selectedSection.style.display = 'flex';
                         selectedSection.classList.add('active');
                         
                         // 네비게이션 닷 업데이트

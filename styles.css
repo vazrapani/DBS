@@ -376,7 +376,7 @@ main {
 .nav-dot {
     width: 8px;
     height: 8px;
-    background-color: rgba(239, 246, 238, 0.1); /* #EFF6EE with 10% opacity */
+    background-color: rgba(239, 246, 238, 0.1);
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
