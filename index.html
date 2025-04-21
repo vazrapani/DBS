@@ -52,6 +52,52 @@
             const categorySections = document.querySelectorAll('.category-section');
             const menuLinks = document.querySelectorAll('.menu-link');
             let currentCategory = 'red-pepper';
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            // 카테고리 순서 정의
+            const categoryOrder = ['red-pepper', 'perilla', 'processed'];
+
+            // 다음/이전 카테고리로 이동하는 함수
+            function moveToCategory(direction) {
+                const currentIndex = categoryOrder.indexOf(currentCategory);
+                let nextIndex;
+                
+                if (direction === 'next') {
+                    nextIndex = currentIndex + 1;
+                    if (nextIndex >= categoryOrder.length) return; // 마지막 카테고리면 이동하지 않음
+                } else {
+                    nextIndex = currentIndex - 1;
+                    if (nextIndex < 0) return; // 첫 카테고리면 이동하지 않음
+                }
+
+                const nextCategory = categoryOrder[nextIndex];
+                const nextSection = document.querySelector(`.category-section[data-category="${nextCategory}"]`);
+                if (nextSection) {
+                    nextSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            // 터치 이벤트 처리
+            document.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].clientX;
+                const diffX = touchEndX - touchStartX;
+                
+                // 50px 이상의 스와이프만 인식
+                if (Math.abs(diffX) > 50) {
+                    if (diffX > 0) {
+                        // 오른쪽으로 스와이프: 이전 카테고리
+                        moveToCategory('prev');
+                    } else {
+                        // 왼쪽으로 스와이프: 다음 카테고리
+                        moveToCategory('next');
+                    }
+                }
+            });
 
             // 메뉴 활성화 함수
             function updateMenuActive(selectedCategory) {
@@ -111,6 +157,7 @@
                     if (rect.top <= windowCenter && rect.bottom >= windowCenter) {
                         currentSection = section;
                         const category = section.getAttribute('data-category');
+                        currentCategory = category; // 현재 카테고리 업데이트
                         
                         // 메뉴 활성화 상태 업데이트
                         updateMenuActive(category);
