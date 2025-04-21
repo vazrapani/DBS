@@ -388,10 +388,6 @@ main {
     background-color: #EFF6EE;
 }
 
-.nav-dot:hover:not(.active) {
-    background-color: rgba(239, 246, 238, 0.3); /* hover 시 30% 투명도로 설정 */
-}
-
 /* Top App Bar */
 /* .top-app-bar {
     position: fixed;
