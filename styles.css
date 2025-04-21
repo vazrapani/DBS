@@ -511,13 +511,13 @@ main {
 }
 
 .category-section {
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 16px;
     padding-top: 0;
     margin-top: 0;
     scroll-snap-type: y mandatory;
-    overflow-y: auto;
+    overflow-y: visible;
     height: auto;
 }
 
@@ -568,4 +568,9 @@ main {
 /* 마지막 카드의 여백 조정 */
 .product-card:last-child {
     margin-bottom: 32px;
+}
+
+/* 카테고리 섹션 사이 여백 */
+.category-section + .category-section {
+    margin-top: 32px;
 } 

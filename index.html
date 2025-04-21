@@ -101,27 +101,39 @@
 
             // 스크롤 이벤트 처리
             window.addEventListener('scroll', function() {
-                const activeSection = document.querySelector('.category-section.active');
-                if (!activeSection) return;
-
-                const cards = activeSection.querySelectorAll('.product-card');
-                const dots = document.querySelectorAll('.nav-dot');
-                let activeFound = false;
+                const sections = document.querySelectorAll('.category-section');
+                let currentSection = null;
                 
-                // 모든 닷 비활성화
-                dots.forEach(dot => dot.classList.remove('active'));
-                
-                cards.forEach((card, index) => {
-                    const rect = card.getBoundingClientRect();
-                    const cardTop = rect.top;
-                    const cardBottom = rect.bottom;
+                sections.forEach(section => {
+                    const rect = section.getBoundingClientRect();
                     const windowCenter = window.innerHeight / 2;
-
-                    if (cardTop <= windowCenter && cardBottom >= windowCenter) {
-                        if (dots[index]) {
-                            dots[index].classList.add('active');
-                            activeFound = true;
+                    
+                    if (rect.top <= windowCenter && rect.bottom >= windowCenter) {
+                        currentSection = section;
+                        const category = section.getAttribute('data-category');
+                        
+                        // 메뉴 활성화 상태 업데이트
+                        updateMenuActive(category);
+                        
+                        // 네비게이션 닷 업데이트
+                        if (category !== currentCategory) {
+                            currentCategory = category;
+                            updateNavigationDots(category);
                         }
+                        
+                        // 카드별 네비게이션 닷 활성화 상태 업데이트
+                        const cards = section.querySelectorAll('.product-card');
+                        const dots = document.querySelectorAll('.nav-dot');
+                        
+                        cards.forEach((card, index) => {
+                            const cardRect = card.getBoundingClientRect();
+                            if (cardRect.top <= windowCenter && cardRect.bottom >= windowCenter) {
+                                dots.forEach(dot => dot.classList.remove('active'));
+                                if (dots[index]) {
+                                    dots[index].classList.add('active');
+                                }
+                            }
+                        });
                     }
                 });
             });
@@ -132,37 +144,13 @@
                     e.preventDefault();
                     
                     const selectedCategory = this.getAttribute('data-category');
-                    currentCategory = selectedCategory;
-                    
-                    // 모든 카테고리 섹션 숨기기
-                    categorySections.forEach(section => {
-                        section.classList.remove('active');
-                    });
-                    
-                    // 선택된 카테고리 섹션 보이기
                     const selectedSection = document.querySelector(`.category-section[data-category="${selectedCategory}"]`);
+                    
                     if (selectedSection) {
-                        selectedSection.classList.add('active');
-                        
-                        // 네비게이션 닷 업데이트
-                        updateNavigationDots(selectedCategory);
-                        // 메뉴 활성화 상태 업데이트
-                        updateMenuActive(selectedCategory);
-                        
-                        // 스크롤 위치를 상단으로 자동 이동
-                        window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
+                        selectedSection.scrollIntoView({ behavior: 'smooth' });
                     }
                 });
             });
-
-            // 초기 카테고리 표시
-            const firstSection = document.querySelector('.category-section');
-            if (firstSection) {
-                firstSection.classList.add('active');
-            }
         });
     </script>
 </head>
