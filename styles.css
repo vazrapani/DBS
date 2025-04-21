@@ -67,7 +67,7 @@ body {
 /* 컨텐츠 영역 */
 main {
     position: relative;
-    padding-top: 150px;
+    padding-top: 132px; /* 헤더 높이(132px = 72px + 60px) */
     z-index: 1;
     width: 100%;
     min-height: 100vh;
@@ -76,7 +76,7 @@ main {
 }
 
 #product-list {
-    padding: 0;
+    padding: 32px 0 0 0; /* 상단에 32px 패딩 추가 */
     margin: 0;
     width: 100%;
     display: flex;
