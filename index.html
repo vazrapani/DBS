@@ -92,35 +92,33 @@
 
             // 네비게이션 닷 업데이트 함수
             function updateNavigationDots(category) {
-                // 기존 닷 제거
-                verticalNav.innerHTML = '';
-                
                 // 현재 카테고리의 상품 카드 수 확인
                 const currentSection = document.querySelector(`.category-section[data-category="${category}"]`);
+                if (!currentSection) return;
+                
                 const productCards = currentSection.querySelectorAll('.product-card');
+                const cardCount = productCards.length;
+                
+                // 기존 닷 제거
+                const verticalNav = document.querySelector('.vertical-nav');
+                verticalNav.innerHTML = '';
                 
                 // 상품 카드 수만큼 닷 생성
-                productCards.forEach((_, index) => {
+                for (let i = 0; i < cardCount; i++) {
                     const dot = document.createElement('div');
                     dot.className = 'nav-dot';
-                    if (index === 0) dot.classList.add('active');
+                    if (i === 0) dot.classList.add('active');
                     dot.addEventListener('click', () => {
                         // 모든 닷 비활성화
                         document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
                         // 클릭한 닷 활성화
                         dot.classList.add('active');
                         // 해당 카드로 스크롤
-                        const targetCard = productCards[index];
-                        targetCard.scrollIntoView({ behavior: 'smooth' });
+                        productCards[i].scrollIntoView({ behavior: 'smooth' });
                     });
                     verticalNav.appendChild(dot);
-                });
+                }
             }
-
-            // 초기 네비게이션 닷 생성
-            updateNavigationDots('red-pepper');
-            // 초기 메뉴 활성화
-            updateMenuActive('red-pepper');
 
             // 스크롤 이벤트 처리
             window.addEventListener('scroll', function() {
@@ -134,14 +132,11 @@
                     if (rect.top <= windowCenter && rect.bottom >= windowCenter) {
                         currentSection = section;
                         const category = section.getAttribute('data-category');
-                        currentCategory = category; // 현재 카테고리 업데이트
                         
-                        // 메뉴 활성화 상태 업데이트
-                        updateMenuActive(category);
-                        
-                        // 네비게이션 닷 업데이트
+                        // 카테고리가 변경되었을 때만 네비게이션 닷 업데이트
                         if (category !== currentCategory) {
                             currentCategory = category;
+                            updateMenuActive(category);
                             updateNavigationDots(category);
                         }
                         
@@ -161,6 +156,11 @@
                     }
                 });
             });
+
+            // 초기 네비게이션 닷 생성
+            updateNavigationDots('red-pepper');
+            // 초기 메뉴 활성화
+            updateMenuActive('red-pepper');
 
             // 메뉴 링크 클릭 이벤트
             menuLinks.forEach(link => {
