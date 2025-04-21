@@ -67,7 +67,7 @@ body {
 /* 컨텐츠 영역 */
 main {
     position: relative;
-    padding-top: 240px;
+    padding-top: 0;
     z-index: 1;
     width: 100%;
     min-height: 100vh;
@@ -514,7 +514,7 @@ main {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 0;
+    padding: 240px 0 0 0;
     margin: 0;
     scroll-snap-type: y mandatory;
     overflow-y: visible;
