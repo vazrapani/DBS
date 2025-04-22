@@ -595,4 +595,37 @@ main {
 
 .product-card.drag-right {
     transform: translateX(50px);
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 16, 15, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-overlay.active {
+    display: flex;
+}
+
+.menu-overlay .close-button {
+    position: absolute;
+    top: 60px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid rgba(109, 109, 109, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 } 

@@ -178,8 +178,20 @@
 
             // 메뉴 버튼 클릭 이벤트
             const menuButton = document.querySelector('.menu-button');
+            const menuOverlay = document.querySelector('.menu-overlay');
+
             menuButton.addEventListener('click', function() {
-                this.classList.toggle('active');
+                if (this.classList.contains('active')) {
+                    // 활성화된 상태(undo 아이콘)에서 클릭하면 오버레이 닫기
+                    this.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                } else {
+                    // 비활성화된 상태(메뉴 아이콘)에서 클릭하면 오버레이 열기
+                    this.classList.add('active');
+                    menuOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
             });
         });
     </script>
@@ -1099,6 +1111,10 @@
             </svg>
         </div>
         <div class="enlarged-image"></div>
+    </div>
+
+    <!-- 메뉴 오버레이 -->
+    <div class="menu-overlay">
     </div>
     <script>
         // 이미지 클릭 이벤트 처리
