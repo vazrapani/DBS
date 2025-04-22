@@ -45,7 +45,7 @@ body {
 
 /* 타이틀 영역 */
 .top-app-bar {
-    height: 72px;
+    height: 80px;
     padding: 0 20px;
     display: flex;
     align-items: center;
@@ -547,7 +547,7 @@ main {
 /* 이미지 오버레이 스타일 */
 .image-overlay {
     position: fixed;
-    top: 64px; /* 타이틀 영역 높이 */
+    top: 80px;
     left: 0;
     right: 0;
     bottom: 0;
