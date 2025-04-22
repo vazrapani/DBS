@@ -98,7 +98,6 @@ main {
     scroll-snap-align: center;
     scroll-snap-stop: always;
     margin-bottom: 16px;
-    touch-action: pan-y; /* 수직 스크롤만 허용 */
     user-select: none; /* 텍스트 선택 방지 */
 }
 
@@ -125,7 +124,6 @@ main {
     height: 310px;
     background: no-repeat bottom/contain;
     cursor: pointer;
-    touch-action: none; /* 이미지 영역에서 모든 브라우저 기본 터치 동작 비활성화 */
 }
 
 .product-card:nth-child(1) .product-image {
