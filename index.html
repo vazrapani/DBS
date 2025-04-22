@@ -1203,8 +1203,8 @@
         // 수평 드래그로 판단된 경우
         if (isHorizontalDrag) {
             e.preventDefault();
-            // 드래그 이동 범위를 ±100px로 제한
-            const limitedDiffX = Math.max(Math.min(diffX, 100), -100);
+            // 드래그 이동 범위를 ±35px로 제한
+            const limitedDiffX = Math.max(Math.min(diffX, 35), -35);
             currentCard.style.transform = `translateX(${limitedDiffX}px)`;
         }
     }
@@ -1224,30 +1224,28 @@
             let targetCategory = null;
             
             // 드래그 방향에 따른 카테고리 전환
-            if (diffX > 0) {
-                // 오른쪽 드래그: 다음 카테고리로 (오른쪽으로)
+            if (diffX < 0) {  // 왼쪽으로 드래그: 이전 카테고리로
                 switch(currentCategory) {
-                    case 'red-pepper':
-                        targetCategory = 'perilla';
-                        break;
                     case 'perilla':
-                        targetCategory = 'processed';
+                        targetCategory = 'red-pepper';
                         break;
                     case 'processed':
-                        targetCategory = 'red-pepper';
+                        targetCategory = 'perilla';
+                        break;
+                    case 'red-pepper':  // 순환 구조를 위한 추가
+                        targetCategory = 'processed';
                         break;
                 }
-            } else if (diffX < 0) {
-                // 왼쪽 드래그: 이전 카테고리로 (왼쪽으로)
+            } else if (diffX > 0) {  // 오른쪽으로 드래그: 다음 카테고리로
                 switch(currentCategory) {
                     case 'red-pepper':
-                        targetCategory = 'processed';
+                        targetCategory = 'perilla';
                         break;
                     case 'perilla':
-                        targetCategory = 'red-pepper';
+                        targetCategory = 'processed';
                         break;
-                    case 'processed':
-                        targetCategory = 'perilla';
+                    case 'processed':  // 순환 구조를 위한 추가
+                        targetCategory = 'red-pepper';
                         break;
                 }
             }
