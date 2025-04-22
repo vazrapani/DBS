@@ -175,6 +175,12 @@
                     }
                 });
             });
+
+            // 메뉴 버튼 클릭 이벤트
+            const menuButton = document.querySelector('.menu-button');
+            menuButton.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
         });
     </script>
 </head>
@@ -188,10 +194,9 @@
                         <p class="subheadline">전국 식당 식자재 납품 전문</p>
                     </div>
                 </div>
-                <div class="menu-button">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 18H21V16H3V18ZM3 13H21V11H3V13ZM3 6V8H21V6H3Z" fill="#F7F9F4"/>
-                    </svg>
+                <div class="menu-button" aria-label="메뉴">
+                    <img src="images/icon-menu.svg" alt="메뉴" class="icon-menu">
+                    <img src="images/icon-undo.svg" alt="뒤로" class="icon-undo">
                 </div>
             </header>
             
