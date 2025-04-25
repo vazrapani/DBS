@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link href="styles.css" rel="stylesheet">
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=c3ps2p9f1s"></script>
     <style>
     /* 카테고리별 상품 카드 배경 스타일 */
     .category-section[data-category="red-pepper"] .product-card {
@@ -1115,6 +1116,38 @@
 
     <!-- 메뉴 오버레이 -->
     <div class="menu-overlay">
+        <div class="menu-sections">
+            <div class="menu-section" data-section="map">
+                <div class="section-header">
+                    <span class="section-title">찾아오시는 길</span>
+                    <img src="images/icon-arrow-down.svg" alt="펼치기" class="icon-arrow">
+                </div>
+                <div class="section-content">
+                    <div class="map-container">
+                        <div id="map" style="width:100%;height:250px;border-radius:4px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-section">
+                <div class="section-header">
+                    <span class="section-title">현장 사진</span>
+                    <img src="images/icon-arrow-down.svg" alt="펼치기" class="icon-arrow">
+                </div>
+                <div class="section-content">
+                    <div class="photo-gallery">
+                        <div class="gallery-container" id="galleryContainer">
+                            <!-- 이미지는 JavaScript로 동적 로드됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-section">
+                <a href="https://www.instagram.com/midas_21_com/" target="_system" class="section-header no-expand">
+                    <span class="section-title">인스타그램</span>
+                    <img src="images/icon-link.svg" alt="바로가기" class="icon-arrow" width="24" height="24">
+                </a>
+            </div>
+        </div>
     </div>
     <script>
         // 이미지 클릭 이벤트 처리
@@ -1337,6 +1370,148 @@
             updateNavigationDots(targetCategory);
         }
     }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 갤러리 이미지 동적 로드 함수
+            async function loadGalleryImages() {
+                const galleryContainer = document.getElementById('galleryContainer');
+                if (!galleryContainer) return;
+
+                try {
+                    // 이미지 파일 목록을 가져오기 위한 fetch 요청
+                    const response = await fetch('/images/gallery/');
+                    if (!response.ok) throw new Error('갤러리 로드 실패');
+                    
+                    const text = await response.text();
+                    
+                    // HTML 응답을 파싱하여 이미지 파일 찾기
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, 'text/html');
+                    const links = Array.from(doc.querySelectorAll('a'))
+                        .filter(a => a.href.match(/DBS-gallery-\d{3}\.jpg$/i))
+                        .map(a => a.href.split('/').pop())
+                        .sort();
+
+                    // 갤러리 아이템 생성
+                    links.forEach((filename, index) => {
+                        const galleryItem = document.createElement('div');
+                        galleryItem.className = 'gallery-item';
+                        
+                        const img = document.createElement('img');
+                        img.src = `images/gallery/${filename}`;
+                        img.alt = `현장 사진 ${index + 1}`;
+                        
+                        // 이미지 클릭 시 확대 보기
+                        img.addEventListener('click', function() {
+                            const overlay = document.querySelector('.image-overlay');
+                            const enlargedImage = overlay.querySelector('.enlarged-image');
+                            enlargedImage.style.backgroundImage = `url(${this.src})`;
+                            overlay.classList.add('active');
+                            document.body.style.overflow = 'hidden';
+                        });
+                        
+                        galleryItem.appendChild(img);
+                        galleryContainer.appendChild(galleryItem);
+                    });
+                } catch (error) {
+                    console.error('갤러리 로드 중 오류:', error);
+                }
+            }
+
+            // 갤러리 섹션이 열릴 때 이미지 로드
+            const gallerySection = document.querySelector('.menu-section:nth-child(2)');
+            if (gallerySection) {
+                const header = gallerySection.querySelector('.section-header');
+                header.addEventListener('click', function() {
+                    if (!gallerySection.classList.contains('active')) {
+                        loadGalleryImages();
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+    window.navermap_authFailure = function() {
+        console.error('네이버 지도 API 인증 실패');
+        alert('지도 로딩 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    };
+
+    function initMap() {
+        try {
+            console.log('지도 초기화 시작');
+            var mapOptions = {
+                center: new naver.maps.LatLng(37.5666805, 126.9784147),
+                zoom: 16,
+                scaleControl: false,
+                logoControl: false,
+                mapDataControl: false,
+                zoomControl: true,
+                minZoom: 6,
+                maxZoom: 21
+            };
+            
+            var map = new naver.maps.Map('map', mapOptions);
+            console.log('지도 객체 생성 완료');
+            
+            var marker = new naver.maps.Marker({
+                position: new naver.maps.LatLng(37.5666805, 126.9784147),
+                map: map
+            });
+            console.log('마커 생성 완료');
+        } catch (error) {
+            console.error('지도 초기화 중 오류 발생:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const mapSection = document.querySelector('.menu-section[data-section="map"]');
+        if (mapSection) {
+            const header = mapSection.querySelector('.section-header');
+            header.addEventListener('click', function() {
+                if (!mapSection.classList.contains('active')) {
+                    setTimeout(initMap, 500);
+                }
+            });
+        }
+    });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 메뉴 섹션 클릭 이벤트
+        const sections = document.querySelectorAll('.menu-section');
+        sections.forEach(section => {
+            const header = section.querySelector('.section-header');
+            if (!header.classList.contains('no-expand')) {  // no-expand 클래스가 없는 경우에만 토글 기능 추가
+                const content = section.querySelector('.section-content');
+                
+                header.addEventListener('click', () => {
+                    const isActive = section.classList.contains('active');
+                    
+                    // 다른 섹션들 닫기
+                    sections.forEach(s => {
+                        if (s !== section && s.classList.contains('active')) {
+                            s.classList.remove('active');
+                            s.querySelector('.section-content').style.height = '0';
+                        }
+                    });
+                    
+                    // 현재 섹션 토글
+                    section.classList.toggle('active');
+                    
+                    if (!isActive) {
+                        content.style.height = content.scrollHeight + 'px';
+                        // 지도가 있는 섹션이 열릴 때 지도 초기화
+                        if (section.querySelector('#map')) {
+                            setTimeout(initMap, 500);
+                        }
+                    } else {
+                        content.style.height = '0';
+                    }
+                });
+            }
+        });
+    });
     </script>
 </body>
 </html> 
