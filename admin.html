@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 로그인</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #222; color: #fff; font-family: Pretendard, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .login-container { background: #333; padding: 32px 24px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.2); width: 320px; }
+        .login-title { font-size: 1.3rem; margin-bottom: 24px; text-align: center; }
+        .login-form label { display: block; margin-bottom: 8px; font-size: 15px; }
+        .login-form input { width: 100%; padding: 10px; margin-bottom: 16px; border-radius: 6px; border: none; font-size: 15px; }
+        .login-form button { width: 100%; padding: 12px; background: #4a90e2; color: #fff; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+        .login-form button:active { background: #357ab8; }
+        .error-message { color: #ff6b6b; margin-bottom: 12px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="loginContainer">
+        <div class="login-title">관리자 로그인</div>
+        <form class="login-form" id="loginForm">
+            <label for="username">아이디</label>
+            <input type="text" id="username" name="username" required autocomplete="username">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" required autocomplete="current-password">
+            <label><input type="checkbox" id="keepLoggedIn"> 로그인 유지</label>
+            <div class="error-message" id="errorMessage" style="display:none;"></div>
+            <button type="submit">로그인</button>
+        </form>
+    </div>
+    <div id="dashboard" style="display:none;">
+        <div class="login-title">인사말 섹션 관리</div>
+        <form id="greetingForm">
+            <label for="greetingText">인사말 텍스트</label>
+            <textarea id="greetingText" rows="7" style="width:100%;padding:10px;font-size:15px;border-radius:6px;border:none;resize:vertical;"></textarea>
+            <div class="error-message" id="greetingError" style="display:none;"></div>
+            <button type="submit" style="width:100%;padding:12px;background:#4a90e2;color:#fff;border:none;border-radius:6px;font-size:16px;cursor:pointer;margin-top:12px;">저장</button>
+            <div id="greetingSuccess" style="color:#4caf50;margin-top:10px;display:none;text-align:center;">저장되었습니다.</div>
+        </form>
+        <hr style="margin:32px 0 24px 0; border:0; border-top:1px solid #444;">
+        <div class="login-title">현장 사진(갤러리) 관리</div>
+        <form id="galleryUploadForm" enctype="multipart/form-data" style="margin-bottom:16px;">
+            <input type="file" id="galleryFile" accept="image/*" style="margin-bottom:8px;">
+            <button type="submit" style="padding:8px 16px;background:#4a90e2;color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer;">업로드</button>
+            <span id="galleryUploadMsg" style="margin-left:12px;color:#4caf50;display:none;">업로드 완료</span>
+            <span id="galleryUploadErr" style="margin-left:12px;color:#ff6b6b;display:none;">업로드 실패</span>
+        </form>
+        <div id="galleryList" style="display:flex;flex-wrap:wrap;gap:16px;"></div>
+        <hr>
+        <h2>카테고리별 상품카드 관리</h2>
+        <div id="productManager">
+            <form id="productForm">
+                <label>카테고리:
+                    <select id="productCategory" name="category">
+                        <option value="red-pepper">고추가루</option>
+                        <option value="perilla">들깨가루</option>
+                        <option value="processed">공산품</option>
+                    </select>
+                </label><br>
+                <label>상품명: <input type="text" id="productTitle" required></label><br>
+                <label>설명: <input type="text" id="productDesc"></label><br>
+                <div id="priceInputs">
+                    <label>가격(용량/가격):
+                        <input type="text" class="amount" placeholder="예: 500ml" required>
+                        <input type="text" class="price" placeholder="예: 35,000" required>
+                        <button type="button" onclick="addPriceInput()">+</button>
+                    </label>
+                </div>
+                <label>이미지: <input type="file" id="productImage" accept="image/*" required></label><br>
+                <button type="submit">상품 추가</button>
+                <span id="productFormMsg"></span>
+            </form>
+            <hr>
+            <div>
+                <label>카테고리별 상품 목록:
+                    <select id="productListCategory">
+                        <option value="red-pepper">고추가루</option>
+                        <option value="perilla">들깨가루</option>
+                        <option value="processed">공산품</option>
+                    </select>
+                </label>
+                <button onclick="loadProductList()">새로고침</button>
+            </div>
+            <div id="productList" style="max-height: 500px; overflow-y: auto;"></div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const keepLoggedIn = document.getElementById('keepLoggedIn').checked;
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'none';
+
+            try {
+                const res = await fetch('http://localhost:5000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, keepLoggedIn })
+                });
+                const data = await res.json();
+                console.log('서버 응답:', data); // 응답 결과를 콘솔에 출력
+                if (res.ok && data.success) {
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    afterLogin();
+                } else {
+                    errorMessage.textContent = data.message || '로그인에 실패했습니다.';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (err) {
+                console.error('로그인 요청 중 오류:', err);
+                errorMessage.textContent = '서버와 통신 중 오류가 발생했습니다.';
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        async function loadGreeting() {
+            const greetingText = document.getElementById('greetingText');
+            const greetingError = document.getElementById('greetingError');
+            greetingError.style.display = 'none';
+            try {
+                const res = await fetch('http://localhost:5000/api/greeting');
+                const data = await res.json();
+                greetingText.value = data.greeting || '';
+            } catch (err) {
+                greetingError.textContent = '인사말을 불러오지 못했습니다.';
+                greetingError.style.display = 'block';
+            }
+        }
+
+        document.getElementById('greetingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const greetingText = document.getElementById('greetingText').value.trim();
+            const greetingError = document.getElementById('greetingError');
+            const greetingSuccess = document.getElementById('greetingSuccess');
+            greetingError.style.display = 'none';
+            greetingSuccess.style.display = 'none';
+            try {
+                const res = await fetch('http://localhost:5000/api/greeting', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ greeting: greetingText })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    greetingSuccess.style.display = 'block';
+                    setTimeout(() => { greetingSuccess.style.display = 'none'; }, 2000);
+                } else {
+                    greetingError.textContent = data.message || '저장에 실패했습니다.';
+                    greetingError.style.display = 'block';
+                }
+            } catch (err) {
+                greetingError.textContent = '서버와 통신 중 오류가 발생했습니다.';
+                greetingError.style.display = 'block';
+            }
+        });
+
+        // 갤러리 이미지 목록 불러오기
+        async function loadGalleryList() {
+            const galleryList = document.getElementById('galleryList');
+            galleryList.innerHTML = '<span style="color:#aaa;">로딩 중...</span>';
+            try {
+                const res = await fetch('/api/gallery/list');
+                const data = await res.json();
+                galleryList.innerHTML = '';
+                if (data.images && data.images.length > 0) {
+                    data.images.forEach(filename => {
+                        const item = document.createElement('div');
+                        item.style.position = 'relative';
+                        item.style.width = '120px';
+                        item.style.height = '90px';
+                        item.style.border = '1px solid #444';
+                        item.style.borderRadius = '6px';
+                        item.style.overflow = 'hidden';
+                        item.style.background = '#222';
+                        const img = document.createElement('img');
+                        img.src = `/images/gallery/${filename}`;
+                        img.alt = filename;
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        const delBtn = document.createElement('button');
+                        delBtn.textContent = '삭제';
+                        delBtn.style.position = 'absolute';
+                        delBtn.style.right = '6px';
+                        delBtn.style.top = '6px';
+                        delBtn.style.background = '#ff6b6b';
+                        delBtn.style.color = '#fff';
+                        delBtn.style.border = 'none';
+                        delBtn.style.borderRadius = '4px';
+                        delBtn.style.fontSize = '12px';
+                        delBtn.style.padding = '2px 8px';
+                        delBtn.style.cursor = 'pointer';
+                        delBtn.onclick = async function() {
+                            if (!confirm('정말 삭제하시겠습니까?')) return;
+                            const res = await fetch('/api/gallery/delete', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include',
+                                body: JSON.stringify({ filename })
+                            });
+                            const data = await res.json();
+                            if (res.ok && data.success) {
+                                loadGalleryList();
+                            } else {
+                                alert(data.message || '삭제 실패');
+                            }
+                        };
+                        item.appendChild(img);
+                        item.appendChild(delBtn);
+                        galleryList.appendChild(item);
+                    });
+                } else {
+                    galleryList.innerHTML = '<span style="color:#aaa;">이미지가 없습니다.</span>';
+                }
+            } catch (err) {
+                galleryList.innerHTML = '<span style="color:#ff6b6b;">목록 불러오기 실패</span>';
+            }
+        }
+
+        document.getElementById('galleryUploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('galleryFile');
+            const msg = document.getElementById('galleryUploadMsg');
+            const err = document.getElementById('galleryUploadErr');
+            msg.style.display = 'none';
+            err.style.display = 'none';
+            if (!fileInput.files || fileInput.files.length === 0) {
+                err.textContent = '파일을 선택하세요.';
+                err.style.display = 'inline';
+                return;
+            }
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            try {
+                const res = await fetch('/api/gallery/upload', {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    msg.textContent = '업로드 완료';
+                    msg.style.display = 'inline';
+                    fileInput.value = '';
+                    loadGalleryList();
+                } else {
+                    err.textContent = data.message || '업로드 실패';
+                    err.style.display = 'inline';
+                }
+            } catch (error) {
+                err.textContent = '서버 오류';
+                err.style.display = 'inline';
+            }
+        });
+
+        // 로그인 성공 시 갤러리 목록도 불러오기
+        async function afterLogin() {
+            loadGreeting();
+            loadGalleryList();
+        }
+
+        function addPriceInput() {
+            const div = document.createElement('div');
+            div.innerHTML = '<input type="text" class="amount" placeholder="예: 1000ml" required> <input type="text" class="price" placeholder="예: 60,000" required> <button type="button" onclick="this.parentNode.remove()">-</button>';
+            document.getElementById('priceInputs').appendChild(div);
+        }
+
+        window.addEventListener('DOMContentLoaded', loadProductList);
+
+        async function loadProductList() {
+            const category = document.getElementById('productListCategory').value;
+            const res = await fetch(`/api/products/${category}`);
+            const data = await res.json();
+            console.log('상품 리스트 응답:', data); // 서버에서 받아온 데이터 콘솔 출력
+            const listDiv = document.getElementById('productList');
+            if (!data.success) {
+                listDiv.textContent = data.message || '불러오기 실패';
+                return;
+            }
+            if (data.products.length === 0) {
+                listDiv.textContent = '상품이 없습니다.';
+                return;
+            }
+            listDiv.innerHTML = '';
+            data.products.forEach(product => {
+                const card = document.createElement('div');
+                card.style.border = '1px solid #ccc';
+                card.style.margin = '8px 0';
+                card.style.padding = '8px';
+                card.innerHTML = `
+                    <img src="/${product.image}" alt="상품이미지" style="max-width:100px;max-height:100px;vertical-align:middle;"> <b>${product.title}</b><br>
+                    <span>${product.description || ''}</span><br>
+                    <ul style="margin:0;padding-left:20px;">
+                        ${product.prices.map(p => `<li>${p.amount} : ${p.price}원</li>`).join('')}
+                    </ul>
+                    <button onclick="deleteProduct('${category}','${product.id}')">삭제</button>
+                    <button onclick="showEditForm('${category}','${product.id}')">수정</button>
+                    <div class="edit-form" id="editForm-${product.id}" style="display:none;margin-top:8px;"></div>
+                `;
+                listDiv.appendChild(card);
+            });
+        }
+
+        async function deleteProduct(category, id) {
+            // ... 기존 코드 ...
+        }
+
+        window.showEditForm = function(category, id) {
+            const listDiv = document.getElementById('productList');
+            const cardDiv = Array.from(listDiv.children).find(div => div.querySelector(`button[onclick*="${id}"]`));
+            const editFormDiv = document.getElementById(`editForm-${id}`);
+            if (!editFormDiv) return;
+            // 이미 열려있으면 닫기
+            if (editFormDiv.style.display === 'block') {
+                editFormDiv.style.display = 'none';
+                editFormDiv.innerHTML = '';
+                return;
+            }
+            // 상품 데이터 찾기
+            fetch(`/api/products/${category}`)
+                .then(res => res.json())
+                .then(data => {
+                    const product = data.products.find(p => p.id === id);
+                    if (!product) return;
+                    // 가격 입력칸 생성
+                    let pricesHtml = '';
+                    product.prices.forEach((p, i) => {
+                        pricesHtml += `<div><input type='text' class='edit-amount' value='${p.amount}' placeholder='용량'> <input type='text' class='edit-price' value='${p.price}' placeholder='가격'> <button type='button' onclick='this.parentNode.remove()'>-</button></div>`;
+                    });
+                    editFormDiv.innerHTML = `
+                        <form onsubmit="return false;" enctype="multipart/form-data">
+                            <label>상품명: <input type="text" class="edit-title" value="${product.title}" required></label><br>
+                            <label>설명: <input type="text" class="edit-desc" value="${product.description || ''}"></label><br>
+                            <div class="edit-prices">
+                                <label>가격(용량/가격):
+                                    ${pricesHtml}
+                                    <button type="button" onclick="addEditPriceInput(this)">+</button>
+                                </label>
+                            </div>
+                            <label>이미지: <input type="file" class="edit-image" accept="image/*"></label><br>
+                            <button type="button" onclick="submitEditForm('${category}','${id}', this)">저장</button>
+                            <button type="button" onclick="window.showEditForm('${category}','${id}')">취소</button>
+                            <span class="edit-msg" style="margin-left:8px;color:#4caf50;"></span>
+                        </form>
+                    `;
+                    editFormDiv.style.display = 'block';
+                });
+        };
+
+        window.addEditPriceInput = function(btn) {
+            const div = document.createElement('div');
+            div.innerHTML = `<input type='text' class='edit-amount' placeholder='용량'> <input type='text' class='edit-price' placeholder='가격'> <button type='button' onclick='this.parentNode.remove()'>-</button>`;
+            btn.parentNode.parentNode.appendChild(div);
+        };
+
+        window.submitEditForm = async function(category, id, btn) {
+            const form = btn.closest('form');
+            const title = form.querySelector('.edit-title').value.trim();
+            const description = form.querySelector('.edit-desc').value.trim();
+            const image = form.querySelector('.edit-image').files[0];
+            const priceDivs = form.querySelectorAll('.edit-prices > div');
+            const prices = [];
+            priceDivs.forEach(div => {
+                const amount = div.querySelector('.edit-amount')?.value.trim();
+                const price = div.querySelector('.edit-price')?.value.trim();
+                if (amount && price) prices.push({amount, price});
+            });
+            if (!title || prices.length === 0) {
+                form.querySelector('.edit-msg').textContent = '필수 정보를 입력하세요.';
+                return;
+            }
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('prices', JSON.stringify(prices));
+            if (image) formData.append('image', image);
+            try {
+                const res = await fetch(`/api/products/${category}`, {
+                    method: 'PATCH',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const data = await res.json();
+                if (data.success) {
+                    form.querySelector('.edit-msg').textContent = '저장되었습니다!';
+                    setTimeout(() => { window.showEditForm(category, id); loadProductList(); }, 1000);
+                } else {
+                    form.querySelector('.edit-msg').textContent = data.message || '오류 발생';
+                }
+            } catch (e) {
+                form.querySelector('.edit-msg').textContent = '서버 오류';
+            }
+        };
+
+        window.loadProductList = loadProductList;
+        window.deleteProduct = deleteProduct;
+        window.addPriceInput = addPriceInput;
+
+        document.getElementById('productForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const category = document.getElementById('productCategory').value;
+            const title = document.getElementById('productTitle').value.trim();
+            const description = document.getElementById('productDesc').value.trim();
+            const image = document.getElementById('productImage').files[0];
+            const priceDivs = document.querySelectorAll('#priceInputs > div, #priceInputs > label');
+            const prices = [];
+            priceDivs.forEach(div => {
+                const amount = div.querySelector('.amount')?.value.trim();
+                const price = div.querySelector('.price')?.value.trim();
+                if (amount && price) prices.push({amount, price});
+            });
+            if (!title || !image || prices.length === 0) {
+                document.getElementById('productFormMsg').textContent = '모든 필수 정보를 입력하세요.';
+                return;
+            }
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('prices', JSON.stringify(prices));
+            formData.append('image', image);
+            try {
+                const res = await fetch(`/api/products/${category}`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                if (res.status === 401 || res.status === 403) {
+                    document.getElementById('productFormMsg').textContent = '로그인 세션이 만료되었습니다. 다시 로그인해 주세요.';
+                    return;
+                }
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('productFormMsg').textContent = '상품이 추가되었습니다!';
+                    this.reset();
+                    document.getElementById('priceInputs').innerHTML = `<label>가격(용량/가격): <input type="text" class="amount" placeholder="예: 500ml" required> <input type="text" class="price" placeholder="예: 35,000" required> <button type="button" onclick="addPriceInput()">+</button></label>`;
+                    loadProductList();
+                } else {
+                    document.getElementById('productFormMsg').textContent = data.message || '오류 발생';
+                }
+            } catch (e) {
+                document.getElementById('productFormMsg').textContent = '서버 오류';
+            }
+        };
+    </script>
+</body>
+</html> 

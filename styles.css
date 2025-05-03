@@ -700,7 +700,6 @@ main {
     height: 250px;
     border: none;
     border-radius: 8px;
-    margin-bottom: 20px;
 }
 
 .menu-section.active .icon-arrow {
@@ -722,7 +721,6 @@ main {
 
 /* 갤러리 스타일 */
 .photo-gallery {
-    height: 310px;
     padding: 0 40px;
     overflow: hidden;
 }
