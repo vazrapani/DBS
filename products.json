@@ -1,41 +1,9 @@
 {
   "red-pepper": [
     {
-      "id": "red1",
-      "title": "고추가루 상품 1",
       "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다. 한정수량이니 서두르세요.",
-      "prices": [
-        {
-          "amount": "500ml",
-          "price": "35,000"
-        },
-        {
-          "amount": "1000ml",
-          "price": "60,000"
-        }
-      ],
-      "image": "images/img_product_red_01.png"
-    },
-    {
-      "id": "red2",
-      "title": "고추가루 상품 2",
-      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다. 한정수량이니 서두르세요.",
-      "prices": [
-        {
-          "amount": "500ml",
-          "price": "35,000"
-        },
-        {
-          "amount": "1000ml",
-          "price": "60,000"
-        }
-      ],
-      "image": "images/img_product_red_02.png"
-    },
-    {
       "id": "red3",
-      "title": "고추가루 상품 3",
-      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다. 한정수량이니 서두르세요.",
+      "image": "images/img_product_red_03.png",
       "prices": [
         {
           "amount": "500ml",
@@ -46,12 +14,44 @@
           "price": "60,000"
         }
       ],
-      "image": "images/img_product_red_03.png"
+      "title": "고추가루 상품 3"
     },
     {
+      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다. 한정수량이니 서두르세요.",
+      "id": "red2",
+      "image": "images/img_product_red_02.png",
+      "prices": [
+        {
+          "amount": "500ml",
+          "price": "35,000"
+        },
+        {
+          "amount": "1000ml",
+          "price": "60,000"
+        }
+      ],
+      "title": "고추가루 상품 2"
+    },
+    {
+      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다. 한정수량이니 서두르세요.",
+      "id": "red1",
+      "image": "images/img_product_red_01.png",
+      "prices": [
+        {
+          "amount": "500ml",
+          "price": "35,000"
+        },
+        {
+          "amount": "1000ml",
+          "price": "60,000"
+        }
+      ],
+      "title": "고추가루 상품 1"
+    },
+    {
+      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다. 한정수량이니 서두르세요.",
       "id": "red4",
-      "title": "고추가루 상품 4",
-      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다. 한정수량이니 서두르세요.",
+      "image": "images/img_product_red_04.png",
       "prices": [
         {
           "amount": "500ml",
@@ -62,35 +62,35 @@
           "price": "60,000"
         }
       ],
-      "image": "images/img_product_red_04.png"
+      "title": "고추가루 상품 4"
     },
     {
-      "id": "red5",
-      "title": "고추가루 상품 5",
-      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다. 한정수량이니 서두르세요.",
-      "prices": [
-        {
-          "amount": "500ml",
-          "price": "35,000"
-        },
-        {
-          "amount": "1000ml",
-          "price": "60,000"
-        }
-      ],
-      "image": "images/img_product_red_05.png"
-    },
-    {
-      "id": "7f4c438e-3aa8-404b-b9d6-7a004f684f1a",
-      "title": "22",
       "description": "11",
+      "id": "7f4c438e-3aa8-404b-b9d6-7a004f684f1a",
+      "image": "images/products/7f4c438e-3aa8-404b-b9d6-7a004f684f1a.png",
       "prices": [
         {
           "amount": "22",
           "price": "22"
         }
       ],
-      "image": "images/products/7f4c438e-3aa8-404b-b9d6-7a004f684f1a.png"
+      "title": "22"
+    },
+    {
+      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다. 한정수량이니 서두르세요.",
+      "id": "red5",
+      "image": "images/img_product_red_05.png",
+      "prices": [
+        {
+          "amount": "500ml",
+          "price": "35,000"
+        },
+        {
+          "amount": "1000ml",
+          "price": "60,000"
+        }
+      ],
+      "title": "고추가루 상품 5"
     }
   ],
   "perilla": [

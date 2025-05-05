@@ -98,7 +98,11 @@ main {
     scroll-snap-align: center;
     scroll-snap-stop: always;
     margin-bottom: 16px;
-    user-select: none; /* 텍스트 선택 방지 */
+    user-select: none;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+    will-change: transform;
+    touch-action: pan-y pinch-zoom;
 }
 
 /* 고추가루 카테고리 카드 배경 */
@@ -372,21 +376,23 @@ main {
     flex-direction: column;
     gap: 12px;
     z-index: 1000;
+    pointer-events: none;
 }
 
 .nav-dot {
     width: 8px;
     height: 8px;
-    background-color: rgba(239, 246, 238, 0.1);
+    background-color: rgba(239, 246, 238, 0.3);
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
+    pointer-events: auto;
 }
 
 .nav-dot.active {
     height: 16px;
     border-radius: 12px;
-    background-color: #EFF6EE;
+    background-color: rgba(239, 246, 238, 0.9);
 }
 
 /* 메뉴 영역 스타일 */
@@ -406,6 +412,7 @@ main {
     flex: 1;
     max-width: 100px;
     text-align: center;
+    transition: all 0.3s ease;
 }
 
 .menu-link {
@@ -585,10 +592,9 @@ main {
 }
 
 .product-card.dragging {
-    transition: transform 0.3s ease;
+    transition: none;
 }
 
-/* 드래그 방향 표시를 위한 스타일 */
 .product-card.drag-left {
     transform: translateX(-50px);
 }
@@ -833,4 +839,16 @@ main {
     margin: 0 !important;
     min-width: auto !important;
     padding: 0 !important;
+}
+
+/* 인사말 스타일 */
+.greeting-container {
+    padding: 0 40px 32px;
+}
+
+.greeting-text {
+    color: rgba(246, 246, 239, 0.8);
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-line;
 } 

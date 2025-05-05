@@ -13,10 +13,20 @@
         .login-form button { width: 100%; padding: 12px; background: #4a90e2; color: #fff; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
         .login-form button:active { background: #357ab8; }
         .error-message { color: #ff6b6b; margin-bottom: 12px; text-align: center; }
+        .product-anim {
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            will-change: transform;
+        }
+        .card-moved {
+            background: #fffbe6 !important;
+            box-shadow: 0 0 12px 4px #ffe066;
+            transition: background 1s, box-shadow 1s;
+        }
     </style>
 </head>
 <body>
-    <div class="login-container" id="loginContainer">
+    <!-- 로그인 폼 숨김 처리 -->
+    <div class="login-container" id="loginContainer" style="display:none;">
         <div class="login-title">관리자 로그인</div>
         <form class="login-form" id="loginForm">
             <label for="username">아이디</label>
@@ -28,60 +38,74 @@
             <button type="submit">로그인</button>
         </form>
     </div>
-    <div id="dashboard" style="display:none;">
-        <div class="login-title">인사말 섹션 관리</div>
-        <form id="greetingForm">
-            <label for="greetingText">인사말 텍스트</label>
-            <textarea id="greetingText" rows="7" style="width:100%;padding:10px;font-size:15px;border-radius:6px;border:none;resize:vertical;"></textarea>
-            <div class="error-message" id="greetingError" style="display:none;"></div>
-            <button type="submit" style="width:100%;padding:12px;background:#4a90e2;color:#fff;border:none;border-radius:6px;font-size:16px;cursor:pointer;margin-top:12px;">저장</button>
-            <div id="greetingSuccess" style="color:#4caf50;margin-top:10px;display:none;text-align:center;">저장되었습니다.</div>
-        </form>
-        <hr style="margin:32px 0 24px 0; border:0; border-top:1px solid #444;">
-        <div class="login-title">현장 사진(갤러리) 관리</div>
-        <form id="galleryUploadForm" enctype="multipart/form-data" style="margin-bottom:16px;">
-            <input type="file" id="galleryFile" accept="image/*" style="margin-bottom:8px;">
-            <button type="submit" style="padding:8px 16px;background:#4a90e2;color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer;">업로드</button>
-            <span id="galleryUploadMsg" style="margin-left:12px;color:#4caf50;display:none;">업로드 완료</span>
-            <span id="galleryUploadErr" style="margin-left:12px;color:#ff6b6b;display:none;">업로드 실패</span>
-        </form>
-        <div id="galleryList" style="display:flex;flex-wrap:wrap;gap:16px;"></div>
-        <hr>
-        <h2>카테고리별 상품카드 관리</h2>
-        <div id="productManager">
-            <form id="productForm">
-                <label>카테고리:
-                    <select id="productCategory" name="category">
-                        <option value="red-pepper">고추가루</option>
-                        <option value="perilla">들깨가루</option>
-                        <option value="processed">공산품</option>
-                    </select>
-                </label><br>
-                <label>상품명: <input type="text" id="productTitle" required></label><br>
-                <label>설명: <input type="text" id="productDesc"></label><br>
-                <div id="priceInputs">
-                    <label>가격(용량/가격):
-                        <input type="text" class="amount" placeholder="예: 500ml" required>
-                        <input type="text" class="price" placeholder="예: 35,000" required>
-                        <button type="button" onclick="addPriceInput()">+</button>
-                    </label>
-                </div>
-                <label>이미지: <input type="file" id="productImage" accept="image/*" required></label><br>
-                <button type="submit">상품 추가</button>
-                <span id="productFormMsg"></span>
-            </form>
-            <hr>
-            <div>
-                <label>카테고리별 상품 목록:
-                    <select id="productListCategory">
-                        <option value="red-pepper">고추가루</option>
-                        <option value="perilla">들깨가루</option>
-                        <option value="processed">공산품</option>
-                    </select>
-                </label>
-                <button onclick="loadProductList()">새로고침</button>
+    <!-- 관리자 대시보드 항상 보이게 -->
+    <div id="dashboard" style="display:block;">
+        <div id="adminTabs" style="display:flex;gap:0;background:#222;border-radius:8px 8px 0 0;overflow:hidden;margin-bottom:24px;">
+            <button class="tab-btn active" data-tab="product" style="flex:1;padding:16px 0;background:#333;color:#fff;border:none;font-size:17px;cursor:pointer;outline:none;border-right:1px solid #444;">상품카드</button>
+            <button class="tab-btn" data-tab="greeting" style="flex:1;padding:16px 0;background:#333;color:#fff;border:none;font-size:17px;cursor:pointer;outline:none;border-right:1px solid #444;">인사말</button>
+            <button class="tab-btn" data-tab="gallery" style="flex:1;padding:16px 0;background:#333;color:#fff;border:none;font-size:17px;cursor:pointer;outline:none;">현장사진</button>
+        </div>
+        <div id="tab-product" class="admin-tab-section">
+            <h2>카테고리별 상품카드 관리</h2>
+            <div style="text-align:right;margin-bottom:8px;">
+                <button id="saveOrderBtn" style="padding:6px 18px;background:#4a90e2;color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer;">순서 저장</button>
+                <span id="saveOrderMsg" style="margin-left:12px;color:#4caf50;display:none;"></span>
             </div>
-            <div id="productList" style="max-height: 500px; overflow-y: auto;"></div>
+            <div id="productManager">
+                <form id="productForm">
+                    <label>카테고리:
+                        <select id="productCategory" name="category">
+                            <option value="red-pepper">고추가루</option>
+                            <option value="perilla">들깨가루</option>
+                            <option value="processed">공산품</option>
+                        </select>
+                    </label><br>
+                    <label>상품명: <input type="text" id="productTitle" required></label><br>
+                    <label>설명: <input type="text" id="productDesc"></label><br>
+                    <div id="priceInputs">
+                        <label>가격(용량/가격):
+                            <input type="text" class="amount" placeholder="예: 500ml" required>
+                            <input type="text" class="price" placeholder="예: 35,000" required>
+                            <button type="button" onclick="addPriceInput()">+</button>
+                        </label>
+                    </div>
+                    <label>이미지: <input type="file" id="productImage" accept="image/*" required></label><br>
+                    <button type="submit">상품 추가</button>
+                    <span id="productFormMsg"></span>
+                </form>
+                <hr>
+                <div>
+                    <label>카테고리별 상품 목록:
+                        <select id="productListCategory">
+                            <option value="red-pepper">고추가루</option>
+                            <option value="perilla">들깨가루</option>
+                            <option value="processed">공산품</option>
+                        </select>
+                    </label>
+                    <button onclick="loadProductList()">새로고침</button>
+                </div>
+                <div id="productList" style="max-height: 500px; overflow-y: auto;"></div>
+            </div>
+        </div>
+        <div id="tab-greeting" class="admin-tab-section" style="display:none;">
+            <div class="login-title">인사말 섹션 관리</div>
+            <form id="greetingForm">
+                <label for="greetingText">인사말 텍스트</label>
+                <textarea id="greetingText" rows="7" style="width:100%;padding:10px;font-size:15px;border-radius:6px;border:none;resize:vertical;"></textarea>
+                <div class="error-message" id="greetingError" style="display:none;"></div>
+                <button type="submit" style="width:100%;padding:12px;background:#4a90e2;color:#fff;border:none;border-radius:6px;font-size:16px;cursor:pointer;margin-top:12px;">저장</button>
+                <div id="greetingSuccess" style="color:#4caf50;margin-top:10px;display:none;text-align:center;">저장되었습니다.</div>
+            </form>
+        </div>
+        <div id="tab-gallery" class="admin-tab-section" style="display:none;">
+            <div class="login-title">현장 사진(갤러리) 관리</div>
+            <form id="galleryUploadForm" enctype="multipart/form-data" style="margin-bottom:16px;">
+                <input type="file" id="galleryFile" accept="image/*" style="margin-bottom:8px;">
+                <button type="submit" style="padding:8px 16px;background:#4a90e2;color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer;">업로드</button>
+                <span id="galleryUploadMsg" style="margin-left:12px;color:#4caf50;display:none;">업로드 완료</span>
+                <span id="galleryUploadErr" style="margin-left:12px;color:#ff6b6b;display:none;">업로드 실패</span>
+            </form>
+            <div id="galleryList" style="display:flex;flex-wrap:wrap;gap:16px;"></div>
         </div>
     </div>
     <script>
@@ -97,7 +121,8 @@
                 const res = await fetch('http://localhost:5000/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, keepLoggedIn })
+                    body: JSON.stringify({ username, password, keepLoggedIn }),
+                    credentials: 'include'
                 });
                 const data = await res.json();
                 console.log('서버 응답:', data); // 응답 결과를 콘솔에 출력
@@ -120,13 +145,19 @@
             const greetingText = document.getElementById('greetingText');
             const greetingError = document.getElementById('greetingError');
             greetingError.style.display = 'none';
+            greetingText.value = '';
+            greetingText.placeholder = '로딩 중...';
             try {
-                const res = await fetch('http://localhost:5000/api/greeting');
+                const res = await fetch('http://localhost:5000/api/greeting', {
+                    credentials: 'include'
+                });
                 const data = await res.json();
                 greetingText.value = data.greeting || '';
+                greetingText.placeholder = '';
             } catch (err) {
                 greetingError.textContent = '인사말을 불러오지 못했습니다.';
                 greetingError.style.display = 'block';
+                greetingText.placeholder = '';
             }
         }
 
@@ -163,7 +194,9 @@
             const galleryList = document.getElementById('galleryList');
             galleryList.innerHTML = '<span style="color:#aaa;">로딩 중...</span>';
             try {
-                const res = await fetch('/api/gallery/list');
+                const res = await fetch('/api/gallery/list', {
+                    credentials: 'include'
+                });
                 const data = await res.json();
                 galleryList.innerHTML = '';
                 if (data.images && data.images.length > 0) {
@@ -273,10 +306,12 @@
 
         async function loadProductList() {
             const category = document.getElementById('productListCategory').value;
-            const res = await fetch(`/api/products/${category}`);
-            const data = await res.json();
-            console.log('상품 리스트 응답:', data); // 서버에서 받아온 데이터 콘솔 출력
             const listDiv = document.getElementById('productList');
+            listDiv.innerHTML = '<span style="color:#aaa;">로딩 중...</span>';
+            const res = await fetch(`/api/products/${category}`, {
+                credentials: 'include'
+            });
+            const data = await res.json();
             if (!data.success) {
                 listDiv.textContent = data.message || '불러오기 실패';
                 return;
@@ -286,7 +321,7 @@
                 return;
             }
             listDiv.innerHTML = '';
-            data.products.forEach(product => {
+            data.products.forEach((product, idx) => {
                 const card = document.createElement('div');
                 card.style.border = '1px solid #ccc';
                 card.style.margin = '8px 0';
@@ -297,16 +332,84 @@
                     <ul style="margin:0;padding-left:20px;">
                         ${product.prices.map(p => `<li>${p.amount} : ${p.price}원</li>`).join('')}
                     </ul>
+                    <label>카테고리: <select class="category-select" data-idx="${idx}" data-id="${product.id}">
+                        <option value="red-pepper" ${category==='red-pepper'?'selected':''}>고추가루</option>
+                        <option value="perilla" ${category==='perilla'?'selected':''}>들깨가루</option>
+                        <option value="processed" ${category==='processed'?'selected':''}>공산품</option>
+                    </select></label>
+                    <button class="move-up" data-idx="${idx}">▲</button>
+                    <button class="move-down" data-idx="${idx}">▼</button>
                     <button onclick="deleteProduct('${category}','${product.id}')">삭제</button>
                     <button onclick="showEditForm('${category}','${product.id}')">수정</button>
                     <div class="edit-form" id="editForm-${product.id}" style="display:none;margin-top:8px;"></div>
                 `;
                 listDiv.appendChild(card);
             });
+            bindMoveButtons();
+        }
+
+        async function reorderProduct(category, fromIdx, toIdx) {
+            const listDiv = document.getElementById('productList');
+            const cards = Array.from(listDiv.children);
+            if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
+            // FLIP 애니메이션 적용 및 DOM에서 카드만 이동
+            flipAnimate(listDiv, fromIdx, toIdx);
+            // 서버에 순서 저장 (비동기, UI는 이미 바뀐 상태)
+            const res = await fetch(`/api/products/${category}`, {
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (!data.success) return;
+            const products = data.products;
+            const moved = products.splice(fromIdx, 1)[0];
+            products.splice(toIdx, 0, moved);
+            try {
+                const saveRes = await fetch(`/api/products/${category}/reorder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ products })
+                });
+                const saveData = await saveRes.json();
+                if (!saveData.success) {
+                    alert('순서 저장에 실패했습니다. 새로고침 후 다시 시도해 주세요.');
+                }
+            } catch (e) {
+                alert('서버와 통신 중 오류가 발생했습니다.');
+            }
+            // 전체 목록을 다시 그리지 않음, UI는 즉시 반영
+        }
+
+        async function changeProductCategory(fromCategory, id, toCategory) {
+            // 서버에 카테고리 이동 요청
+            await fetch(`/api/products/move`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ id, fromCategory, toCategory })
+            });
+            loadProductList();
         }
 
         async function deleteProduct(category, id) {
-            // ... 기존 코드 ...
+            if (!confirm('정말 삭제하시겠습니까?')) return;
+            try {
+                const res = await fetch(`/api/products/${category}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert('삭제되었습니다.');
+                    loadProductList();
+                } else {
+                    alert(data.message || '삭제 실패');
+                }
+            } catch (e) {
+                alert('서버 오류');
+            }
         }
 
         window.showEditForm = function(category, id) {
@@ -321,7 +424,9 @@
                 return;
             }
             // 상품 데이터 찾기
-            fetch(`/api/products/${category}`)
+            fetch(`/api/products/${category}`, {
+                credentials: 'include'
+            })
                 .then(res => res.json())
                 .then(data => {
                     const product = data.products.find(p => p.id === id);
@@ -444,6 +549,201 @@
                 }
             } catch (e) {
                 document.getElementById('productFormMsg').textContent = '서버 오류';
+            }
+        };
+
+        // FLIP 애니메이션 함수
+        function flipAnimate(listDiv, fromIdx, toIdx) {
+            const cards = Array.from(listDiv.children);
+            if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
+            // 1. First: 각 카드의 현재 위치 저장
+            const firstRects = cards.map(card => card.getBoundingClientRect());
+            // 2. DOM 재배치(순서 변경)
+            if (fromIdx < toIdx) {
+                listDiv.insertBefore(cards[fromIdx], cards[toIdx].nextSibling);
+            } else {
+                listDiv.insertBefore(cards[fromIdx], cards[toIdx]);
+            }
+            // 3. Last: 재배치 후 위치 저장
+            const newCards = Array.from(listDiv.children);
+            const lastRects = newCards.map(card => card.getBoundingClientRect());
+            // 4. Invert: 위치 차이만큼 transform 적용
+            newCards.forEach((card, i) => {
+                const dy = firstRects[i]?.top - lastRects[i]?.top;
+                if (dy) {
+                    card.style.transition = 'none';
+                    card.style.transform = `translateY(${dy}px)`;
+                }
+            });
+            // 5. Play: 트랜지션 적용 후 transform 해제
+            requestAnimationFrame(() => {
+                newCards.forEach((card) => {
+                    card.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+                    card.style.transform = '';
+                });
+            });
+            // 6. 트랜지션 끝나면 transition 속성 제거
+            setTimeout(() => {
+                newCards.forEach(card => {
+                    card.style.transition = '';
+                });
+            }, 800);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabSections = document.querySelectorAll('.admin-tab-section');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const tab = this.getAttribute('data-tab');
+                    tabSections.forEach(sec => sec.style.display = 'none');
+                    document.getElementById('tab-' + tab).style.display = 'block';
+                });
+            });
+            // 기본값: 상품카드 탭
+            document.querySelector('.tab-btn[data-tab="product"]').classList.add('active');
+            document.getElementById('tab-product').style.display = 'block';
+            loadGalleryList();
+            loadProductList();
+            loadGreeting();
+            // 탭 클릭 시 인사말 탭이면 loadGreeting() 실행
+            document.querySelector('.tab-btn[data-tab="greeting"]').addEventListener('click', loadGreeting);
+        });
+
+        // ▲/▼ 버튼 클릭 시 화면에서만 DOM 이동(서버 저장 X)
+        function moveCard(listDiv, fromIdx, toIdx) {
+            const cards = Array.from(listDiv.children);
+            if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
+            // 이동 전 위치 저장 (fromIdx가 이동할 카드)
+            const prevCard = cards[fromIdx];
+            const prevRect = prevCard ? prevCard.getBoundingClientRect() : null;
+            // FLIP 애니메이션: 두 카드 모두에 적용
+            const firstRects = cards.map(card => card.getBoundingClientRect());
+            // DOM에서 카드 이동
+            if (fromIdx < toIdx) {
+                listDiv.insertBefore(cards[fromIdx], cards[toIdx].nextSibling);
+            } else {
+                listDiv.insertBefore(cards[fromIdx], cards[toIdx]);
+            }
+            const newCards = Array.from(listDiv.children);
+            const lastRects = newCards.map(card => card.getBoundingClientRect());
+            // 이동한 카드와 자리를 내준 카드 모두에 transform 적용
+            const movedIdx = toIdx;
+            const affectedIdx = fromIdx < toIdx ? toIdx - 1 : toIdx + 1;
+            // 내가 움직인 카드: y축 이동만
+            const movedCardAfter = newCards[movedIdx];
+            if (movedCardAfter) {
+                const dy = firstRects[cards.indexOf(movedCardAfter)]?.top - lastRects[movedIdx]?.top;
+                if (dy) {
+                    movedCardAfter.style.transition = 'none';
+                    movedCardAfter.style.transform = `translateY(${dy}px)`;
+                }
+            }
+            // 자리를 내준 카드: y축 이동 + scale(0.9)
+            const affectedCard = newCards[affectedIdx];
+            if (affectedCard) {
+                const dy2 = firstRects[cards.indexOf(affectedCard)]?.top - lastRects[affectedIdx]?.top;
+                if (dy2) {
+                    affectedCard.style.transition = 'none';
+                    affectedCard.style.transform = `translateY(${dy2}px) scale(0.9)`;
+                }
+            }
+            // 트랜지션 적용 후 transform 해제
+            requestAnimationFrame(() => {
+                if (movedCardAfter) {
+                    movedCardAfter.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+                    movedCardAfter.style.transform = '';
+                }
+                if (affectedCard) {
+                    affectedCard.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+                    affectedCard.style.transform = '';
+                }
+            });
+            setTimeout(() => {
+                if (movedCardAfter) movedCardAfter.style.transition = '';
+                if (affectedCard) affectedCard.style.transition = '';
+                // 이동 전후 위치 차이만큼 스크롤 보정 (fromIdx → toIdx)
+                const newCardsAfter = Array.from(listDiv.children);
+                const movedCardNow = newCardsAfter[toIdx];
+                if (movedCardNow && prevRect) {
+                    const newRect = movedCardNow.getBoundingClientRect();
+                    const deltaY = newRect.top - prevRect.top;
+                    listDiv.scrollTop += deltaY;
+                }
+            }, 500);
+            // data-idx 등 인덱스 재설정
+            updateCardIdx(listDiv);
+        }
+        // data-idx 재설정 함수
+        function updateCardIdx(listDiv) {
+            Array.from(listDiv.children).forEach((card, idx) => {
+                card.querySelectorAll('[data-idx]').forEach(el => {
+                    el.setAttribute('data-idx', idx);
+                });
+            });
+        }
+        // 상품카드 목록 렌더 후 moveCard로 동작하도록 이벤트 바인딩
+        function bindMoveButtons() {
+            const listDiv = document.getElementById('productList');
+            listDiv.querySelectorAll('.move-up').forEach(btn => {
+                btn.onclick = function() {
+                    const idx = parseInt(this.dataset.idx);
+                    moveCard(listDiv, idx, idx-1);
+                };
+            });
+            listDiv.querySelectorAll('.move-down').forEach(btn => {
+                btn.onclick = function() {
+                    const idx = parseInt(this.dataset.idx);
+                    moveCard(listDiv, idx, idx+1);
+                };
+            });
+        }
+        // 저장 버튼 클릭 시 현재 DOM 순서대로 서버에 저장
+        const saveOrderBtn = document.getElementById('saveOrderBtn');
+        const saveOrderMsg = document.getElementById('saveOrderMsg');
+        saveOrderBtn.onclick = async function() {
+            const listDiv = document.getElementById('productList');
+            const cards = Array.from(listDiv.children);
+            const category = document.getElementById('productListCategory').value;
+            // 각 카드의 id를 DOM 순서대로 추출
+            const ids = cards.map(card => {
+                const sel = card.querySelector('.category-select');
+                return sel ? sel.getAttribute('data-id') : null;
+            }).filter(Boolean);
+            // 저장중 메시지 표시
+            saveOrderMsg.textContent = '저장중입니다...';
+            saveOrderMsg.style.color = '#4caf50';
+            saveOrderMsg.style.display = 'inline';
+            // 서버에서 현재 상품 목록 받아오기
+            const res = await fetch(`/api/products/${category}`, { credentials: 'include' });
+            const data = await res.json();
+            if (!data.success) {
+                saveOrderMsg.textContent = '서버 오류';
+                saveOrderMsg.style.color = '#ff6b6b';
+                saveOrderMsg.style.display = 'inline';
+                return;
+            }
+            // id 순서대로 products 배열 재정렬
+            const newProducts = ids.map(id => data.products.find(p => p.id == id)).filter(Boolean);
+            // 서버에 순서 저장
+            const saveRes = await fetch(`/api/products/${category}/reorder`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ products: newProducts })
+            });
+            const saveData = await saveRes.json();
+            if (saveData.success) {
+                saveOrderMsg.textContent = '저장되었습니다!';
+                saveOrderMsg.style.color = '#4caf50';
+                saveOrderMsg.style.display = 'inline';
+                setTimeout(() => { saveOrderMsg.style.display = 'none'; }, 2000);
+            } else {
+                saveOrderMsg.textContent = saveData.message || '저장 실패';
+                saveOrderMsg.style.color = '#ff6b6b';
+                saveOrderMsg.style.display = 'inline';
             }
         };
     </script>

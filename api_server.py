@@ -7,9 +7,9 @@ from werkzeug.utils import secure_filename
 from datetime import timedelta
 
 app = Flask(__name__, static_folder='.', static_url_path='')
-app.secret_key = 'your_secret_key'  # 실제 서비스 시 더 복잡하게 변경
+app.secret_key = 'my-very-secret-key-1234'  # 반드시 고정값으로 설정
 CORS(app, supports_credentials=True)
-app.permanent_session_lifetime = timedelta(days=30)
+app.permanent_session_lifetime = timedelta(days=30)  # 30일 유지
 
 ADMIN_ID = 'rnjsdhepd'
 ADMIN_PW = 'rnjsdhepd'
@@ -19,8 +19,21 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 PRODUCTS_FILE = 'products.json'
 PRODUCTS_IMAGE_FOLDER = os.path.join('images', 'products')
 
-os.makedirs(GALLERY_FOLDER, exist_ok=True)
+# 폴더/파일 충돌 근본적 차단: 파일로 존재하면 명확한 에러 메시지와 함께 실행 중단
+if os.path.exists(PRODUCTS_IMAGE_FOLDER) and not os.path.isdir(PRODUCTS_IMAGE_FOLDER):
+    raise RuntimeError(
+        f"경로 {PRODUCTS_IMAGE_FOLDER}가 파일로 존재합니다. "
+        "이 폴더는 반드시 폴더여야 하며, 파일로 존재하면 서버가 실행되지 않습니다. "
+        "파일을 직접 삭제하고 폴더로 만들어 주세요."
+    )
 os.makedirs(PRODUCTS_IMAGE_FOLDER, exist_ok=True)
+
+os.makedirs(GALLERY_FOLDER, exist_ok=True)
+
+# 대표 인사말 데이터
+greeting_data = {
+    "greeting": "안녕하세요.\n정성과 신뢰로 보답하는 농업회사법인 ㈜에이치팜입니다.\n\n저희는 청양고추와 들깨를 전문적으로 재배하고 가공하여\n믿을 수 있는 농산물을 제공하고 있습니다.\n\n앞으로도 더 좋은 품질의 제품으로 보답하겠습니다.\n감사합니다."
+}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -33,20 +46,23 @@ def login():
     keep_logged_in = data.get('keepLoggedIn', False)
     if username == ADMIN_ID and password == ADMIN_PW:
         session['admin'] = True
-        session.permanent = bool(keep_logged_in)
+        if keep_logged_in:
+            session.permanent = True
+        else:
+            session.permanent = False
         return jsonify({'success': True})
     else:
         return jsonify({'success': False, 'message': '아이디 또는 비밀번호가 올바르지 않습니다.'}), 401
 
 @app.route('/api/greeting', methods=['GET'])
 def get_greeting():
-    if not os.path.exists(GREETING_FILE):
-        # 기본 인사말 생성
-        with open(GREETING_FILE, 'w', encoding='utf-8') as f:
-            json.dump({'greeting': '안녕하세요. 동빈 스토어 입니다.\n저희는 전국 식당 및 업소에 신선하고 믿을 수 있는 식자재를 공급하고 있습니다.\n앞으로도 변함없는 품질과 서비스로 보답하겠습니다.\n\n대표 궈노뎅'}, f, ensure_ascii=False)
-    with open(GREETING_FILE, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    return jsonify({'greeting': data.get('greeting', '')})
+    try:
+        if os.path.exists(GREETING_FILE):
+            with open(GREETING_FILE, 'r', encoding='utf-8') as f:
+                return jsonify(json.load(f))
+    except Exception as e:
+        print(f"Error loading greeting: {e}")
+    return jsonify(greeting_data)  # 파일이 없거나 에러 시 기본 인사말 반환
 
 @app.route('/api/greeting', methods=['POST'])
 def set_greeting():
@@ -226,5 +242,20 @@ def update_product(category):
     save_products(data)
     return jsonify({'success': True, 'product': product})
 
+@app.route('/api/products/<category>/reorder', methods=['POST'])
+def reorder_products(category):
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    data = load_products()
+    if category not in data:
+        return jsonify({'success': False, 'message': '잘못된 카테고리'}), 400
+    req = request.get_json()
+    new_products = req.get('products')
+    if not isinstance(new_products, list):
+        return jsonify({'success': False, 'message': '잘못된 데이터'}), 400
+    data[category] = new_products
+    save_products(data)
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
-    app.run(port=5000, debug=False) 
+    app.run(host='0.0.0.0', port=5000, debug=False) 

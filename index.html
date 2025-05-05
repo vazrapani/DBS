@@ -46,136 +46,161 @@
     }
     </style>
     <script>
+        // 네비게이션 닷 업데이트 함수
+        function updateNavigationDots(category) {
+            const currentSection = document.querySelector(`.category-section[data-category="${category}"]`);
+            if (!currentSection) return;
+            
+            const productCards = currentSection.querySelectorAll('.product-card');
+            const cardCount = productCards.length;
+            
+            // 기존 닷 제거
+            const verticalNav = document.querySelector('.vertical-nav');
+            verticalNav.innerHTML = '';
+            
+            // 상품 카드 수만큼 닷 생성
+            for (let i = 0; i < cardCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'nav-dot';
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    // 모든 닷 비활성화
+                    document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
+                    // 클릭한 닷 활성화
+                    dot.classList.add('active');
+                    // 해당 카드로 스크롤
+                    productCards[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                        handleScroll();
+                        updateActiveByScroll(category);
+                    }, 500);
+                });
+                verticalNav.appendChild(dot);
+            }
+        }
+
+        // 메뉴 활성화 함수
+        function updateMenuActive(selectedCategory) {
+            // 모든 메뉴 아이템 비활성화
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 선택된 메뉴 아이템 활성화
+            const selectedMenuItem = document.querySelector(`.menu-link[data-category="${selectedCategory}"]`).parentElement;
+            if (selectedMenuItem) {
+                selectedMenuItem.classList.add('active');
+            }
+        }
+
+        // 전역 함수로 이동
+        function moveToCategory(direction) {
+            const categoryOrder = ['red-pepper', 'perilla', 'processed'];
+            const currentSection = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2)
+                .closest('.category-section');
+            if (!currentSection) return;
+            
+            const currentCategory = currentSection.getAttribute('data-category');
+            const currentIndex = categoryOrder.indexOf(currentCategory);
+            let nextIndex;
+            
+            if (direction === 'next') {
+                nextIndex = (currentIndex + 1) % categoryOrder.length;
+            } else {
+                nextIndex = (currentIndex - 1 + categoryOrder.length) % categoryOrder.length;
+            }
+
+            const nextCategory = categoryOrder[nextIndex];
+            const nextSection = document.querySelector(`.category-section[data-category="${nextCategory}"]`);
+            if (nextSection) {
+                nextSection.scrollIntoView({ behavior: 'smooth' });
+                // 메뉴 활성화 상태 업데이트
+                updateMenuActive(nextCategory);
+                // 네비게이션 닷 업데이트
+                updateNavigationDots(nextCategory);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // 초기 설정
             const productList = document.getElementById('product-list');
             const verticalNav = document.querySelector('.vertical-nav');
             const categorySections = document.querySelectorAll('.category-section');
             const menuLinks = document.querySelectorAll('.menu-link');
-            let currentCategory = 'red-pepper';
 
-            // 카테고리 순서 정의
-            const categoryOrder = ['red-pepper', 'perilla', 'processed'];
+            // 현재 카테고리의 가장 중앙에 가까운 카드 인덱스에 따라 닷과 메뉴를 활성화하는 함수
+            function updateActiveByScroll(category) {
+                const section = document.querySelector(`.category-section[data-category="${category}"]`);
+                if (!section) return;
+                const cards = section.querySelectorAll('.product-card');
+                if (!cards.length) return;
 
-            // 다음/이전 카테고리로 이동하는 함수
-            function moveToCategory(direction) {
-                const currentIndex = categoryOrder.indexOf(currentCategory);
-                let nextIndex;
-                
-                if (direction === 'next') {
-                    nextIndex = currentIndex + 1;
-                    if (nextIndex >= categoryOrder.length) return; // 마지막 카테고리면 이동하지 않음
-                } else {
-                    nextIndex = currentIndex - 1;
-                    if (nextIndex < 0) return; // 첫 카테고리면 이동하지 않음
-                }
+                let minDiff = Infinity;
+                let activeIdx = 0;
+                const centerY = window.innerHeight / 2;
 
-                const nextCategory = categoryOrder[nextIndex];
-                const nextSection = document.querySelector(`.category-section[data-category="${nextCategory}"]`);
-                if (nextSection) {
-                    nextSection.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-
-            // 메뉴 활성화 함수
-            function updateMenuActive(selectedCategory) {
-                // 모든 메뉴 아이템 비활성화
-                menuLinks.forEach(link => {
-                    link.parentElement.classList.remove('active');
+                cards.forEach((card, idx) => {
+                    const rect = card.getBoundingClientRect();
+                    const cardCenter = rect.top + rect.height / 2;
+                    const diff = Math.abs(cardCenter - centerY);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        activeIdx = idx;
+                    }
                 });
-                
-                // 선택된 메뉴 아이템 활성화
-                const selectedLink = document.querySelector(`.menu-link[data-category="${selectedCategory}"]`);
-                if (selectedLink) {
-                    selectedLink.parentElement.classList.add('active');
-                }
-            }
 
-            // 네비게이션 닷 업데이트 함수
-            function updateNavigationDots(category) {
-                // 현재 카테고리의 상품 카드 수 확인
-                const currentSection = document.querySelector(`.category-section[data-category="${category}"]`);
-                if (!currentSection) return;
-                
-                const productCards = currentSection.querySelectorAll('.product-card');
-                const cardCount = productCards.length;
-                
-                // 기존 닷 제거
-                const verticalNav = document.querySelector('.vertical-nav');
-                verticalNav.innerHTML = '';
-                
-                // 상품 카드 수만큼 닷 생성
-                for (let i = 0; i < cardCount; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'nav-dot';
-                    if (i === 0) dot.classList.add('active');
-                    dot.addEventListener('click', () => {
-                        // 모든 닷 비활성화
-                        document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
-                        // 클릭한 닷 활성화
-                        dot.classList.add('active');
-                        // 해당 카드로 스크롤
-                        productCards[i].scrollIntoView({ behavior: 'smooth' });
-                    });
-                    verticalNav.appendChild(dot);
-                }
+                // 닷 활성화
+                const dots = document.querySelectorAll('.vertical-nav .nav-dot');
+                dots.forEach((dot, idx) => {
+                    dot.classList.toggle('active', idx === activeIdx);
+                });
             }
 
             // 스크롤 이벤트 처리
-            window.addEventListener('scroll', function() {
+            function handleScroll() {
                 const sections = document.querySelectorAll('.category-section');
-                let currentSection = null;
-                
+                let firstVisibleSection = null;
+                let minTop = Infinity;
+
                 sections.forEach(section => {
                     const rect = section.getBoundingClientRect();
-                    const windowCenter = window.innerHeight / 2;
-                    
-                    if (rect.top <= windowCenter && rect.bottom >= windowCenter) {
-                        currentSection = section;
-                        const category = section.getAttribute('data-category');
-                        
-                        // 카테고리가 변경되었을 때만 네비게이션 닷 업데이트
-                        if (category !== currentCategory) {
-                            currentCategory = category;
-                            updateMenuActive(category);
-                            updateNavigationDots(category);
-                        }
-                        
-                        // 카드별 네비게이션 닷 활성화 상태 업데이트
-                        const cards = section.querySelectorAll('.product-card');
-                        const dots = document.querySelectorAll('.nav-dot');
-                        
-                        cards.forEach((card, index) => {
-                            const cardRect = card.getBoundingClientRect();
-                            if (cardRect.top <= windowCenter && cardRect.bottom >= windowCenter) {
-                                dots.forEach(dot => dot.classList.remove('active'));
-                                if (dots[index]) {
-                                    dots[index].classList.add('active');
-                                }
-                            }
-                        });
+                    if (rect.top >= 0 && rect.top < minTop) {
+                        minTop = rect.top;
+                        firstVisibleSection = section;
                     }
                 });
-            });
 
-            // 초기 네비게이션 닷 생성
-            updateNavigationDots('red-pepper');
-            // 초기 메뉴 활성화
-            updateMenuActive('red-pepper');
+                if (firstVisibleSection) {
+                    const category = firstVisibleSection.getAttribute('data-category');
+                    updateMenuActive(category);
+                    updateNavigationDots(category);
+                    updateActiveByScroll(category);
+                }
+            }
+
+            // 스크롤 이벤트 리스너 등록
+            window.addEventListener('scroll', handleScroll);
 
             // 메뉴 링크 클릭 이벤트
             menuLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    
                     const selectedCategory = this.getAttribute('data-category');
                     const selectedSection = document.querySelector(`.category-section[data-category="${selectedCategory}"]`);
-                    
                     if (selectedSection) {
                         selectedSection.scrollIntoView({ behavior: 'smooth' });
+                        setTimeout(() => {
+                            handleScroll();
+                            updateActiveByScroll(selectedCategory);
+                        }, 500); // 스크롤 애니메이션 후 강제 갱신
                     }
                 });
             });
+
+            // 초기 네비게이션 닷 생성 및 메뉴 활성화
+            updateNavigationDots('red-pepper');
+            updateMenuActive('red-pepper');
+            handleScroll();
 
             // 메뉴 버튼 클릭 이벤트
             const menuButton = document.querySelector('.menu-button');
@@ -229,878 +254,88 @@
         <!-- 컨텐츠 영역 -->
         <main>
             <div id="product-list">
-                <!-- 고추가루 카테고리 -->
-                <div class="category-section active" data-category="red-pepper">
-                    <!-- 첫 번째 카드 -->
-                    <div class="product-card" data-id="red1">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">고추가루 상품 1</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
+                <!-- 상품카드 템플릿 (숨김) -->
+                <template id="productCardTemplate">
+                  <div class="product-card">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                      <div class="product-content">
+                        <h3 class="product-title"></h3>
+                        <div class="price-group"></div>
+                        <p class="product-description"></p>
+                      </div>
+                      <div class="product-buttons">
+                        <div class="buttons-content">
+                          <a href="tel:010-9002-0797" class="call-button call-button-1">
+                            <div class="button-icon">
+                              <img src="images/icon-call.svg" alt="전화 아이콘">
                             </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
+                            <span>전화 문의</span>
+                          </a>
+                          <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
+                            <div class="button-icon">
+                              <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
                             </div>
+                            <span>카톡 문의</span>
+                          </a>
                         </div>
+                      </div>
                     </div>
-                    <!-- 두 번째 카드 -->
-                    <div class="product-card" data-id="red2">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">고추가루 상품 2</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 세 번째 카드 -->
-                    <div class="product-card" data-id="red3">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">고추가루 상품 3</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 네 번째 카드 -->
-                    <div class="product-card" data-id="red4">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">고추가루 상품 4</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 다섯 번째 카드 -->
-                    <div class="product-card" data-id="red5">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">고추가루 상품 5</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  </div>
+                </template>
+                <!-- 카테고리별 상품카드 컨테이너 -->
+                <div class="category-section" data-category="red-pepper">
+                  <div class="vertical-nav"></div>
+                  <div class="product-list" id="productList-red-pepper"></div>
                 </div>
-
-                <!-- 들깨가루 카테고리 -->
                 <div class="category-section" data-category="perilla">
-                    <!-- 카드 1 -->
-                    <div class="product-card" data-id="perilla1">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">들깨가루 상품 1</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 2 -->
-                    <div class="product-card" data-id="perilla2">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">들깨가루 상품 2</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 3 -->
-                    <div class="product-card" data-id="perilla3">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">들깨가루 상품 3</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 4 -->
-                    <div class="product-card" data-id="perilla4">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">들깨가루 상품 4</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 5 -->
-                    <div class="product-card" data-id="perilla5">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">들깨가루 상품 5</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 6 -->
-                    <div class="product-card" data-id="perilla6">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">들깨가루 상품 6</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  <div class="vertical-nav"></div>
+                  <div class="product-list" id="productList-perilla"></div>
                 </div>
-
-                <!-- 공산품 카테고리 -->
                 <div class="category-section" data-category="processed">
-                    <!-- 카드 1 -->
-                    <div class="product-card" data-id="goods1">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 1</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 2 -->
-                    <div class="product-card" data-id="goods2">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 2</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 3 -->
-                    <div class="product-card" data-id="goods3">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 3</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 4 -->
-                    <div class="product-card" data-id="goods4">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 4</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 5 -->
-                    <div class="product-card" data-id="goods5">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 5</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 6 -->
-                    <div class="product-card" data-id="goods6">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 6</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 7 -->
-                    <div class="product-card" data-id="goods7">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 7</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 8 -->
-                    <div class="product-card" data-id="goods8">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 8</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 9 -->
-                    <div class="product-card" data-id="goods9">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 9</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 카드 10 -->
-                    <div class="product-card" data-id="goods10">
-                        <div class="product-image"></div>
-                        <div class="product-info">
-                            <div class="product-content">
-                                <h3 class="product-title">공산품 상품 10</h3>
-                                <div class="price-group">
-                                    <div class="product-price">
-                                        <span class="amount">500ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">35,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="amount">1000ml</span>
-                                        <span class="colon">:</span>
-                                        <span class="price">60,000</span>
-                                        <span class="unit">원</span>
-                                    </div>
-                                </div>
-                                <p class="product-description">동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.
-한정수량이니 서두르세요.</p>
-                            </div>
-                            <div class="product-buttons">
-                                <div class="buttons-content">
-                                    <a href="tel:010-9002-0797" class="call-button call-button-1">
-                                        <div class="button-icon">
-                                            <img src="images/icon-call.svg" alt="전화 아이콘">
-                                        </div>
-                                        <span>전화 문의</span>
-                                    </a>
-                                    <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                                        <div class="button-icon">
-                                            <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                                        </div>
-                                        <span>카톡 문의</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  <div class="vertical-nav"></div>
+                  <div class="product-list" id="productList-processed"></div>
                 </div>
+                <script>
+                async function loadProducts(category) {
+                    try {
+                        const res = await fetch(`http://localhost:5000/api/products/${category}`);
+                        const data = await res.json();
+                        const container = document.getElementById(`productList-${category}`);
+                        container.innerHTML = '';
+                        if (!data.success || !data.products) return;
+                        
+                        const template = document.getElementById('productCardTemplate');
+                        data.products.forEach((product, idx) => {
+                            const card = template.content.cloneNode(true);
+                            const productImage = card.querySelector('.product-image');
+                            const productTitle = card.querySelector('.product-title');
+                            const productDescription = card.querySelector('.product-description');
+                            const priceGroup = card.querySelector('.price-group');
+
+                            productImage.style.backgroundImage = `url('/${product.image}')`;
+                            productTitle.textContent = product.title;
+                            productDescription.textContent = product.description || '';
+
+                            if (priceGroup && product.prices) {
+                                priceGroup.innerHTML = '';
+                                product.prices.forEach(p => {
+                                    priceGroup.innerHTML += `<div class='product-price'><span class='amount'>${p.amount}</span><span class='colon'>:</span><span class='price'>${p.price}</span><span class='unit'>원</span></div>`;
+                                });
+                            }
+
+                            container.appendChild(card);
+                        });
+                    } catch (error) {
+                        console.error('상품 로드 중 오류:', error);
+                    }
+                }
+                document.addEventListener('DOMContentLoaded', () => {
+                    loadProducts('red-pepper');
+                    loadProducts('perilla');
+                    loadProducts('processed');
+                });
+                </script>
             </div>
         </main>
     </div>
@@ -1117,6 +352,17 @@
     <!-- 메뉴 오버레이 -->
     <div class="menu-overlay">
         <div class="menu-sections">
+            <div class="menu-section" data-section="greeting">
+                <div class="section-header">
+                    <span class="section-title">대표 인사말</span>
+                    <img src="images/icon-arrow-down.svg" alt="펼치기" class="icon-arrow">
+                </div>
+                <div class="section-content">
+                    <div class="greeting-container">
+                        <p id="greetingText" class="greeting-text"></p>
+                    </div>
+                </div>
+            </div>
             <div class="menu-section" data-section="map">
                 <div class="section-header">
                     <span class="section-title">찾아오시는 길</span>
@@ -1220,6 +466,16 @@
     const DRAG_THRESHOLD = 50;
     const DIRECTION_LOCK_THRESHOLD = 10;
 
+    // 터치 이벤트 리스너 등록
+    document.addEventListener('DOMContentLoaded', function() {
+        const productList = document.getElementById('product-list');
+        
+        // 터치 이벤트 리스너 추가
+        productList.addEventListener('touchstart', handleTouchStart, { passive: false });
+        productList.addEventListener('touchmove', handleTouchMove, { passive: false });
+        productList.addEventListener('touchend', handleTouchEnd, { passive: false });
+    });
+
     // 터치 시작
     function handleTouchStart(e) {
         const card = e.target.closest('.product-card');
@@ -1238,137 +494,67 @@
     function handleTouchMove(e) {
         if (!currentCard || !touchStartX) return;
 
-        const touchCurrentX = e.touches[0].clientX;
-        const touchCurrentY = e.touches[0].clientY;
-        const diffX = touchCurrentX - touchStartX;
-        const diffY = touchCurrentY - touchStartY;
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        const deltaX = touchX - touchStartX;
+        const deltaY = touchY - touchStartY;
 
-        // 스크롤 방향 결정
+        // 방향 잠금 (수평/수직 스크롤 결정)
         if (!isHorizontalDrag) {
-            if (Math.abs(diffX) > DIRECTION_LOCK_THRESHOLD || Math.abs(diffY) > DIRECTION_LOCK_THRESHOLD) {
-                isHorizontalDrag = Math.abs(diffX) > Math.abs(diffY);
+            if (Math.abs(deltaX) > DIRECTION_LOCK_THRESHOLD || Math.abs(deltaY) > DIRECTION_LOCK_THRESHOLD) {
+                isHorizontalDrag = Math.abs(deltaX) > Math.abs(deltaY);
                 if (!isHorizontalDrag) {
-                    resetDrag();
+                    currentCard = null;
                     return;
                 }
             }
         }
 
-        // 수평 드래그로 판단된 경우
         if (isHorizontalDrag) {
             e.preventDefault();
-            // 드래그 이동 범위를 ±35px로 제한
-            const limitedDiffX = Math.max(Math.min(diffX, 35), -35);
-            currentCard.style.transform = `translateX(${limitedDiffX}px)`;
+            // 드래그 범위를 50px로 제한
+            const limitedDeltaX = Math.max(Math.min(deltaX, 50), -50);
+            currentCard.style.transform = `translateX(${limitedDeltaX}px)`;
+            
+            // 드래그 방향에 따른 클래스 추가
+            currentCard.classList.remove('drag-left', 'drag-right');
+            if (deltaX < -DRAG_THRESHOLD) {
+                currentCard.classList.add('drag-left');
+            } else if (deltaX > DRAG_THRESHOLD) {
+                currentCard.classList.add('drag-right');
+            }
         }
     }
 
     // 터치 종료
     function handleTouchEnd(e) {
-        if (!currentCard || !isHorizontalDrag) return;
-
-        const touchEndX = e.changedTouches[0].clientX;
-        const diffX = touchEndX - touchStartX;
-        const currentCategory = getCurrentCategory();
-
-        // 트랜지션 복원 - 스프링 효과를 위한 트랜지션 수정
-        currentCard.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-
-        if (Math.abs(diffX) > DRAG_THRESHOLD) {
-            let targetCategory = null;
-            
-            // 드래그 방향에 따른 카테고리 전환
-            if (diffX < 0) {  // 왼쪽으로 드래그: 이전 카테고리로
-                switch(currentCategory) {
-                    case 'perilla':
-                        targetCategory = 'red-pepper';
-                        break;
-                    case 'processed':
-                        targetCategory = 'perilla';
-                        break;
-                    case 'red-pepper':  // 순환 구조를 위한 추가
-                        targetCategory = 'processed';
-                        break;
-                }
-            } else if (diffX > 0) {  // 오른쪽으로 드래그: 다음 카테고리로
-                switch(currentCategory) {
-                    case 'red-pepper':
-                        targetCategory = 'perilla';
-                        break;
-                    case 'perilla':
-                        targetCategory = 'processed';
-                        break;
-                    case 'processed':  // 순환 구조를 위한 추가
-                        targetCategory = 'red-pepper';
-                        break;
-                }
-            }
-
-            if (targetCategory) {
-                // 스프링 효과와 함께 카테고리 전환
-                currentCard.style.transform = 'translateX(0)';
-                setTimeout(() => {
-                    switchCategory(targetCategory);
-                    resetDrag();
-                }, 500);
-            } else {
-                // 유효하지 않은 드래그는 스프링 효과와 함께 원위치로
-                currentCard.style.transform = 'translateX(0)';
-                setTimeout(resetDrag, 500);
-            }
-        } else {
-            // 드래그가 임계값을 넘지 않으면 스프링 효과와 함께 원위치로
-            currentCard.style.transform = 'translateX(0)';
-            setTimeout(resetDrag, 500);
-        }
-    }
-
-    // 드래그 상태 초기화
-    function resetDrag() {
         if (!currentCard) return;
+
+        const deltaX = e.changedTouches[0].clientX - touchStartX;
+        currentCard.style.transition = 'transform 0.3s ease';
         currentCard.style.transform = '';
-        currentCard.style.transition = '';
+
+        // 드래그 방향 클래스 제거
         currentCard.classList.remove('drag-left', 'drag-right');
+        
+        // 임계값을 넘은 경우 카드 전환
+        if (Math.abs(deltaX) > DRAG_THRESHOLD) {
+            const direction = deltaX > 0 ? 'next' : 'prev';
+            moveToCategory(direction);
+        }
+
+        // 드래그 후 상태 갱신
+        handleScroll();
+        if (currentCard) {
+            const section = currentCard.closest('.category-section');
+            if (section) {
+                const category = section.getAttribute('data-category');
+                updateActiveByScroll(category);
+            }
+        }
+
         currentCard = null;
         touchStartX = 0;
-        isHorizontalDrag = false;
-    }
-
-    // 현재 카테고리 가져오기
-    function getCurrentCategory() {
-        const activeSection = document.querySelector('.category-section.active');
-        return activeSection ? activeSection.getAttribute('data-category') : null;
-    }
-
-    // 이벤트 리스너 등록
-    document.addEventListener('DOMContentLoaded', () => {
-        const productCards = document.querySelectorAll('.product-card');
-        productCards.forEach(card => {
-            card.addEventListener('touchstart', handleTouchStart, { passive: true });
-            card.addEventListener('touchmove', handleTouchMove, { passive: false });
-            card.addEventListener('touchend', handleTouchEnd, { passive: true });
-        });
-    });
-
-    // 카테고리 전환 함수
-    function switchCategory(targetCategory) {
-        // 현재 활성화된 카테고리 섹션 찾기
-        const currentSection = document.querySelector('.category-section.active');
-        if (currentSection) {
-            currentSection.classList.remove('active');
-        }
-
-        // 새로운 카테고리 섹션 활성화
-        const targetSection = document.querySelector(`.category-section[data-category="${targetCategory}"]`);
-        if (targetSection) {
-            targetSection.classList.add('active');
-            targetSection.scrollIntoView({ behavior: 'smooth' });
-            
-            // 메뉴 활성화 상태 업데이트
-            updateMenuActive(targetCategory);
-            // 네비게이션 닷 업데이트
-            updateNavigationDots(targetCategory);
-        }
     }
     </script>
     <script>
@@ -1515,42 +701,201 @@
     </script>
     <script>
     async function updateStaticCards() {
-        const categories = ['red-pepper', 'perilla', 'processed'];
-        for (const category of categories) {
-            const res = await fetch(`/api/products/${category}`);
+        try {
+            const res = await fetch('http://localhost:5000/api/products/red-pepper');
             const data = await res.json();
-            if (!data.success || !data.products) continue;
+            if (!data.success || !data.products) return;
+            
+            // 나머지 코드는 그대로 유지
             data.products.forEach((product, idx) => {
-                // id 매칭: 예시로 red1, perilla1, goods1 등으로 가정
-                let cardId = '';
-                if (category === 'red-pepper') cardId = `red${idx+1}`;
-                if (category === 'perilla') cardId = `perilla${idx+1}`;
-                if (category === 'processed') cardId = `goods${idx+1}`;
-                const card = document.querySelector(`.category-section[data-category='${category}'] .product-card[data-id='${cardId}']`);
-                if (!card) return;
-                // 제목
-                const titleEl = card.querySelector('.product-title');
-                if (titleEl) titleEl.textContent = product.title;
-                // 설명
-                const descEl = card.querySelector('.product-description');
-                if (descEl) descEl.textContent = product.description || '';
-                // 가격
-                const priceGroup = card.querySelector('.price-group');
-                if (priceGroup && product.prices) {
-                    priceGroup.innerHTML = '';
-                    product.prices.forEach(p => {
-                        priceGroup.innerHTML += `<div class='product-price'><span class='amount'>${p.amount}</span><span class='colon'>:</span><span class='price'>${p.price}</span><span class='unit'>원</span></div>`;
-                    });
-                }
-                // 이미지 (배경 이미지 방식일 경우는 별도 처리 필요)
-                const imgEl = card.querySelector('.product-image');
+                const imgEl = document.querySelector(`.static-card-${idx + 1} .product-image`);
                 if (imgEl && product.image) {
                     imgEl.style.backgroundImage = `url('/${product.image}')`;
                 }
             });
+        } catch (error) {
+            console.error('상품 로드 중 오류:', error);
         }
     }
     document.addEventListener('DOMContentLoaded', updateStaticCards);
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 대표 인사말 가져오기
+        async function loadGreeting() {
+            try {
+                const response = await fetch('/api/greeting');
+                const data = await response.json();
+                const greetingText = document.getElementById('greetingText');
+                if (greetingText && data.greeting) {
+                    greetingText.textContent = data.greeting;
+                }
+            } catch (error) {
+                console.error('인사말 로드 중 오류:', error);
+            }
+        }
+
+        // 인사말 섹션이 열릴 때 데이터 로드
+        const greetingSection = document.querySelector('.menu-section[data-section="greeting"]');
+        if (greetingSection) {
+            const header = greetingSection.querySelector('.section-header');
+            header.addEventListener('click', function() {
+                if (!greetingSection.classList.contains('active')) {
+                    loadGreeting();
+                }
+            });
+        }
+    });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuLinks = document.querySelectorAll('.menu-link');
+        const menuItems = document.querySelectorAll('.menu-item');
+        let isDotScrolling = false;
+
+        // 화면 중앙에 가장 가까운 카드와 카테고리 반환
+        function getCurrentCategoryAndCard() {
+            const sections = document.querySelectorAll('.category-section');
+            let minDiff = Infinity;
+            let result = { category: null, cardIdx: 0 };
+            const centerY = window.innerHeight / 2;
+            sections.forEach(section => {
+                const category = section.getAttribute('data-category');
+                const cards = section.querySelectorAll('.product-card');
+                cards.forEach((card, idx) => {
+                    const rect = card.getBoundingClientRect();
+                    const cardCenter = rect.top + rect.height / 2;
+                    const diff = Math.abs(cardCenter - centerY);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        result = { category, cardIdx: idx };
+                    }
+                });
+            });
+            return result;
+        }
+
+        // 메뉴와 닷 active 동기화
+        function syncMenuAndDots() {
+            const { category, cardIdx } = getCurrentCategoryAndCard();
+            // 메뉴 active
+            menuItems.forEach(item => item.classList.remove('active'));
+            const menuItem = document.querySelector(`.menu-link[data-category="${category}"]`)?.parentElement;
+            if (menuItem) menuItem.classList.add('active');
+            // 닷 active (카테고리별로)
+            const nav = document.getElementById(`verticalNav-${category}`);
+            if (nav) {
+                const dots = nav.querySelectorAll('.nav-dot');
+                dots.forEach((dot, idx) => dot.classList.toggle('active', idx === cardIdx));
+            }
+        }
+
+        // 카드가 중앙에 올 때까지 대기
+        function waitForCardToBeCentered(card, callback) {
+            function check() {
+                const rect = card.getBoundingClientRect();
+                const centerY = window.innerHeight / 2;
+                if (Math.abs((rect.top + rect.height / 2) - centerY) < 2) {
+                    callback();
+                } else {
+                    requestAnimationFrame(check);
+                }
+            }
+            check();
+        }
+
+        // 네비게이션 닷 생성 (카테고리별 vertical-nav에)
+        function updateNavigationDots(category) {
+            const nav = document.getElementById(`verticalNav-${category}`);
+            const section = document.querySelector(`.category-section[data-category="${category}"]`);
+            if (!nav || !section) return;
+            const productCards = section.querySelectorAll('.product-card');
+            nav.innerHTML = '';
+            productCards.forEach((card, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'nav-dot';
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    isDotScrolling = true;
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    waitForCardToBeCentered(card, () => {
+                        syncMenuAndDots();
+                        isDotScrolling = false;
+                    });
+                });
+                nav.appendChild(dot);
+            });
+        }
+
+        // 상품카드 동적 로드 함수 오버라이드 (카드 렌더 후 닷/동기화)
+        window.loadProducts = async function(category) {
+            try {
+                const res = await fetch(`/api/products/${category}`);
+                const data = await res.json();
+                const container = document.getElementById(`productList-${category}`);
+                container.innerHTML = '';
+                if (!data.success || !data.products) return;
+
+                const template = document.getElementById('productCardTemplate');
+                data.products.forEach((product, idx) => {
+                    const card = template.content.cloneNode(true);
+                    const productImage = card.querySelector('.product-image');
+                    const productTitle = card.querySelector('.product-title');
+                    const productDescription = card.querySelector('.product-description');
+                    const priceGroup = card.querySelector('.price-group');
+
+                    productImage.style.backgroundImage = `url('/${product.image}')`;
+                    productTitle.textContent = product.title;
+                    productDescription.textContent = product.description || '';
+
+                    if (priceGroup && product.prices) {
+                        priceGroup.innerHTML = '';
+                        product.prices.forEach(p => {
+                            priceGroup.innerHTML += `<div class='product-price'><span class='amount'>${p.amount}</span><span class='colon'>:</span><span class='price'>${p.price}</span><span class='unit'>원</span></div>`;
+                        });
+                    }
+
+                    container.appendChild(card);
+                });
+
+                // 상품카드 렌더 후 닷/동기화
+                updateNavigationDots(category);
+                setTimeout(syncMenuAndDots, 100);
+            } catch (error) {
+                console.error('상품 로드 중 오류:', error);
+            }
+        };
+
+        // 스크롤 이벤트 리스너 등록 (닷 클릭 중에는 무시)
+        window.addEventListener('scroll', function() {
+            if (!isDotScrolling) {
+                syncMenuAndDots();
+            }
+        });
+
+        // 메뉴 링크 클릭 이벤트
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const selectedCategory = this.getAttribute('data-category');
+                const selectedSection = document.querySelector(`.category-section[data-category="${selectedCategory}"]`);
+                if (selectedSection) {
+                    // 첫번째 카드로 스크롤
+                    const firstCard = selectedSection.querySelector('.product-card');
+                    if (firstCard) {
+                        firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(syncMenuAndDots, 500);
+                    }
+                }
+            });
+        });
+
+        // 초기 네비게이션 닷 생성 및 메뉴 활성화
+        updateNavigationDots('red-pepper');
+        updateNavigationDots('perilla');
+        updateNavigationDots('processed');
+        setTimeout(syncMenuAndDots, 500);
+    });
     </script>
 </body>
 </html> 
