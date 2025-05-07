@@ -74,6 +74,19 @@ app.use(express.static(path.resolve(__dirname, '.')));
 //     res.sendFile(path.resolve(__dirname, 'index.html'));
 // });
 
+const galleryDir = path.resolve(__dirname, 'images/gallery');
+
+app.get('/api/gallery/list', (req, res) => {
+    fs.readdir(galleryDir, (err, files) => {
+        if (err) {
+            return res.status(500).json({ success: false, error: '갤러리 이미지 목록을 불러올 수 없습니다.' });
+        }
+        // 이미지 파일만 필터링 (jpg, png, jpeg, gif 등)
+        const images = files.filter(f => /\.(jpg|jpeg|png|gif)$/i.test(f));
+        res.json({ images });
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Express proxy server running on http://localhost:${PORT}`);
 }); 
