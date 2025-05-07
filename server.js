@@ -1,6 +1,7 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = 8888;
@@ -26,6 +27,25 @@ app.use(express.static(path.resolve(__dirname, '.')));
 // app.get('*', (req, res) => {
 //     res.sendFile(path.resolve(__dirname, 'index.html'));
 // });
+
+// 상품 데이터 API (Express에서 직접 제공)
+app.get('/api/products/:category', (req, res) => {
+    const category = req.params.category;
+    fs.readFile(path.resolve(__dirname, 'products.json'), 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).json({ success: false, error: '상품 데이터 파일을 읽을 수 없습니다.' });
+        }
+        try {
+            const products = JSON.parse(data);
+            if (!products[category]) {
+                return res.status(404).json({ success: false, error: '해당 카테고리 상품이 없습니다.' });
+            }
+            res.json({ success: true, products: products[category] });
+        } catch (e) {
+            res.status(500).json({ success: false, error: '상품 데이터 파싱 오류' });
+        }
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Express proxy server running on http://localhost:${PORT}`);
