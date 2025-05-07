@@ -6,6 +6,8 @@ const fs = require('fs');
 const app = express();
 const PORT = 8888;
 
+const isProduction = process.env.RENDER === 'true' || process.env.NODE_ENV === 'production';
+
 // 상품 데이터 API (Express에서 직접 제공)
 app.get('/api/products/:category', (req, res) => {
     const category = req.params.category;
@@ -40,27 +42,29 @@ app.get('/api/greeting', (req, res) => {
     });
 });
 
-// /api로 시작하는 모든 요청을 Flask(5000)으로 프록시 (직접 제공하는 API는 제외)
-app.use('/api', (req, res, next) => {
-    if (
-        req.path.startsWith('/products') ||
-        req.path === '/greeting'
-    ) {
-        return next();
-    }
-    createProxyMiddleware({
-        target: 'http://127.0.0.1:5000',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: { '^/api': '/api' },
-        onProxyReq: (proxyReq, req, res) => {
-            console.log(`[PROXY] ${req.method} ${req.originalUrl} -> ${proxyReq.path}`);
-        },
-        onError: (err, req, res) => {
-            console.error('[PROXY ERROR]', err);
+// 프록시 미들웨어는 로컬(개발 환경)에서만 활성화
+if (!isProduction) {
+    app.use('/api', (req, res, next) => {
+        if (
+            req.path.startsWith('/products') ||
+            req.path === '/greeting'
+        ) {
+            return next();
         }
-    })(req, res, next);
-});
+        createProxyMiddleware({
+            target: 'http://127.0.0.1:5000',
+            changeOrigin: true,
+            ws: true,
+            pathRewrite: { '^/api': '/api' },
+            onProxyReq: (proxyReq, req, res) => {
+                console.log(`[PROXY] ${req.method} ${req.originalUrl} -> ${proxyReq.path}`);
+            },
+            onError: (err, req, res) => {
+                console.error('[PROXY ERROR]', err);
+            }
+        })(req, res, next);
+    });
+}
 
 // 정적 파일 서비스 (현재 디렉토리 기준)
 app.use(express.static(path.resolve(__dirname, '.')));
