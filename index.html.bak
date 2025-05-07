@@ -229,48 +229,6 @@
                 fadeInOverlay(menuOverlay);
                 document.body.style.overflow = 'hidden';
             });
-
-            const barTop = document.getElementById('barTop');
-            if (barTop) {
-                barTop.setAttribute('style', 'transition: all 0.25s cubic-bezier(0.4,0,0.2,1);');
-            }
-            if (menuButton && barTop) {
-                const originalX = 6, originalW = 24, originalY = 9;
-                const activeX = 9, activeW = 12, activeY = 18;
-                const observer = new MutationObserver(() => {
-                    if (menuButton.classList.contains('active')) {
-                        barTop.setAttribute('x', activeX);
-                        barTop.setAttribute('width', activeW);
-                        barTop.setAttribute('y', activeY);
-                    } else {
-                        barTop.setAttribute('x', originalX);
-                        barTop.setAttribute('width', originalW);
-                        barTop.setAttribute('y', originalY);
-                    }
-                });
-                observer.observe(menuButton, { attributes: true, attributeFilter: ['class'] });
-            }
-
-            const barBottom = document.getElementById('barBottom');
-            if (barBottom) {
-                barBottom.setAttribute('style', 'transition: all 0.25s cubic-bezier(0.4,0,0.2,1);');
-            }
-            if (menuButton && barBottom) {
-                const originalBX = 6, originalBW = 24, originalBY = 23;
-                const activeBX = 22, activeBW = 12, activeBY = 9;
-                const observerB = new MutationObserver(() => {
-                    if (menuButton.classList.contains('active')) {
-                        barBottom.setAttribute('x', activeBX);
-                        barBottom.setAttribute('width', activeBW);
-                        barBottom.setAttribute('y', activeBY);
-                    } else {
-                        barBottom.setAttribute('x', originalBX);
-                        barBottom.setAttribute('width', originalBW);
-                        barBottom.setAttribute('y', originalBY);
-                    }
-                });
-                observerB.observe(menuButton, { attributes: true, attributeFilter: ['class'] });
-            }
         });
     </script>
 </head>
@@ -285,11 +243,8 @@
                     </div>
                 </div>
                 <div class="menu-button" aria-label="메뉴">
-                  <svg class="hamburger-svg" width="36" height="32" viewBox="0 0 36 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect class="bar top" id="barTop" x="6" y="9" width="24" height="3" rx="1.5" fill="#F7F9F4" />
-                    <rect class="bar middle" x="6" y="16" width="24" height="3" rx="1.5" fill="#F7F9F4" />
-                    <rect class="bar bottom" id="barBottom" x="6" y="23" width="24" height="3" rx="1.5" fill="#F7F9F4" />
-                  </svg>
+                    <img src="images/icon-menu.svg" alt="메뉴" class="icon-menu">
+                    <img src="images/icon-undo.svg" alt="뒤로" class="icon-undo">
                 </div>
             </header>
             

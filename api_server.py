@@ -10,6 +10,9 @@ app = Flask(__name__, static_folder='.', static_url_path='')
 app.secret_key = 'my-very-secret-key-1234'  # 반드시 고정값으로 설정
 CORS(app, supports_credentials=True)
 app.permanent_session_lifetime = timedelta(days=30)  # 30일 유지
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = False  # http 환경에서는 False, https에서는 True
+app.config['SESSION_COOKIE_PATH'] = '/'
 
 ADMIN_ID = 'rnjsdhepd'
 ADMIN_PW = 'rnjsdhepd'
@@ -18,6 +21,7 @@ GALLERY_FOLDER = os.path.join('images', 'gallery')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 PRODUCTS_FILE = 'products.json'
 PRODUCTS_IMAGE_FOLDER = os.path.join('images', 'products')
+GALLERY_ORDER_FILE = 'gallery_order.json'
 
 # 폴더/파일 충돌 근본적 차단: 파일로 존재하면 명확한 에러 메시지와 함께 실행 중단
 if os.path.exists(PRODUCTS_IMAGE_FOLDER) and not os.path.isdir(PRODUCTS_IMAGE_FOLDER):
@@ -74,26 +78,59 @@ def set_greeting():
         json.dump({'greeting': greeting}, f, ensure_ascii=False)
     return jsonify({'success': True})
 
+@app.route('/api/gallery/save', methods=['POST'])
+def gallery_save():
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    data = request.get_json()
+    images = data.get('images', [])
+    deleted = data.get('deleted', [])
+    # 1. 삭제 처리
+    for filename in deleted:
+        if filename and allowed_file(filename):
+            file_path = os.path.join(GALLERY_FOLDER, filename)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+    # 2. 순서 저장
+    with open(GALLERY_ORDER_FILE, 'w', encoding='utf-8') as f:
+        json.dump(images, f, ensure_ascii=False)
+    return jsonify({'success': True})
+
 @app.route('/api/gallery/list', methods=['GET'])
 def gallery_list():
     files = [f for f in os.listdir(GALLERY_FOLDER) if allowed_file(f)]
-    files.sort()
-    return jsonify({'images': files})
+    # 순서 파일이 있으면 그 순서대로, 없으면 파일명 정렬
+    order = []
+    if os.path.exists(GALLERY_ORDER_FILE):
+        try:
+            with open(GALLERY_ORDER_FILE, 'r', encoding='utf-8') as f:
+                order = json.load(f)
+        except Exception:
+            order = []
+    if order:
+        ordered = [f for f in order if f in files]
+        unordered = [f for f in files if f not in order]
+        result = ordered + sorted(unordered)
+    else:
+        result = sorted(files)
+    return jsonify({'images': result})
 
 @app.route('/api/gallery/upload', methods=['POST'])
 def gallery_upload():
     if not session.get('admin'):
         return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
-    if 'file' not in request.files:
+    if 'files' not in request.files:
         return jsonify({'success': False, 'message': '파일이 없습니다.'}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'success': False, 'message': '파일명이 비어 있습니다.'}), 400
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        save_path = os.path.join(GALLERY_FOLDER, filename)
-        file.save(save_path)
-        return jsonify({'success': True, 'filename': filename})
+    files = request.files.getlist('files')
+    saved_files = []
+    for file in files:
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            save_path = os.path.join(GALLERY_FOLDER, filename)
+            file.save(save_path)
+            saved_files.append(filename)
+    if saved_files:
+        return jsonify({'success': True, 'filenames': saved_files})
     else:
         return jsonify({'success': False, 'message': '허용되지 않는 파일 형식입니다.'}), 400
 
@@ -258,4 +295,4 @@ def reorder_products(category):
     return jsonify({'success': True})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False) 
+    app.run(host='127.0.0.1', port=5000, debug=False) 

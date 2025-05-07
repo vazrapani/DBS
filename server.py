@@ -11,6 +11,7 @@ class ProxyRequestHandler(SimpleHTTPRequestHandler):
                 headers = {key: value for key, value in self.headers.items()}
                 if 'Host' in headers:
                     del headers['Host']  # Host 헤더 제거
+                print(f"Request cookies: {self.parse_cookies()}")  # 쿠키 로그 추가
                 
                 # API 서버로 요청 전달
                 response = requests.get(
@@ -26,9 +27,14 @@ class ProxyRequestHandler(SimpleHTTPRequestHandler):
                         self.send_header(key, value)
                 
                 # CORS 헤더 추가
-                self.send_header('Access-Control-Allow-Origin', '*')
+                origin = self.headers.get('Origin')
+                if origin:
+                    self.send_header('Access-Control-Allow-Origin', origin)
+                else:
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Vary', 'Origin')
                 self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type, Cookie')
                 self.send_header('Access-Control-Allow-Credentials', 'true')
                 
                 self.end_headers()
@@ -53,6 +59,7 @@ class ProxyRequestHandler(SimpleHTTPRequestHandler):
                 headers = {key: value for key, value in self.headers.items()}
                 if 'Host' in headers:
                     del headers['Host']  # Host 헤더 제거
+                print(f"Request cookies: {self.parse_cookies()}")  # 쿠키 로그 추가
                 
                 # API 서버로 요청 전달
                 response = requests.post(
@@ -69,9 +76,14 @@ class ProxyRequestHandler(SimpleHTTPRequestHandler):
                         self.send_header(key, value)
                 
                 # CORS 헤더 추가
-                self.send_header('Access-Control-Allow-Origin', '*')
+                origin = self.headers.get('Origin')
+                if origin:
+                    self.send_header('Access-Control-Allow-Origin', origin)
+                else:
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Vary', 'Origin')
                 self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type, Cookie')
                 self.send_header('Access-Control-Allow-Credentials', 'true')
                 
                 self.end_headers()
@@ -96,6 +108,7 @@ class ProxyRequestHandler(SimpleHTTPRequestHandler):
                 headers = {key: value for key, value in self.headers.items()}
                 if 'Host' in headers:
                     del headers['Host']  # Host 헤더 제거
+                print(f"Request cookies: {self.parse_cookies()}")  # 쿠키 로그 추가
 
                 # API 서버로 요청 전달
                 response = requests.delete(
@@ -112,9 +125,14 @@ class ProxyRequestHandler(SimpleHTTPRequestHandler):
                         self.send_header(key, value)
 
                 # CORS 헤더 추가
-                self.send_header('Access-Control-Allow-Origin', '*')
+                origin = self.headers.get('Origin')
+                if origin:
+                    self.send_header('Access-Control-Allow-Origin', origin)
+                else:
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Vary', 'Origin')
                 self.send_header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
-                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type, Cookie')
                 self.send_header('Access-Control-Allow-Credentials', 'true')
 
                 self.end_headers()
@@ -128,9 +146,14 @@ class ProxyRequestHandler(SimpleHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
+        origin = self.headers.get('Origin')
+        if origin:
+            self.send_header('Access-Control-Allow-Origin', origin)
+        else:
+            self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Vary', 'Origin')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Cookie')
         self.send_header('Access-Control-Allow-Credentials', 'true')
         self.end_headers()
 
