@@ -1,5 +1,5 @@
-# Use the Bun image as the base image
-FROM oven/bun:latest
+# Use the node image as the base image
+FROM node:18
 
 # Set the working directory in the container
 WORKDIR /app
@@ -7,7 +7,9 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY package*.json ./
 
-RUN bun install
+RUN npm install
+
+COPY . .
 
 # Expose the port on which the API will listen
 EXPOSE 3055
