@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 3055
 
 # Run the server when the container launches
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "python3 api_server.py & node server.js"]
