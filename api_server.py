@@ -82,8 +82,8 @@ def save_greeting():
 
 @app.route('/api/gallery/save', methods=['POST'])
 def gallery_save():
-    if not session.get('admin'):
-        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    # if not session.get('admin'):
+    #     return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
     data = request.get_json()
     images = data.get('images', [])
     deleted = data.get('deleted', [])
@@ -119,8 +119,8 @@ def gallery_list():
 
 @app.route('/api/gallery/upload', methods=['POST'])
 def gallery_upload():
-    if not session.get('admin'):
-        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    # if not session.get('admin'):
+    #     return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
     if 'files' not in request.files:
         return jsonify({'success': False, 'message': '파일이 없습니다.'}), 400
     files = request.files.getlist('files')
@@ -138,8 +138,8 @@ def gallery_upload():
 
 @app.route('/api/gallery/delete', methods=['POST'])
 def gallery_delete():
-    if not session.get('admin'):
-        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    # if not session.get('admin'):
+    #     return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
     data = request.get_json()
     filename = data.get('filename')
     if not filename or not allowed_file(filename):
@@ -179,8 +179,8 @@ def get_products(category):
 
 @app.route('/api/products/<category>', methods=['POST'])
 def add_product(category):
-    if not session.get('admin'):
-        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    # if not session.get('admin'):
+    #     return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
     data = load_products()
     if category not in data:
         return jsonify({'success': False, 'message': '잘못된 카테고리'}), 400
@@ -212,8 +212,8 @@ def add_product(category):
 
 @app.route('/api/products/<category>', methods=['DELETE'])
 def delete_product(category):
-    if not session.get('admin'):
-        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    # if not session.get('admin'):
+    #     return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
     data = load_products()
     if category not in data:
         return jsonify({'success': False, 'message': '잘못된 카테고리'}), 400
@@ -238,8 +238,8 @@ def delete_product(category):
 
 @app.route('/api/products/<category>', methods=['PATCH'])
 def update_product(category):
-    if not session.get('admin'):
-        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    # if not session.get('admin'):
+    #     return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
     data = load_products()
     if category not in data:
         return jsonify({'success': False, 'message': '잘못된 카테고리'}), 400
@@ -283,8 +283,8 @@ def update_product(category):
 
 @app.route('/api/products/<category>/reorder', methods=['POST'])
 def reorder_products(category):
-    if not session.get('admin'):
-        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    # if not session.get('admin'):
+    #     return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
     data = load_products()
     if category not in data:
         return jsonify({'success': False, 'message': '잘못된 카테고리'}), 400
