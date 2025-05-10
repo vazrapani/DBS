@@ -70,8 +70,8 @@ def get_greeting():
 
 @app.route('/api/greeting', methods=['POST'])
 def save_greeting():
-    if not session.get('admin'):
-        return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
+    # if not session.get('admin'):
+    #     return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
     data = request.get_json()
     greeting = data.get('greeting', '').strip()
     if not greeting:
