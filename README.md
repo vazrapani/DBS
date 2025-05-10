@@ -64,4 +64,41 @@ git clone https://github.com/vazrapani/DBS.git
 3. 브라우저에서 접속
 ```
 http://localhost:8888
+```
+
+## 로컬 개발 및 실행 방법
+
+1. Node.js 18 이상 설치
+2. 의존성 설치
+
+```bash
+npm install
+```
+
+3. 환경변수 파일(.env) 생성 (선택, 기본값 사용 가능)
+
+```env
+PORT=8888
+NODE_ENV=development
+```
+
+4. 서버 실행
+
+```bash
+npm start
+```
+
+5. 브라우저에서 접속
+
+```
+http://localhost:8888
+```
+
+---
+
+### Docker로 실행하려면
+
+```bash
+docker build -t my-proxy-server .
+docker run -p 3055:8888 my-proxy-server
 ``` 

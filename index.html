@@ -45,6 +45,55 @@
         }
     }
     </style>
+<script>
+function updateActiveByScroll(category) {
+    const section = document.querySelector(`.category-section[data-category="${category}"]`);
+    if (!section) return;
+    const cards = section.querySelectorAll('.product-card');
+    if (!cards.length) return;
+
+    let minDiff = Infinity;
+    let activeIdx = 0;
+    const centerY = window.innerHeight / 2;
+
+    cards.forEach((card, idx) => {
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.top + rect.height / 2;
+        const diff = Math.abs(cardCenter - centerY);
+        if (diff < minDiff) {
+            minDiff = diff;
+            activeIdx = idx;
+        }
+    });
+
+    // 닷 활성화
+    const dots = document.querySelectorAll('.vertical-nav .nav-dot');
+    dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === activeIdx);
+    });
+}
+
+function handleScroll() {
+    const sections = document.querySelectorAll('.category-section');
+    let firstVisibleSection = null;
+    let minTop = Infinity;
+
+    sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top >= 0 && rect.top < minTop) {
+            minTop = rect.top;
+            firstVisibleSection = section;
+        }
+    });
+
+    if (firstVisibleSection) {
+        const category = firstVisibleSection.getAttribute('data-category');
+        updateMenuActive(category);
+        updateNavigationDots(category);
+        updateActiveByScroll(category);
+    }
+}
+</script>
     <script>
         // 네비게이션 닷 업데이트 함수
         function updateNavigationDots(category) {
@@ -71,7 +120,6 @@
                     // 해당 카드로 스크롤
                     productCards[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
                     setTimeout(() => {
-                        handleScroll();
                         updateActiveByScroll(category);
                     }, 500);
                 });
@@ -156,28 +204,6 @@
                 });
             }
 
-            // 스크롤 이벤트 처리
-            function handleScroll() {
-                const sections = document.querySelectorAll('.category-section');
-                let firstVisibleSection = null;
-                let minTop = Infinity;
-
-                sections.forEach(section => {
-                    const rect = section.getBoundingClientRect();
-                    if (rect.top >= 0 && rect.top < minTop) {
-                        minTop = rect.top;
-                        firstVisibleSection = section;
-                    }
-                });
-
-                if (firstVisibleSection) {
-                    const category = firstVisibleSection.getAttribute('data-category');
-                    updateMenuActive(category);
-                    updateNavigationDots(category);
-                    updateActiveByScroll(category);
-                }
-            }
-
             // 스크롤 이벤트 리스너 등록
             window.addEventListener('scroll', handleScroll);
 
@@ -190,7 +216,6 @@
                     if (selectedSection) {
                         selectedSection.scrollIntoView({ behavior: 'smooth' });
                         setTimeout(() => {
-                            handleScroll();
                             updateActiveByScroll(selectedCategory);
                         }, 500); // 스크롤 애니메이션 후 강제 갱신
                     }
@@ -200,7 +225,7 @@
             // 초기 네비게이션 닷 생성 및 메뉴 활성화
             updateNavigationDots('red-pepper');
             updateMenuActive('red-pepper');
-            handleScroll();
+            updateActiveByScroll('red-pepper');
 
             // 메뉴 버튼 클릭 이벤트
             const menuButton = document.querySelector('.menu-button');
@@ -272,6 +297,28 @@
                 observerB.observe(menuButton, { attributes: true, attributeFilter: ['class'] });
             }
         });
+
+        // 1. handleScroll 함수 정의를 DOMContentLoaded 바깥으로 이동
+        function handleScroll() {
+            const sections = document.querySelectorAll('.category-section');
+            let firstVisibleSection = null;
+            let minTop = Infinity;
+
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top >= 0 && rect.top < minTop) {
+                    minTop = rect.top;
+                    firstVisibleSection = section;
+                }
+            });
+
+            if (firstVisibleSection) {
+                const category = firstVisibleSection.getAttribute('data-category');
+                updateMenuActive(category);
+                updateNavigationDots(category);
+                updateActiveByScroll(category);
+            }
+        }
     </script>
 </head>
 <body>
@@ -402,11 +449,18 @@
                     } catch (error) {
                         console.error('상품 로드 중 오류:', error);
                     }
+                    return Promise.resolve();
                 }
                 document.addEventListener('DOMContentLoaded', () => {
-                    loadProducts('red-pepper');
-                    loadProducts('perilla');
-                    loadProducts('processed');
+                    Promise.all([
+                        loadProducts('red-pepper'),
+                        loadProducts('perilla'),
+                        loadProducts('processed')
+                    ]).then(() => {
+                        updateNavigationDots('red-pepper');
+                        updateMenuActive('red-pepper');
+                        updateActiveByScroll('red-pepper');
+                    });
                 });
                 </script>
             </div>
@@ -638,14 +692,7 @@
         }
 
         // 드래그 후 상태 갱신
-        handleScroll();
-        if (currentCard) {
-            const section = currentCard.closest('.category-section');
-            if (section) {
-                const category = section.getAttribute('data-category');
-                updateActiveByScroll(category);
-            }
-        }
+        updateActiveByScroll(currentCard.closest('.category-section').getAttribute('data-category'));
 
         currentCard = null;
         touchStartX = 0;

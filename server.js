@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = 8888;
+const PORT = process.env.PORT || 8888;
 
 const isProduction = process.env.RENDER === 'true' || process.env.NODE_ENV === 'production';
 
@@ -45,12 +45,14 @@ app.get('/api/greeting', (req, res) => {
 // 프록시 미들웨어는 로컬(개발 환경)에서만 활성화
 if (!isProduction) {
     app.use('/api', (req, res, next) => {
+        // GET /api/products 또는 GET /api/greeting만 직접 처리
         if (
-            req.path.startsWith('/products') ||
-            req.path === '/greeting'
+            (req.method === 'GET' && req.path.startsWith('/products')) ||
+            (req.method === 'GET' && req.path === '/greeting')
         ) {
             return next();
         }
+        // 나머지(POST 등)는 Flask로 프록시
         createProxyMiddleware({
             target: 'http://127.0.0.1:5000',
             changeOrigin: true,

@@ -28,6 +28,701 @@
             box-shadow: 0 0 12px 4px #ffe066;
             transition: background 1s, box-shadow 1s;
         }
+        .product-add-group, .product-add-upload-btn {
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 12px;
+            margin: 0;
+            background: none;
+            transition: height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s;
+            overflow: hidden;
+            opacity: 1;
+            height: auto;
+        }
+        .product-add-group.closed {
+            opacity: 1;
+            height: 24px !important;
+            pointer-events: none;
+        }
+        .product-add-header, .product-list-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .product-add-title {
+            display: block;
+            color: rgba(247, 249, 244, 0.6);
+            font-size: 14px;
+            text-align: center;
+            margin: 12px 0 18px 0;
+            font-family: 'Pretendard', 'Pretendard Variable', sans-serif;
+            font-weight: 400;
+        }
+        .product-list-title {
+            display: block;
+            color: rgba(247, 249, 244, 0.6);
+            font-size: 14px;
+            text-align: center;
+            margin: 72px 0 18px 0;
+            font-family: 'Pretendard', 'Pretendard Variable', sans-serif;
+            font-weight: 400;
+        }
+        .product-add-save-btn, .product-list-save-btn {
+            width: 100%;
+            height: 60px;
+            padding: 12px;
+            background: #4a90e2;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .product-add-save-btn:active, .product-list-save-btn:active {
+            background: #357ab8;
+        }
+        .product-add-message-area {
+            min-height: 24px;
+            width: 100%;
+            text-align: center;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .product-add-message {
+            display: block;
+            min-height: 24px;
+            font-size: 12px;
+        }
+        .product-add-upload-btn {
+            width: 100%;
+            height: 60px;
+            padding: 12px;
+            background: #4a90e2;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: height 0.2s cubic-bezier(0.4,0,0.2,1), opacity 0.2s;
+            overflow: hidden;
+            opacity: 1;
+        }
+        .product-add-upload-btn:active {
+            background: #357ab8;
+        }
+        .product-add-upload-btn.closed {
+            opacity: 1;
+            height: 60px;
+            pointer-events: none;
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.10);
+            border: none;
+        }
+        .product-add-inner-group {
+            padding: 12px 16px;
+        }
+        .greeting-title {
+            display: block;
+            color: rgba(247, 249, 244, 0.6);
+            font-size: 14px;
+            text-align: center;
+            margin: 12px 0 18px 0;
+            font-family: 'Pretendard', 'Pretendard Variable', sans-serif;
+            font-weight: 400;
+        }
+        .product-add-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .product-add-row:last-child {
+            margin-bottom: 0;
+        }
+        #productCategoryRow {
+            margin-bottom: 0;
+        }
+        .product-add-label {
+            min-width: 90px;
+            max-width: 90px;
+            flex-shrink: 0;
+            color: rgba(247, 249, 244, 0.9);
+            font-size: 15px;
+            font-weight: 400;
+            text-align: left;
+            margin-right: 0;
+            margin-left: 4px;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .product-add-row.price-row {
+            align-items: flex-start;
+        }
+        .product-add-row.price-row > .product-add-label {
+            margin-top: 12px;
+        }
+        .product-add-input {
+            flex: 1;
+            width: 100%;
+            font-size: 15px;
+            padding: 10px 16px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: none;
+            color: #fff;
+            min-width: 0;
+            transition: border-color 0.2s, background 0.2s;
+            box-sizing: border-box;
+        }
+        .product-add-input:focus,
+        .product-add-input:hover {
+            background: rgba(16,16,16,0.2);
+            border-color: rgba(255,255,255,0.1);
+            outline: none;
+        }
+        .product-add-input[type="file"] {
+            padding: 0;
+            background: none;
+        }
+        .product-add-inner-group label {
+            color: rgba(247, 249, 244, 0.9);
+        }
+        .select-wrap {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        #productCategory {
+            width: 100%;
+            padding-right: 32px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            transition: border-color 0.2s, background 0.2s;
+        }
+        #productCategory:focus,
+        #productCategory:hover {
+            background: rgba(16,16,16,0.2);
+            border-color: rgba(255,255,255,0.40);
+            outline: none;
+        }
+        .custom-select-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%) rotate(0deg);
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            transition: transform 0.2s;
+            z-index: 2;
+        }
+        .product-add-row.open .custom-select-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        #productCategory option, #productCategory optgroup {
+            background: rgba(16,16,16,0.1);
+            color: #fff;
+        }
+        #productCategory option {
+            color: rgba(16,16,16,0.4);
+        }
+        #productCategory option:checked {
+            color: #101010;
+        }
+        #productCategory option:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .product-add-input#productDesc:focus,
+        .product-add-input#productDesc:hover {
+            background: rgba(16,16,16,0.2);
+            border-color: rgba(255,255,255,0.60);
+            outline: none;
+        }
+        .product-add-input#productDesc {
+            min-height: 110px;
+            height: 110px;
+            line-height: 1.5;
+            resize: none;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .product-add-input#productDesc::placeholder {
+            color: rgba(247,249,244,0.10);
+        }
+        .price-inputs-group {
+            width: 100%;
+        }
+        .price-inputs-group > div {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        .add-price-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(16,16,16,0.4);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 4px;
+            height: 40px;
+            color: #fff;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background 0.2s, border-color 0.2s;
+            cursor: pointer;
+            padding: 0;
+            font-size: 16px;
+        }
+        .add-price-btn:focus,
+        .add-price-btn:hover {
+            background: rgba(16,16,16,0.6);
+            border: 1px solid rgba(255,255,255,0.60);
+        }
+        .remove-price-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            border-radius: 4px;
+            background: rgba(16,16,16,0.0);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #fff;
+            height: 40px;
+            width: 100%;
+            transition: background 0.2s, border-color 0.2s;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        .remove-price-btn:hover,
+        .remove-price-btn:active {
+            background: rgba(16,16,16,0.1);
+            border-color: rgba(255,255,255,0.10);
+        }
+        .remove-price-row-btn {
+            display: none;
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            min-height: 30px;
+            max-width: 30px;
+            max-height: 30px;
+            border-radius: 50%;
+            background: rgba(16,16,16,0.0);
+            border: 1px solid rgba(255,255,255,0.05);
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .remove-price-row-btn:hover,
+        .remove-price-row-btn:active {
+            background: rgba(16,16,16,0.1);
+            border-color: rgba(255,255,255,0.10);
+        }
+        .label-line-block { width: 100%; }
+        .label-line-margin { height: 12px; }
+        .label-line {
+            width: 100%;
+            height: 1px;
+            background: rgba(255,255,255,0.02);
+        }
+        .label-line-content {
+            display: flex;
+            align-items: center;
+        }
+        .custom-file-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #222;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            margin-bottom: 0;
+        }
+        .custom-file-btn:hover,
+        .custom-file-btn:active {
+            background: #333;
+            border-color: #4a90e2;
+            color: #4a90e2;
+        }
+        #productImagePreview img {
+            max-width: 274px;
+            max-height: 274px;
+            width: 274px;
+            height: 274px;
+            border-radius: 4px;
+            display: block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        /* 상품 사진 업로드에만 적용되는 커스텀 파일 버튼 */
+        .form-section--image .custom-file-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #222;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            margin-bottom: 0;
+        }
+        .form-section--image .custom-file-btn:hover,
+        .form-section--image .custom-file-btn:active {
+            background: #333;
+            border-color: #4a90e2;
+            color: #4a90e2;
+        }
+        .form-section--image #productImagePreview img {
+            max-width: 274px;
+            max-height: 274px;
+            width: 274px;
+            height: 274px;
+            border-radius: 4px;
+            display: block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        .product-image-file-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            background: rgba(16,16,16,0.4);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 4px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0;
+            margin-bottom: 0;
+        }
+        .product-image-file-btn:hover,
+        .product-image-file-btn:active {
+            background: rgba(16,16,16,0.6);
+            border: 1px solid rgba(255,255,255,0.60);
+        }
+        .product-image-file-btn .product-upload-icon {
+            opacity: 0.15;
+            transition: opacity 0.2s;
+        }
+        .product-image-file-btn:hover .product-upload-icon,
+        .product-image-file-btn:active .product-upload-icon,
+        .product-image-file-btn.focus .product-upload-icon {
+            opacity: 0.6;
+        }
+        .gallery-image-file-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 60px;
+            background: rgba(16,16,16,0.4);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 4px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            margin-bottom: 0;
+            box-sizing: border-box;
+            padding: 0;
+            overflow: hidden;
+        }
+        .gallery-image-file-btn .btn-text {
+            position: absolute;
+            left: 0; right: 0; top: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .file-count-badge {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            pointer-events: none;
+            font-size: 12px;
+            border: 2px solid rgba(255,255,255,0.05);
+            box-shadow: none;
+            outline: none;
+        }
+        .gallery-image-file-btn:hover,
+        .gallery-image-file-btn:active {
+            background: rgba(16,16,16,0.6);
+            border: 1px solid rgba(255,255,255,0.60);
+        }
+        .form-section--image .product-add-label {
+            margin-bottom: 12px;
+        }
+        .form-section--image .product-image-file-btn {
+            margin-top: 0;
+        }
+        .form-section--image .product-add-row {
+            margin-bottom: 0;
+        }
+        #toggleProductAddBtn {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 2px solid rgba(255,255,255,0.03);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            padding: 0;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        #toggleProductAddBtn:hover,
+        #toggleProductAddBtn:active,
+        #toggleProductAddBtn:focus,
+        #toggleProductAddBtn:focus-visible {
+            background: rgba(16,16,16,0.10);
+            border: 2px solid rgba(255,255,255,0.10);
+            outline: none;
+        }
+        #productTitle {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            transition: border-color 0.2s, background 0.2s;
+        }
+        #productTitle:focus,
+        #productTitle:hover {
+            background: rgba(16,16,16,0.2);
+            border-color: rgba(255,255,255,0.60);
+            outline: none;
+        }
+        .amount.product-add-input, .price.product-add-input {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .amount.product-add-input:focus,
+        .amount.product-add-input:hover,
+        .price.product-add-input:focus,
+        .price.product-add-input:hover {
+            background: rgba(16,16,16,0.2);
+            border-color: rgba(255,255,255,0.60);
+            outline: none;
+        }
+        .amount.product-add-input::placeholder,
+        .price.product-add-input::placeholder {
+            color: rgba(247, 249, 244, 0.10);
+        }
+        #greetingText {
+            width: 100%;
+            line-height: 1.5;
+            resize: none;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            color: #fff;
+            border-radius: 4px;
+            padding: 10px 16px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        #greetingText:focus,
+        #greetingText:hover {
+            background: rgba(16,16,16,0.2);
+            border-color: rgba(255,255,255,0.60);
+            outline: none;
+        }
+        .product-upload-icon {
+            opacity: 0.15;
+            transition: opacity 0.2s;
+        }
+        .gallery-image-file-btn:hover .product-upload-icon,
+        .gallery-image-file-btn:active .product-upload-icon,
+        .gallery-image-file-btn.focus .product-upload-icon {
+            opacity: 0.6;
+        }
+        .greeting-message-area {
+            margin: 12px 0;
+        }
+        .product-list-select-wrap { position:relative; flex:1; width:100%; display:flex; align-items:center; }
+        .product-list-select {
+            width: 100%;
+            padding-left: 16px;
+            padding-right: 32px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.10);
+            transition: border-color 0.2s, background 0.2s;
+            font-size: 15px;
+            color: #fff;
+            height: 40px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .product-list-select:focus,
+        .product-list-select:hover {
+            background: rgba(16,16,16,0.2);
+            border-color: rgba(255,255,255,0.40);
+            outline: none;
+        }
+        .product-list-select option, .product-list-select optgroup {
+            background: rgba(16,16,16,0.1);
+            color: #fff;
+        }
+        .product-list-select option {
+            color: rgba(16,16,16,0.4);
+        }
+        .product-list-select option:checked {
+            color: #101010;
+        }
+        .product-list-select option:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .product-list-custom-select-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%) rotate(0deg);
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            transition: transform 0.2s;
+            z-index: 2;
+        }
+        .product-list-select-wrap.open .product-list-custom-select-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        .product-list-group {
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            row-gap: 16px;
+        }
+        #productList {
+            display: flex;
+            flex-direction: column;
+            row-gap: 16px;
+        }
+        .product-list-item-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            width: 100%;
+        }
+        .product-order-controls {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 8px !important;
+            margin: 0 !important;
+        }
+        .product-list-item {
+            flex: 1 1 0;
+            /* 기존 스타일 유지 */
+        }
+        .product-admin-image-area {
+            width: 80px;
+            flex: 0 0 80px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            background: rgba(16,16,16,0.4);
+            border-radius: 4px;
+        }
+        .product-edit-btn, .product-delete-btn {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            min-height: 30px;
+            max-width: 30px;
+            max-height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.05);
+            background: none;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        .product-list-message-area {
+            margin-top: 12px;
+            margin-bottom: 136px;
+        }
+        .product-list-message-area span,
+        .product-add-message-area span,
+        .gallery-upload-message-area span,
+        .gallery-list-message-area span {
+            display: block;
+            min-height: 24px;
+            font-size: 14px;
+            font-family: 'Pretendard', 'Pretendard Variable', sans-serif;
+            text-align: center;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+        .product-list-success, #galleryUploadMsg, #galleryListSaveMsg, .product-add-message.success {
+            color: #4a90e2 !important;
+        }
+        .product-list-error, #galleryUploadErr, #galleryListSaveErr, .product-add-message.error {
+            color: #ff6b6b !important;
+        }
+        .admin-gallery-item {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0;
+            background: rgba(16,16,16,0.9);
+            border-radius: 4px;
+        }
+        .admin-gallery-item-main {
+            width: 100%;
+            display: flex;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center;
+        }
+        .admin-gallery-item-actions {
+            width: 100%;
+            display: flex;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center;
+        }
     </style>
 </head>
 <body style="background:#101010; color:#fff;">
@@ -47,54 +742,128 @@
         <!-- 컨텐츠 영역 -->
         <div class="admin-content-area">
             <div id="tab-product" class="admin-tab-section">
-                <div style="text-align:right;margin-bottom:8px;">
-                    <button id="saveOrderBtn" style="padding:6px 18px;background:#4a90e2;color:#fff;border:none;border-radius:6px;font-size:15px;cursor:pointer;">순서 저장</button>
-                    <span id="saveOrderMsg" style="margin-left:12px;color:#4caf50;display:none;"></span>
-                </div>
                 <div id="productManager">
-                    <form id="productForm">
-                        <label>카테고리:
-                            <select id="productCategory" name="category">
-                                <option value="red-pepper">고추가루</option>
-                                <option value="perilla">들깨가루</option>
-                                <option value="processed">공산품</option>
-                            </select>
-                        </label><br>
-                        <label>상품명: <input type="text" id="productTitle" required></label><br>
-                        <label>설명: <input type="text" id="productDesc"></label><br>
-                        <div id="priceInputs">
-                            <label>가격(용량/가격):
-                                <input type="text" class="amount" placeholder="예: 500ml" required>
-                                <input type="text" class="price" placeholder="예: 35,000" required>
-                                <button type="button" onclick="addPriceInput()">+</button>
-                            </label>
+                    <span class="product-add-title" style="display:flex;align-items:center;justify-content:center;position:relative;width:100%;">상품 추가
+                      <button id="toggleProductAddBtn" type="button" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:none;cursor:pointer;padding:0;position:absolute;right:0;top:50%;transform:translateY(-50%);">
+                        <img src="images/icon-open.svg" alt="열기" style="width:16px;height:16px;"/>
+                      </button>
+                    </span>
+                    <div class="product-add-group closed">
+                        <div class="product-add-inner-group">
+                        <form id="productForm">
+                            <div class="form-section form-section--category">
+                                <div class="product-add-row" id="productCategoryRow">
+                                    <span class="product-add-label">카테고리</span>
+                                    <div class="select-wrap">
+                                        <select id="productCategory" name="category" class="product-add-input">
+                                            <option value="red-pepper">고추가루</option>
+                                            <option value="perilla">들깨가루</option>
+                                            <option value="processed">공산품</option>
+                                        </select>
+                                        <img src="images/icon-arrow-down.svg" class="custom-select-arrow" alt="아래 화살표">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-section form-section--title">
+                                <div class="product-add-row">
+                                    <div class="label-line-block">
+                                        <div class="label-line-margin"></div>
+                                        <div class="label-line"></div>
+                                        <div class="label-line-margin"></div>
+                                        <div class="label-line-content">
+                                            <span class="product-add-label">상품명</span>
+                                            <input type="text" id="productTitle" class="product-add-input" required placeholder="상품명을 입력해 주세요">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="label-line-block">
+                                <div class="label-line-margin"></div>
+                                <div class="label-line"></div>
+                                <div class="label-line-margin"></div>
+                            </div>
+                            <div class="form-section form-section--price">
+                                <div class="product-add-row price-row" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="product-add-label" style="margin-bottom:12px; margin-top:0;">상품 가격</span>
+                                    <div class="price-inputs-group" style="width:100%;">
+                                        <div id="priceInputs" style="display:flex; flex-direction:row; gap:8px; width:100%; margin-bottom:8px; align-items:center;">
+                                            <input type="text" class="amount product-add-input" placeholder="용량" required>
+                                            <input type="text" class="price product-add-input" placeholder="가격" required>
+                                            <button type="button" class="remove-price-row-btn"><img src="images/icon-minus.svg" alt="삭제" style="width:20px;height:20px;"></button>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="addPriceInput()" class="add-price-btn" style="width:100%;"><img src="images/icon-add.svg" alt="추가" style="width:20px;height:20px;"></button>
+                                    <button type="button" onclick="removePriceInput()" class="remove-price-btn" style="width:100%; display:none;"><img src="images/icon-minus.svg" alt="삭제" style="width:20px;height:20px;"></button>
+                                </div>
+                            </div>
+                            <div class="label-line-block">
+                                <div class="label-line-margin"></div>
+                                <div class="label-line"></div>
+                                <div class="label-line-margin"></div>
+                            </div>
+                            <div class="form-section form-section--desc">
+                                <div style="margin-bottom:0;">
+                                    <label for="productDesc" class="product-add-label" style="display:block;width:100%;margin-bottom:12px;">상품 설명</label>
+                                    <div class="desc-input-group">
+                                        <textarea id="productDesc" class="product-add-input" rows="3" placeholder="상품 설명을 입력해 주세요" maxlength="75"></textarea>
+                                        <div id="descCharCounter" class="desc-char-counter">글자 제한&nbsp;<span id="descCharCount">0</span> / 75</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="label-line-block">
+                                <div class="label-line-margin"></div>
+                                <div class="label-line"></div>
+                                <div class="label-line-margin"></div>
+                            </div>
+                            <div class="form-section form-section--image">
+                                <div class="product-add-row" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="product-add-label">상품 사진</span>
+                                    <label for="productImage" class="product-image-file-btn" style="position:relative;">
+                                        <img src="images/icon-upload.svg" alt="업로드" class="product-upload-icon" style="position:absolute;left:20px;top:50%;transform:translateY(-50%);width:24px;height:24px;">
+                                        <span class="btn-text" style="display:block;width:100%;text-align:center;">파일 선택</span>
+                                    </label>
+                                    <input type="file" id="productImage" class="product-add-input" accept="image/*" required style="display:none;">
+                                    <div id="productImagePreview" style="margin-top:12px;"></div>
+                                </div>
+                            </div>
+                            <div class="product-add-row">
+                                <span id="productFormMsg"></span>
+                            </div>
+                        </form>
                         </div>
-                        <label>이미지: <input type="file" id="productImage" accept="image/*" required></label><br>
-                        <button type="submit">상품 추가</button>
-                        <span id="productFormMsg"></span>
-                    </form>
-                    <hr>
-                    <div>
-                        <label>카테고리별 상품 목록:
-                            <select id="productListCategory">
-                                <option value="red-pepper">고추가루</option>
-                                <option value="perilla">들깨가루</option>
-                                <option value="processed">공산품</option>
-                            </select>
-                        </label>
-                        <button onclick="loadProductList()">새로고침</button>
                     </div>
-                    <div id="productList" style="max-height: 500px; overflow-y: auto;"></div>
+                    <button class="product-add-upload-btn closed" type="button" disabled>상품 업로드</button>
+                    <div class="product-add-message-area">
+                        <span class="product-add-message" style="display:block; min-height:24px;"></span>
+                    </div>
+                    <span class="product-list-title">상품 목록</span>
+                    <div class="product-list-group">
+                        <div>
+                            <div class="product-list-select-wrap" style="position:relative;flex:1;width:100%;display:flex;align-items:center;">
+                                <select id="productListCategory" class="product-list-select" style="width:100%;padding-left:16px;padding-right:32px;appearance:none;-webkit-appearance:none;-moz-appearance:none;background:none;border:1px solid rgba(255,255,255,0.10);transition:border-color 0.2s,background 0.2s;font-size:15px;color:#fff;height:40px;border-radius:4px;box-sizing:border-box;">
+                                    <option value="red-pepper" selected>고추가루</option>
+                                    <option value="perilla">들깨가루</option>
+                                    <option value="processed">공산품</option>
+                                </select>
+                                <img src="images/icon-arrow-down.svg" class="product-list-custom-select-arrow" alt="아래 화살표" style="position:absolute;right:16px;top:50%;transform:translateY(-50%) rotate(0deg);width:10px;height:10px;pointer-events:none;transition:transform 0.2s;z-index:2;">
+                            </div>
+                        </div>
+                        <div id="productList"></div>
+                    </div>
+                    <button class="product-list-save-btn">순서 저장</button>
+                    <div class="product-list-message-area">
+                        <span class="product-list-message"></span>
+                    </div>
                 </div>
             </div>
             <div id="tab-greeting" class="admin-tab-section" style="display:none;">
+                <span class="greeting-title">인사말 입력</span>
                 <form id="greetingForm">
                     <div class="greeting-form-group">
                         <textarea id="greetingText" rows="7"></textarea>
                     </div>
                     <button type="submit" class="greeting-save-btn">저장</button>
-                    <div class="error-message" id="greetingError" style="display:none;"></div>
-                    <div id="greetingSuccess" style="color:#4a90e2;margin-top:10px;display:none;text-align:center;">저장되었습니다.</div>
+                    <div class="greeting-message-area" style="min-height:24px;margin-top:10px;text-align:center;transition:opacity 0.5s;opacity:0;"></div>
                 </form>
             </div>
             <div id="tab-gallery" class="admin-tab-section" style="display:none;">
@@ -102,15 +871,16 @@
                 <div class="gallery-form-group1">
                     <form id="galleryUploadForm" enctype="multipart/form-data" style="margin-bottom:0;">
                         <input type="file" id="galleryFile" style="display:none;" accept="image/*" multiple>
-                        <label for="galleryFile" id="galleryFileLabel" class="custom-file-btn">파일 선택<span class="file-count-badge" id="fileCountBadge"></span></label>
+                        <label for="galleryFile" id="galleryFileLabel" class="gallery-image-file-btn" style="position:relative;">
+                            <img src="images/icon-upload.svg" alt="업로드" class="product-upload-icon" style="position:absolute;left:20px;top:50%;transform:translateY(-50%);width:24px;height:24px;">
+                            <span class="btn-text">파일 선택</span>
+                            <span class="file-count-badge" id="fileCountBadge"></span>
+                        </label>
                         <div id="galleryPreviewArea"></div>
                     </form>
                 </div>
                 <button id="galleryUploadBtn" class="greeting-save-btn" type="submit">업로드</button>
-                <div class="gallery-upload-message-area">
-                    <span id="galleryUploadMsg" style="display:none;">업로드 완료</span>
-                    <span id="galleryUploadErr" style="display:none;">업로드 실패</span>
-                </div>
+                <div class="gallery-upload-message-area" style="min-height:24px;margin:12px 0;text-align:center;transition:opacity 0.5s;opacity:0;font-size:12px;"></div>
                 <div id="galleryUploadBottomSpacer"></div>
                 <span class="gallery-section-title" id="galleryListTitle">현장 사진 리스트</span>
                 <div class="gallery-form-group2">
@@ -125,5 +895,139 @@
             </div>
         </div>
     </div>
+    <script>
+    // 커스텀 셀렉트 화살표 회전 (드롭다운이 열린 상태에서 다시 클릭해도 화살표가 원위치로 돌아오게 개선)
+    document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('productCategory');
+        const row = document.getElementById('productCategoryRow');
+        if (select && row) {
+            select.addEventListener('mousedown', function(e) {
+                if (row.classList.contains('open')) {
+                    row.classList.remove('open');
+                    select.blur();
+                    e.preventDefault(); // 드롭다운이 다시 열리지 않게
+                } else {
+                    row.classList.add('open');
+                    setTimeout(() => select.focus(), 0);
+                }
+            });
+            ['blur', 'focusout', 'change'].forEach(evt => {
+                select.addEventListener(evt, function() {
+                    row.classList.remove('open');
+                });
+            });
+        }
+    });
+    // 설명 입력란 글자수 카운터 및 제한 + 포커스 시 그룹 border 진하게
+    document.addEventListener('DOMContentLoaded', function() {
+        const desc = document.getElementById('productDesc');
+        const counter = document.getElementById('descCharCounter');
+        const countSpan = document.getElementById('descCharCount');
+        const group = desc ? desc.closest('.desc-input-group') : null;
+        if (desc && counter && countSpan && group) {
+            const maxLen = 75;
+            function updateCounter() {
+                let val = desc.value;
+                if (val.length > maxLen) {
+                    desc.value = val.slice(0, maxLen);
+                    val = desc.value;
+                }
+                countSpan.textContent = val.length;
+                if (val.length >= maxLen) {
+                    counter.style.color = '#ff6b6b';
+                } else {
+                    counter.style.color = 'rgba(247,249,244,0.4)';
+                }
+            }
+            desc.addEventListener('input', updateCounter);
+            desc.addEventListener('focus', function() {
+                group.classList.add('focused');
+            });
+            desc.addEventListener('blur', function() {
+                group.classList.remove('focused');
+            });
+            updateCounter(); // 초기화
+        }
+    });
+    // 파일 선택 시 이미지 미리보기
+    document.addEventListener('DOMContentLoaded', function() {
+        const productImageInput = document.getElementById('productImage');
+        const productImagePreview = document.getElementById('productImagePreview');
+        if (productImageInput && productImagePreview) {
+            productImageInput.addEventListener('change', function(e) {
+                const file = this.files && this.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        productImagePreview.innerHTML = `
+                            <div style="position:relative;display:inline-block;">
+                                <img src='${ev.target.result}' alt='미리보기'>
+                                <div class="preview-delete-btn" style="position:absolute;top:8px;right:8px;width:30px;height:30px;">
+                                    <img src="images/icon-trash.svg" alt="삭제" style="width:16px;height:16px;">
+                                </div>
+                            </div>
+                        `;
+                        const delBtn = productImagePreview.querySelector('.preview-delete-btn');
+                        if (delBtn) {
+                            delBtn.onclick = function() {
+                                productImageInput.value = '';
+                                productImagePreview.innerHTML = '';
+                            };
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    productImagePreview.innerHTML = '';
+                }
+            });
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleBtn = document.getElementById('toggleProductAddBtn');
+      const productAddGroup = document.querySelector('.product-add-group');
+      const productAddUploadBtn = document.querySelector('.product-add-upload-btn');
+      const toggleIcon = toggleBtn ? toggleBtn.querySelector('img') : null;
+      if (toggleBtn && productAddGroup && productAddUploadBtn && toggleIcon) {
+        toggleBtn.addEventListener('click', function() {
+          const isClosed = productAddGroup.classList.contains('closed');
+          if (isClosed) {
+            productAddGroup.classList.remove('closed');
+            productAddUploadBtn.classList.remove('closed');
+            productAddUploadBtn.disabled = false;
+          } else {
+            productAddGroup.classList.add('closed');
+            productAddUploadBtn.classList.add('closed');
+            productAddUploadBtn.disabled = true;
+          }
+          toggleIcon.style.transition = 'transform 0.2s';
+          toggleIcon.style.transform = isClosed ? 'rotate(180deg)' : 'rotate(0deg)';
+          toggleBtn.blur();
+        });
+      }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const productImageInput = document.getElementById('productImage');
+        const productImageLabel = document.querySelector('.product-image-file-btn');
+        if (productImageInput && productImageLabel) {
+            productImageInput.addEventListener('focus', function() {
+                productImageLabel.classList.add('focus');
+            });
+            productImageInput.addEventListener('blur', function() {
+                productImageLabel.classList.remove('focus');
+            });
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const galleryFileInput = document.getElementById('galleryFile');
+        const galleryFileLabel = document.getElementById('galleryFileLabel');
+        if (galleryFileInput && galleryFileLabel) {
+            galleryFileInput.addEventListener('change', function() {
+                setTimeout(() => {
+                    galleryFileLabel.blur();
+                }, 150); // 클릭 피드백이 자연스럽게 보이도록 약간의 딜레이
+            });
+        }
+    });
+    </script>
 </body>
 </html> 
