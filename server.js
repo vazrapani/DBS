@@ -42,31 +42,29 @@ app.get('/api/greeting', (req, res) => {
     });
 });
 
-// 프록시 미들웨어는 로컬(개발 환경)에서만 활성화
-if (!isProduction) {
-    app.use('/api', (req, res, next) => {
-        // GET /api/products 또는 GET /api/greeting만 직접 처리
-        if (
-            (req.method === 'GET' && req.path.startsWith('/products')) ||
-            (req.method === 'GET' && req.path === '/greeting')
-        ) {
-            return next();
+// 프록시 미들웨어는 항상 활성화
+app.use('/api', (req, res, next) => {
+    // GET /api/products 또는 GET /api/greeting만 직접 처리
+    if (
+        (req.method === 'GET' && req.path.startsWith('/products')) ||
+        (req.method === 'GET' && req.path === '/greeting')
+    ) {
+        return next();
+    }
+    // 나머지(POST 등)는 Flask로 프록시
+    createProxyMiddleware({
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: { '^/api': '/api' },
+        onProxyReq: (proxyReq, req, res) => {
+            console.log(`[PROXY] ${req.method} ${req.originalUrl} -> ${proxyReq.path}`);
+        },
+        onError: (err, req, res) => {
+            console.error('[PROXY ERROR]', err);
         }
-        // 나머지(POST 등)는 Flask로 프록시
-        createProxyMiddleware({
-            target: 'http://127.0.0.1:5000',
-            changeOrigin: true,
-            ws: true,
-            pathRewrite: { '^/api': '/api' },
-            onProxyReq: (proxyReq, req, res) => {
-                console.log(`[PROXY] ${req.method} ${req.originalUrl} -> ${proxyReq.path}`);
-            },
-            onError: (err, req, res) => {
-                console.error('[PROXY ERROR]', err);
-            }
-        })(req, res, next);
-    });
-}
+    })(req, res, next);
+});
 
 // 정적 파일 서비스 (현재 디렉토리 기준)
 app.use(express.static(path.resolve(__dirname, '.')));
