@@ -46,6 +46,7 @@
     }
     </style>
 <script>
+let currentActiveDot = -1;
 function updateActiveByScroll(category) {
     const section = document.querySelector(`.category-section[data-category="${category}"]`);
     if (!section) return;
@@ -66,11 +67,13 @@ function updateActiveByScroll(category) {
         }
     });
 
-    // 닷 활성화
-    const dots = document.querySelectorAll('.vertical-nav .nav-dot');
-    dots.forEach((dot, idx) => {
-        dot.classList.toggle('active', idx === activeIdx);
-    });
+    if (activeIdx !== currentActiveDot) {
+        const dots = document.querySelectorAll('.vertical-nav .nav-dot');
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === activeIdx);
+        });
+        currentActiveDot = activeIdx;
+    }
 }
 
 function handleScroll() {
@@ -101,35 +104,69 @@ function handleScroll() {
 }
 </script>
     <script>
-        // 네비게이션 닷 업데이트 함수
+        // 카테고리별로 현재 활성 dot 인덱스를 관리
+        const currentActiveDotMap = {};
+
         function updateNavigationDots(category) {
-            const currentSection = document.querySelector(`.category-section[data-category="${category}"]`);
-            if (!currentSection) return;
-            
-            const productCards = currentSection.querySelectorAll('.product-card');
+            // 모든 .vertical-nav를 숨김
+            document.querySelectorAll('.vertical-nav').forEach(nav => {
+                nav.style.display = 'none';
+            });
+            const section = document.querySelector(`.category-section[data-category="${category}"]`);
+            if (!section) return;
+            const productCards = section.querySelectorAll('.product-card');
             const cardCount = productCards.length;
-            
-            // 기존 닷 제거
-            const verticalNav = document.querySelector('.vertical-nav');
+            const verticalNav = section.querySelector('.vertical-nav');
+            if (!verticalNav) return;
+            // 현재 카테고리의 .vertical-nav만 보이게
+            verticalNav.style.display = 'flex';
+            // dot이 이미 원하는 개수만큼 있으면 새로 만들지 않음
+            if (verticalNav.childElementCount === cardCount) return;
             verticalNav.innerHTML = '';
-            
-            // 상품 카드 수만큼 닷 생성
             for (let i = 0; i < cardCount; i++) {
                 const dot = document.createElement('div');
                 dot.className = 'nav-dot';
-                if (i === 0) dot.classList.add('active');
                 dot.addEventListener('click', () => {
-                    // 모든 닷 비활성화
-                    document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
-                    // 클릭한 닷 활성화
+                    verticalNav.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
                     dot.classList.add('active');
-                    // 해당 카드로 스크롤
                     productCards[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
                     setTimeout(() => {
                         updateActiveByScroll(category);
                     }, 500);
                 });
                 verticalNav.appendChild(dot);
+            }
+            currentActiveDotMap[category] = -1;
+        }
+
+        function updateActiveByScroll(category) {
+            const section = document.querySelector(`.category-section[data-category="${category}"]`);
+            if (!section) return;
+            const cards = section.querySelectorAll('.product-card');
+            if (!cards.length) return;
+            const verticalNav = section.querySelector('.vertical-nav');
+            if (!verticalNav) return;
+
+            let minDiff = Infinity;
+            let activeIdx = 0;
+            const centerY = window.innerHeight / 2;
+
+            cards.forEach((card, idx) => {
+                const rect = card.getBoundingClientRect();
+                const cardCenter = rect.top + rect.height / 2;
+                const diff = Math.abs(cardCenter - centerY);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    activeIdx = idx;
+                }
+            });
+
+            if (currentActiveDotMap[category] !== activeIdx) {
+                const dots = verticalNav.querySelectorAll('.nav-dot');
+                dots.forEach((dot, idx) => {
+                    dot.classList.toggle('active', idx === activeIdx);
+                });
+                currentActiveDotMap[category] = activeIdx;
             }
         }
 
@@ -203,11 +240,13 @@ function handleScroll() {
                     }
                 });
 
-                // 닷 활성화
-                const dots = document.querySelectorAll('.vertical-nav .nav-dot');
-                dots.forEach((dot, idx) => {
-                    dot.classList.toggle('active', idx === activeIdx);
-                });
+                if (activeIdx !== currentActiveDot) {
+                    const dots = document.querySelectorAll('.vertical-nav .nav-dot');
+                    dots.forEach((dot, idx) => {
+                        dot.classList.toggle('active', idx === activeIdx);
+                    });
+                    currentActiveDot = activeIdx;
+                }
             }
 
             // 스크롤 이벤트 리스너 등록
