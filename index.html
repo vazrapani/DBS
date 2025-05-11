@@ -738,20 +738,51 @@ function handleScroll() {
     </script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // 메뉴 오버레이 섹션 토글 (아코디언)
+        // 메뉴 오버레이 섹션 토글 (아코디언, 부드러운 height 애니메이션)
         const menuSections = document.querySelectorAll('.menu-section');
         menuSections.forEach(section => {
             const header = section.querySelector('.section-header');
+            const content = section.querySelector('.section-content');
             // 인스타그램(외부링크) 섹션은 제외
             if (!header || header.classList.contains('no-expand')) return;
+            // 초기 상태: 열려 있으면 height auto, 닫혀 있으면 height 0
+            if (section.classList.contains('active')) {
+                content.style.height = 'auto';
+            } else {
+                content.style.height = '0px';
+            }
             header.addEventListener('click', function() {
                 if (section.classList.contains('active')) {
+                    // 닫기: 현재 높이 → 0
+                    const currentHeight = content.scrollHeight;
+                    content.style.height = currentHeight + 'px';
+                    // 강제로 리플로우
+                    void content.offsetHeight;
+                    content.style.transition = 'height 0.3s cubic-bezier(0.4,0,0.2,1)';
+                    content.style.height = '0px';
                     section.classList.remove('active');
                 } else {
+                    // 열기: 0 → 실제 높이(px) → auto
                     menuSections.forEach(s => {
-                        if (s !== section) s.classList.remove('active');
+                        if (s !== section) {
+                            s.classList.remove('active');
+                            const c = s.querySelector('.section-content');
+                            if (c) {
+                                c.style.transition = 'height 0.3s cubic-bezier(0.4,0,0.2,1)';
+                                c.style.height = '0px';
+                            }
+                        }
                     });
                     section.classList.add('active');
+                    content.style.transition = 'height 0.3s cubic-bezier(0.4,0,0.2,1)';
+                    content.style.height = content.scrollHeight + 'px';
+                    // 트랜지션 끝나면 height: auto로 고정
+                    content.addEventListener('transitionend', function handler(e) {
+                        if (section.classList.contains('active')) {
+                            content.style.height = 'auto';
+                        }
+                        content.removeEventListener('transitionend', handler);
+                    });
                 }
             });
         });
