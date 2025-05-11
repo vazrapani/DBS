@@ -120,21 +120,23 @@ function handleScroll() {
             if (!verticalNav) return;
             // 현재 카테고리의 .vertical-nav만 보이게
             verticalNav.style.display = 'flex';
-            // dot이 이미 원하는 개수만큼 있으면 새로 만들지 않음
-            if (verticalNav.childElementCount === cardCount) return;
-            verticalNav.innerHTML = '';
-            for (let i = 0; i < cardCount; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'nav-dot';
-                dot.addEventListener('click', () => {
-                    verticalNav.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
-                    dot.classList.add('active');
-                    productCards[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    setTimeout(() => {
-                        updateActiveByScroll(category);
-                    }, 500);
-                });
-                verticalNav.appendChild(dot);
+            // dot 개수가 다를 때만 새로 생성 (중복 dot 방지)
+            if (verticalNav.childElementCount !== cardCount) {
+                verticalNav.innerHTML = '';
+                for (let i = 0; i < cardCount; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot';
+                    dot.addEventListener('click', () => {
+                        // dot 클릭 시 모든 dot 비활성화 후 해당 dot만 활성화
+                        verticalNav.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
+                        dot.classList.add('active');
+                        productCards[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => {
+                            updateActiveByScroll(category);
+                        }, 500);
+                    });
+                    verticalNav.appendChild(dot);
+                }
             }
             currentActiveDotMap[category] = -1;
         }
@@ -341,6 +343,96 @@ function handleScroll() {
                 });
                 observerB.observe(menuButton, { attributes: true, attributeFilter: ['class'] });
             }
+
+            // 드래그(스와이프)로 카테고리 이동 기능 + 카드 스프링 애니메이션 추가
+            const app = document.querySelector('.app');
+            let dragStartX = null;
+            let dragging = false;
+            let dragThreshold = 50; // 카테고리 전환 임계값(50px)
+            let maxDrag = 50; // 카드가 따라가는 최대 이동 px(50px)
+            let lastDragDiff = 0;
+            let dragCard = null; // 드래그 중인 카드
+
+            // 드래그 중 카드 이동 적용 함수 (한 장만 이동)
+            function setCardTranslate(x) {
+                if (!dragCard) return;
+                dragCard.style.transition = 'none';
+                dragCard.style.transform = `translateX(${x}px)`;
+            }
+            // 카드 스프링 복귀 (한 장만 복귀)
+            function resetCardTranslate() {
+                if (!dragCard) return;
+                dragCard.style.transition = 'transform 0.2s cubic-bezier(0.4,0,0.2,1)';
+                dragCard.style.transform = 'translateX(0)';
+                setTimeout(() => {
+                    if (dragCard) dragCard.style.transition = '';
+                    dragCard = null;
+                }, 220);
+            }
+
+            // 터치 이벤트(모바일)
+            app.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 1) {
+                    dragStartX = e.touches[0].clientX;
+                    dragging = true;
+                    lastDragDiff = 0;
+                    // 드래그 시작한 카드 찾기
+                    const touch = e.touches[0];
+                    dragCard = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.product-card');
+                }
+            });
+            app.addEventListener('touchmove', function(e) {
+                if (!dragging || e.touches.length !== 1) return;
+                const currX = e.touches[0].clientX;
+                let diffX = currX - dragStartX;
+                if (Math.abs(diffX) > maxDrag) diffX = maxDrag * Math.sign(diffX);
+                setCardTranslate(diffX);
+                lastDragDiff = diffX;
+            });
+            app.addEventListener('touchend', function(e) {
+                if (!dragging) return;
+                const endX = e.changedTouches[0].clientX;
+                const diffX = endX - dragStartX;
+                if (Math.abs(diffX) > dragThreshold) {
+                    if (diffX > 0) moveToCategory('next');
+                    else moveToCategory('prev');
+                }
+                resetCardTranslate();
+                dragging = false;
+                dragStartX = null;
+                lastDragDiff = 0;
+            });
+
+            // 마우스 이벤트(PC)
+            app.addEventListener('mousedown', function(e) {
+                if (e.button !== 0) return;
+                dragStartX = e.clientX;
+                dragging = true;
+                lastDragDiff = 0;
+                // 드래그 시작한 카드 찾기
+                dragCard = document.elementFromPoint(e.clientX, e.clientY)?.closest('.product-card');
+            });
+            app.addEventListener('mousemove', function(e) {
+                if (!dragging) return;
+                const currX = e.clientX;
+                let diffX = currX - dragStartX;
+                if (Math.abs(diffX) > maxDrag) diffX = maxDrag * Math.sign(diffX);
+                setCardTranslate(diffX);
+                lastDragDiff = diffX;
+            });
+            app.addEventListener('mouseup', function(e) {
+                if (!dragging) return;
+                const endX = e.clientX;
+                const diffX = endX - dragStartX;
+                if (Math.abs(diffX) > dragThreshold) {
+                    if (diffX > 0) moveToCategory('next');
+                    else moveToCategory('prev');
+                }
+                resetCardTranslate();
+                dragging = false;
+                dragStartX = null;
+                lastDragDiff = 0;
+            });
         });
     </script>
 </head>
@@ -362,7 +454,7 @@ function handleScroll() {
                   </svg>
                 </div>
             </header>
-            
+            <div class="header-divider"></div>
             <nav class="navigation-bar">
                 <ul class="menu-list">
                     <li class="menu-item active"><a href="#" class="menu-link" data-category="red-pepper">고추가루</a></li>
@@ -550,13 +642,20 @@ function handleScroll() {
         </div>
     </div>
     <script>
-        // 헤더 높이만큼 오버레이 위치 자동 조정
+        // 헤더 높이 + 디바이더 높이만큼 오버레이 위치 자동 조정
         function updateOverlayTop() {
             const header = document.querySelector('.top-app-bar');
-            const overlay = document.querySelector('.image-overlay');
-            if (header && overlay) {
+            const divider = document.querySelector('.header-divider');
+            const overlays = [
+                document.querySelector('.image-overlay'),
+                document.querySelector('.menu-overlay')
+            ];
+            if (header && divider) {
                 const headerHeight = header.offsetHeight;
-                overlay.style.top = headerHeight + 'px';
+                const dividerHeight = divider.offsetHeight;
+                overlays.forEach(overlay => {
+                    if (overlay) overlay.style.top = (headerHeight + dividerHeight) + 'px';
+                });
             }
         }
         window.addEventListener('resize', updateOverlayTop);
