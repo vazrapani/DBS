@@ -720,5 +720,42 @@ function handleScroll() {
         });
     });
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 대표 인사말 fetch 및 표시
+        fetch('/api/greeting')
+            .then(res => res.json())
+            .then(data => {
+                const greetingText = document.getElementById('greetingText');
+                if (greetingText && data.greeting) {
+                    greetingText.textContent = data.greeting;
+                }
+            })
+            .catch(() => {
+                // 에러 시 아무것도 표시하지 않음(디자인/기능 영향 없음)
+            });
+    });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 메뉴 오버레이 섹션 토글 (아코디언)
+        const menuSections = document.querySelectorAll('.menu-section');
+        menuSections.forEach(section => {
+            const header = section.querySelector('.section-header');
+            // 인스타그램(외부링크) 섹션은 제외
+            if (!header || header.classList.contains('no-expand')) return;
+            header.addEventListener('click', function() {
+                if (section.classList.contains('active')) {
+                    section.classList.remove('active');
+                } else {
+                    menuSections.forEach(s => {
+                        if (s !== section) s.classList.remove('active');
+                    });
+                    section.classList.add('active');
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>
