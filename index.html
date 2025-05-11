@@ -75,19 +75,25 @@ function updateActiveByScroll(category) {
 
 function handleScroll() {
     const sections = document.querySelectorAll('.category-section');
-    let firstVisibleSection = null;
-    let minTop = Infinity;
+    let maxVisible = 0;
+    let activeSection = null;
+    const viewportTop = 0;
+    const viewportBottom = window.innerHeight;
 
     sections.forEach(section => {
         const rect = section.getBoundingClientRect();
-        if (rect.top >= 0 && rect.top < minTop) {
-            minTop = rect.top;
-            firstVisibleSection = section;
+        // 화면에 보이는 부분 계산
+        const visibleTop = Math.max(rect.top, viewportTop);
+        const visibleBottom = Math.min(rect.bottom, viewportBottom);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+        if (visibleHeight > maxVisible) {
+            maxVisible = visibleHeight;
+            activeSection = section;
         }
     });
 
-    if (firstVisibleSection) {
-        const category = firstVisibleSection.getAttribute('data-category');
+    if (activeSection) {
+        const category = activeSection.getAttribute('data-category');
         updateMenuActive(category);
         updateNavigationDots(category);
         updateActiveByScroll(category);
@@ -297,28 +303,6 @@ function handleScroll() {
                 observerB.observe(menuButton, { attributes: true, attributeFilter: ['class'] });
             }
         });
-
-        // 1. handleScroll 함수 정의를 DOMContentLoaded 바깥으로 이동
-        function handleScroll() {
-            const sections = document.querySelectorAll('.category-section');
-            let firstVisibleSection = null;
-            let minTop = Infinity;
-
-            sections.forEach(section => {
-                const rect = section.getBoundingClientRect();
-                if (rect.top >= 0 && rect.top < minTop) {
-                    minTop = rect.top;
-                    firstVisibleSection = section;
-                }
-            });
-
-            if (firstVisibleSection) {
-                const category = firstVisibleSection.getAttribute('data-category');
-                updateMenuActive(category);
-                updateNavigationDots(category);
-                updateActiveByScroll(category);
-            }
-        }
     </script>
 </head>
 <body>
@@ -359,29 +343,33 @@ function handleScroll() {
                 <!-- 상품카드 템플릿 (숨김) -->
                 <template id="productCardTemplate">
                   <div class="product-card">
-                    <img class="product-image" src="" alt="상품 이미지">
+                    <div class="product-image-area">
+                      <img class="product-image" src="" alt="상품 이미지">
+                    </div>
                     <div class="product-info">
-                      <div class="product-content">
+                      <div class="product-info-title">
                         <h3 class="product-title"></h3>
-                        <div class="price-group"></div>
+                      </div>
+                      <div class="product-info-price">
+                        <!-- .product-price들이 여기에 바로 들어감 -->
+                      </div>
+                      <div class="product-info-desc">
                         <p class="product-description"></p>
                       </div>
-                      <div class="product-buttons">
-                        <div class="buttons-content">
-                          <a href="tel:010-9002-0797" class="call-button call-button-1">
-                            <div class="button-icon">
-                              <img src="images/icon-call.svg" alt="전화 아이콘">
-                            </div>
-                            <span>전화 문의</span>
-                          </a>
-                          <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
-                            <div class="button-icon">
-                              <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
-                            </div>
-                            <span>카톡 문의</span>
-                          </a>
+                    </div>
+                    <div class="product-button-group">
+                      <a href="tel:010-9002-0797" class="call-button call-button-1">
+                        <div class="button-icon">
+                          <img src="images/icon-call.svg" alt="전화 아이콘">
                         </div>
-                      </div>
+                        <span>전화 문의</span>
+                      </a>
+                      <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
+                        <div class="button-icon">
+                          <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
+                        </div>
+                        <span>카카오톡 문의</span>
+                      </a>
                     </div>
                   </div>
                 </template>
@@ -408,12 +396,12 @@ function handleScroll() {
                         if (!data.success || !data.products) return;
                         
                         const template = document.getElementById('productCardTemplate');
-                        data.products.forEach((product, idx) => {
+                        data.products.slice().reverse().forEach((product, idx) => {
                             const card = template.content.cloneNode(true);
                             const productImage = card.querySelector('.product-image');
                             const productTitle = card.querySelector('.product-title');
                             const productDescription = card.querySelector('.product-description');
-                            const priceGroup = card.querySelector('.price-group');
+                            const priceGroup = card.querySelector('.product-info-price');
 
                             productImage.src = `/${product.image}`;
                             productImage.alt = product.title || '상품 이미지';
@@ -592,319 +580,7 @@ function handleScroll() {
                 }
             });
         });
-
-        // 카카오톡 버튼 처리
-        document.querySelectorAll('.call-button-2').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const kakaoUrl = 'https://open.kakao.com/o/shaHxdsh';
-                
-                // 새 창에서 열기 (하이브리드 앱 환경 고려)
-                window.open(kakaoUrl, '_system');
-            });
-        });
     });
-    </script>
-    <script>
-    // 드래그 관련 변수
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let currentCard = null;
-    let isHorizontalDrag = false;
-    const DRAG_THRESHOLD = 50;
-    const DIRECTION_LOCK_THRESHOLD = 10;
-
-    // 터치 이벤트 리스너 등록
-    document.addEventListener('DOMContentLoaded', function() {
-        const productList = document.getElementById('product-list');
-        
-        // 터치 이벤트 리스너 추가
-        productList.addEventListener('touchstart', handleTouchStart, { passive: false });
-        productList.addEventListener('touchmove', handleTouchMove, { passive: false });
-        productList.addEventListener('touchend', handleTouchEnd, { passive: false });
-    });
-
-    // 터치 시작
-    function handleTouchStart(e) {
-        const card = e.target.closest('.product-card');
-        if (!card) return;
-
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-        currentCard = card;
-        isHorizontalDrag = false;
-        
-        // 트랜지션 일시 제거
-        currentCard.style.transition = 'none';
-    }
-
-    // 터치 이동
-    function handleTouchMove(e) {
-        if (!currentCard || !touchStartX) return;
-
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
-        const deltaX = touchX - touchStartX;
-        const deltaY = touchY - touchStartY;
-
-        // 방향 잠금 (수평/수직 스크롤 결정)
-        if (!isHorizontalDrag) {
-            if (Math.abs(deltaX) > DIRECTION_LOCK_THRESHOLD || Math.abs(deltaY) > DIRECTION_LOCK_THRESHOLD) {
-                isHorizontalDrag = Math.abs(deltaX) > Math.abs(deltaY);
-                if (!isHorizontalDrag) {
-                    currentCard = null;
-                    return;
-                }
-            }
-        }
-
-        if (isHorizontalDrag) {
-            e.preventDefault();
-            // 드래그 범위를 50px로 제한
-            const limitedDeltaX = Math.max(Math.min(deltaX, 50), -50);
-            currentCard.style.transform = `translateX(${limitedDeltaX}px)`;
-            
-            // 드래그 방향에 따른 클래스 추가
-            currentCard.classList.remove('drag-left', 'drag-right');
-            if (deltaX < -DRAG_THRESHOLD) {
-                currentCard.classList.add('drag-left');
-            } else if (deltaX > DRAG_THRESHOLD) {
-                currentCard.classList.add('drag-right');
-            }
-        }
-    }
-
-    // 터치 종료
-    function handleTouchEnd(e) {
-        if (!currentCard) return;
-
-        const deltaX = e.changedTouches[0].clientX - touchStartX;
-        currentCard.style.transition = 'transform 0.3s ease';
-        currentCard.style.transform = '';
-
-        // 드래그 방향 클래스 제거
-        currentCard.classList.remove('drag-left', 'drag-right');
-        
-        // 임계값을 넘은 경우 카드 전환
-        if (Math.abs(deltaX) > DRAG_THRESHOLD) {
-            const direction = deltaX > 0 ? 'next' : 'prev';
-            moveToCategory(direction);
-        }
-
-        // 드래그 후 상태 갱신
-        updateActiveByScroll(currentCard.closest('.category-section').getAttribute('data-category'));
-
-        currentCard = null;
-        touchStartX = 0;
-    }
-    </script>
-    <script>
-    let greetingCache = null;
-    let galleryCache = null;
-    let galleryLoading = false;
-    let greetingLoading = false;
-
-    function renderGreeting(data) {
-        const greetingText = document.getElementById('greetingText');
-        if (greetingText) {
-            greetingText.textContent = data && data.greeting ? data.greeting : '대표 인사말이 없습니다.';
-        }
-    }
-
-    async function loadGreeting() {
-        const greetingText = document.getElementById('greetingText');
-        if (greetingCache) {
-            renderGreeting(greetingCache);
-            return;
-        }
-        if (greetingLoading) return;
-        greetingLoading = true;
-        if (greetingText) greetingText.textContent = '로딩중...';
-        try {
-            const response = await fetch('/api/greeting');
-            const data = await response.json();
-            greetingCache = data;
-            renderGreeting(data);
-        } catch (error) {
-            if (greetingText) greetingText.textContent = '인사말 로드 실패';
-        } finally {
-            greetingLoading = false;
-        }
-    }
-
-    function renderGallery(images) {
-        const galleryContainer = document.getElementById('galleryContainer');
-        if (!galleryContainer) return;
-        galleryContainer.innerHTML = '';
-        if (!images || images.length === 0) {
-            galleryContainer.innerHTML = '<div style="color:#aaa;text-align:center;">현장 사진이 없습니다.</div>';
-            return;
-        }
-        images.forEach((filename, index) => {
-            const galleryItem = document.createElement('div');
-            galleryItem.className = 'gallery-item';
-            const img = document.createElement('img');
-            img.src = `images/gallery/${filename}`;
-            img.alt = `현장 사진 ${index + 1}`;
-            img.loading = 'lazy';
-            img.addEventListener('click', function() {
-                const overlay = document.querySelector('.image-overlay');
-                const enlargedImage = overlay.querySelector('.enlarged-image');
-                enlargedImage.innerHTML = '';
-                const bigImg = document.createElement('img');
-                bigImg.src = this.src;
-                bigImg.alt = this.alt || '현장 사진';
-                bigImg.style.width = '360px';
-                bigImg.style.height = 'auto';
-                bigImg.style.display = 'block';
-                enlargedImage.appendChild(bigImg);
-                fadeInOverlay(overlay);
-                document.body.style.overflow = 'hidden';
-            });
-            galleryItem.appendChild(img);
-            galleryContainer.appendChild(galleryItem);
-        });
-    }
-
-    async function loadGalleryImages() {
-        const galleryContainer = document.getElementById('galleryContainer');
-        if (!galleryContainer) return;
-        if (galleryCache) {
-            renderGallery(galleryCache);
-            return;
-        }
-        if (galleryLoading) return;
-        galleryLoading = true;
-        galleryContainer.innerHTML = '<div style="color:#aaa;text-align:center;">로딩중...</div>';
-        try {
-            const response = await fetch('/api/gallery/list');
-            const data = await response.json();
-            galleryCache = (data.images || []);
-            renderGallery(galleryCache);
-        } catch (error) {
-            galleryContainer.innerHTML = '<div style="color:#ff6b6b;text-align:center;">갤러리 로드 실패</div>';
-        } finally {
-            galleryLoading = false;
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        loadGreeting();
-        // 현장 사진은 섹션 열릴 때만 1회 fetch
-        let galleryLoaded = false;
-        const gallerySection = document.querySelector('.menu-section[data-section="gallery"]');
-        if (gallerySection) {
-            const header = gallerySection.querySelector('.section-header');
-            header.addEventListener('click', function() {
-                if (!gallerySection.classList.contains('active') && !galleryLoaded) {
-                    loadGalleryImages();
-                    galleryLoaded = true;
-                }
-            });
-        }
-    });
-    </script>
-    <script>
-    window.navermap_authFailure = function() {
-        console.error('네이버 지도 API 인증 실패');
-        alert('지도 로딩 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-    };
-
-    function initMap() {
-        try {
-            console.log('지도 초기화 시작');
-            var mapOptions = {
-                center: new naver.maps.LatLng(37.5666805, 126.9784147),
-                zoom: 16,
-                scaleControl: false,
-                logoControl: false,
-                mapDataControl: false,
-                zoomControl: true,
-                minZoom: 6,
-                maxZoom: 21
-            };
-            
-            var map = new naver.maps.Map('map', mapOptions);
-            console.log('지도 객체 생성 완료');
-            
-            var marker = new naver.maps.Marker({
-                position: new naver.maps.LatLng(37.5666805, 126.9784147),
-                map: map
-            });
-            console.log('마커 생성 완료');
-        } catch (error) {
-            console.error('지도 초기화 중 오류 발생:', error);
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const mapSection = document.querySelector('.menu-section[data-section="map"]');
-        if (mapSection) {
-            const header = mapSection.querySelector('.section-header');
-            header.addEventListener('click', function() {
-                if (!mapSection.classList.contains('active')) {
-                    setTimeout(initMap, 500);
-                }
-            });
-        }
-    });
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 메뉴 섹션 클릭 이벤트
-        const sections = document.querySelectorAll('.menu-section');
-        sections.forEach(section => {
-            const header = section.querySelector('.section-header');
-            if (!header.classList.contains('no-expand')) {  // no-expand 클래스가 없는 경우에만 토글 기능 추가
-                const content = section.querySelector('.section-content');
-                
-                header.addEventListener('click', () => {
-                    const isActive = section.classList.contains('active');
-                    
-                    // 다른 섹션들 닫기
-                    sections.forEach(s => {
-                        if (s !== section && s.classList.contains('active')) {
-                            s.classList.remove('active');
-                            s.querySelector('.section-content').style.height = '0';
-                        }
-                    });
-                    
-                    // 현재 섹션 토글
-                    section.classList.toggle('active');
-                    
-                    if (!isActive) {
-                        content.style.height = content.scrollHeight + 'px';
-                        // 지도가 있는 섹션이 열릴 때 지도 초기화
-                        if (section.querySelector('#map')) {
-                            setTimeout(initMap, 500);
-                        }
-                    } else {
-                        content.style.height = '0';
-                    }
-                });
-            }
-        });
-    });
-    </script>
-    <script>
-    async function updateStaticCards() {
-        try {
-            const res = await fetch('/api/products/red-pepper');
-            const data = await res.json();
-            if (!data.success || !data.products) return;
-            
-            // 나머지 코드는 그대로 유지
-            data.products.forEach((product, idx) => {
-                const imgEl = document.querySelector(`.static-card-${idx + 1} .static-product-image`);
-                if (imgEl && product.image) {
-                    imgEl.style.backgroundImage = `url('/${product.image}')`;
-                }
-            });
-        } catch (error) {
-            console.error('상품 로드 중 오류:', error);
-        }
-    }
-    document.addEventListener('DOMContentLoaded', updateStaticCards);
     </script>
 </body>
-</html> 
+</html>

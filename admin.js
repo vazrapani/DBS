@@ -540,6 +540,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderProductList(products) {
         const productListDiv = document.getElementById('productList');
         productListDiv.innerHTML = '';
+        // reverse() 제거: 이미 최신순으로 정렬된 배열이 전달됨
         products.forEach((product, idx) => {
             const item = document.createElement('div');
             item.className = 'product-list-item';
@@ -703,7 +704,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (!data.success || !data.products) return;
-                productListData = data.products.slice();
+                // 최신순으로 productListData 저장
+                productListData = data.products.slice().reverse();
                 renderProductList(productListData);
             });
     }
@@ -717,6 +719,8 @@ document.addEventListener('DOMContentLoaded', function() {
         productAddMsg.style.opacity = 0;
         productAddMsg.style.transition = 'opacity 0.5s';
         productUploadBtn.addEventListener('click', function() {
+            // 업로드 버튼 클릭 시 스크롤 위치 저장
+            const prevScrollY = window.scrollY;
             // 메시지 초기화: 텍스트만 비우지 않고 opacity만 0으로
             productAddMsg.style.opacity = 0;
             productAddMsg.style.display = 'block';
@@ -783,7 +787,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         setTimeout(() => { productAddMsg.textContent = ''; }, 500);
                     }, 3000);
                     productForm.reset();
+                    // 이미지 미리보기까지 완전히 비움
+                    const productImagePreview = document.getElementById('productImagePreview');
+                    if (productImagePreview) productImagePreview.innerHTML = '';
                     if (window.loadProductList) window.loadProductList();
+                    // 스크롤 위치 복원 (상품 목록 갱신 후)
+                    setTimeout(() => {
+                        window.scrollTo({ top: prevScrollY, behavior: 'auto' });
+                    }, 0);
                 } else {
                     productAddMsg.textContent = (data.message || '저장 실패').replace(/\.$/, '');
                     productAddMsg.style.color = '#ff6b6b';

@@ -102,12 +102,14 @@ main {
     flex: 0 0 auto;
     scroll-snap-align: center;
     scroll-snap-stop: always;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     user-select: none;
     transform: translateX(0);
     transition: transform 0.3s ease;
     will-change: transform;
     touch-action: pan-y pinch-zoom;
+    padding: 16px;
+    padding-bottom: 24px;
 }
 
 /* 고추가루 카테고리 카드 배경 */
@@ -128,25 +130,33 @@ main {
     background: white url('images/bg_card_product.png') no-repeat center/cover;
 }
 
+.product-image-area {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 270px;
+}
+
 .product-image {
+    padding: 0;
+    margin: 0;
     width: 270px;
     height: 270px;
     object-fit: contain;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 16px;
 }
 
 .product-info {
     flex: 1;
     width: 100%;
-    padding: 0;
+    padding: 8px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    gap: 12px;
+    gap: 8px;
 }
 
 .product-content {
@@ -174,12 +184,8 @@ main {
     margin: 0;
     position: relative;
     display: grid;
-    grid-template-columns: 12px 48px 12px 48px 12px;
+    grid-template-columns: 12px 48px 12px auto 12px;
     align-items: center;
-}
-
-.product-price + .product-price {
-    margin-top: 8px;
 }
 
 .product-price::before {
@@ -192,12 +198,16 @@ main {
 }
 
 .product-price .colon {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding-bottom: 2px;
 }
 
 .product-price .price {
     text-align: left;
-    padding: 0;
+    padding-right: 4px;
 }
 
 .product-price .unit {
@@ -217,6 +227,13 @@ main {
 
 .product-description::before {
     content: none;
+}
+
+.product-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 16px;
 }
 
 .product-buttons {
@@ -1525,4 +1542,10 @@ main {
     width: 20px;
     height: 20px;
     display: block;
+}
+
+.product-info-price {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 } 
