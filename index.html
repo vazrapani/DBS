@@ -806,5 +806,83 @@ function handleScroll() {
         });
     });
     </script>
+    <script>
+    // 현장 사진(Gallery) 연동 (미리 로딩)
+    let galleryImagesCache = null;
+    function loadGalleryImages() {
+        // 캐시가 있으면 바로 렌더
+        if (galleryImagesCache) {
+            renderGalleryImages(galleryImagesCache);
+            return;
+        }
+        fetch('/api/gallery/list')
+            .then(res => res.json())
+            .then(data => {
+                galleryImagesCache = data;
+                renderGalleryImages(data);
+            })
+            .catch(() => {
+                renderGalleryImages({ images: null, error: true });
+            });
+    }
+    function renderGalleryImages(data) {
+        const galleryContainer = document.getElementById('galleryContainer');
+        if (!galleryContainer) return;
+        galleryContainer.innerHTML = '';
+        if (data.error) {
+            galleryContainer.innerHTML = '<div style="color:#ff6b6b;font-size:16px;padding:32px 0;text-align:center;width:100%;">사진 목록을 불러오는 중 오류가 발생했습니다.</div>';
+            return;
+        }
+        if (data.images && data.images.length > 0) {
+            data.images.forEach((filename, idx) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                const img = document.createElement('img');
+                img.src = `images/gallery/${filename}`;
+                img.alt = `현장 사진 ${idx + 1}`;
+                img.className = 'gallery-image';
+                item.appendChild(img);
+                galleryContainer.appendChild(item);
+            });
+        } else {
+            galleryContainer.innerHTML = '<div style="color:rgba(247,249,244,0.4);font-size:16px;padding:32px 0;text-align:center;width:100%;">등록된 사진이 없습니다.</div>';
+        }
+    }
+
+    // 찾아오시는 길(Map) 연동 (미리 로딩)
+    let mapLoaded = false;
+    function loadMap() {
+        if (mapLoaded) return;
+        if (window.naver && window.naver.maps) {
+            const mapDiv = document.getElementById('map');
+            if (!mapDiv) return;
+            // 이미 지도 인스턴스가 있으면 중복 생성 방지
+            if (mapDiv._naverMapInstance) return;
+            // 좌표 및 옵션(예시: 동빈스토어 위치)
+            const mapOptions = {
+                center: new naver.maps.LatLng(36.123456, 127.123456), // 실제 좌표로 교체 필요
+                zoom: 16,
+                minZoom: 10,
+                maxZoom: 18,
+                mapTypeControl: false
+            };
+            const map = new naver.maps.Map(mapDiv, mapOptions);
+            mapDiv._naverMapInstance = map;
+            // 마커 추가(예시)
+            new naver.maps.Marker({
+                position: new naver.maps.LatLng(36.123456, 127.123456), // 실제 좌표로 교체 필요
+                map: map,
+                title: '동빈 스토어'
+            });
+            mapLoaded = true;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 현장 사진/지도 미리 로딩
+        loadGalleryImages();
+        loadMap();
+    });
+    </script>
 </body>
 </html>
