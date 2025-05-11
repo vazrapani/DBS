@@ -738,8 +738,9 @@ function handleScroll() {
     </script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // 메뉴 오버레이 섹션 토글 (아코디언, 부드러운 height 애니메이션)
+        // 메뉴 오버레이 섹션 토글 (아코디언, 닫힘/열림 모두 동시에 부드러운 height 애니메이션)
         const menuSections = document.querySelectorAll('.menu-section');
+        let isTransitioning = false;
         menuSections.forEach(section => {
             const header = section.querySelector('.section-header');
             const content = section.querySelector('.section-content');
@@ -752,36 +753,53 @@ function handleScroll() {
                 content.style.height = '0px';
             }
             header.addEventListener('click', function() {
+                if (isTransitioning) return; // 트랜지션 중 중복 클릭 방지
+                const openedSection = document.querySelector('.menu-section.active');
                 if (section.classList.contains('active')) {
                     // 닫기: 현재 높이 → 0
                     const currentHeight = content.scrollHeight;
                     content.style.height = currentHeight + 'px';
-                    // 강제로 리플로우
                     void content.offsetHeight;
                     content.style.transition = 'height 0.3s cubic-bezier(0.4,0,0.2,1)';
+                    isTransitioning = true;
                     content.style.height = '0px';
-                    section.classList.remove('active');
-                } else {
-                    // 열기: 0 → 실제 높이(px) → auto
-                    menuSections.forEach(s => {
-                        if (s !== section) {
-                            s.classList.remove('active');
-                            const c = s.querySelector('.section-content');
-                            if (c) {
-                                c.style.transition = 'height 0.3s cubic-bezier(0.4,0,0.2,1)';
-                                c.style.height = '0px';
-                            }
+                    content.addEventListener('transitionend', function handler(e) {
+                        if (e.target === content) {
+                            section.classList.remove('active');
+                            isTransitioning = false;
+                            content.removeEventListener('transitionend', handler);
                         }
                     });
+                } else {
+                    // 열려 있던 섹션 닫기(동시에 트랜지션)
+                    if (openedSection && openedSection !== section) {
+                        const openedContent = openedSection.querySelector('.section-content');
+                        if (openedContent) {
+                            openedContent.style.transition = 'height 0.3s cubic-bezier(0.4,0,0.2,1)';
+                            openedContent.style.height = openedContent.scrollHeight + 'px';
+                            void openedContent.offsetHeight;
+                            openedContent.style.height = '0px';
+                            openedContent.addEventListener('transitionend', function handler(e) {
+                                if (e.target === openedContent) {
+                                    openedSection.classList.remove('active');
+                                    openedContent.removeEventListener('transitionend', handler);
+                                }
+                            });
+                        }
+                    }
+                    // 열기: 0 → 실제 높이(px) → auto
                     section.classList.add('active');
                     content.style.transition = 'height 0.3s cubic-bezier(0.4,0,0.2,1)';
+                    content.style.height = '0px';
+                    void content.offsetHeight;
+                    isTransitioning = true;
                     content.style.height = content.scrollHeight + 'px';
-                    // 트랜지션 끝나면 height: auto로 고정
                     content.addEventListener('transitionend', function handler(e) {
-                        if (section.classList.contains('active')) {
+                        if (e.target === content) {
                             content.style.height = 'auto';
+                            isTransitioning = false;
+                            content.removeEventListener('transitionend', handler);
                         }
-                        content.removeEventListener('transitionend', handler);
                     });
                 }
             });
