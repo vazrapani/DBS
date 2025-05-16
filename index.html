@@ -188,7 +188,7 @@ function handleScroll() {
 
         // 전역 함수로 이동
         function moveToCategory(direction) {
-            const categoryOrder = ['red-pepper', 'perilla', 'processed'];
+            const categoryOrder = ['red-pepper', 'perilla', 'seafood', 'processed'];
             const currentSection = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2)
                 .closest('.category-section');
             if (!currentSection) return;
@@ -459,6 +459,7 @@ function handleScroll() {
                 <ul class="menu-list">
                     <li class="menu-item active"><a href="#" class="menu-link" data-category="red-pepper">고추가루</a></li>
                     <li class="menu-item"><a href="#" class="menu-link" data-category="perilla">들깨가루</a></li>
+                    <li class="menu-item"><a href="#" class="menu-link" data-category="seafood">수산물</a></li>
                     <li class="menu-item"><a href="#" class="menu-link" data-category="processed">공산품</a></li>
                 </ul>
             </nav>
@@ -495,7 +496,7 @@ function handleScroll() {
                         </div>
                         <span>전화 문의</span>
                       </a>
-                      <a href="https://open.kakao.com/o/shaHxdsh" target="_blank" class="call-button call-button-2">
+                      <a href="https://open.kakao.com/o/s33NGQvh" target="_blank" class="call-button call-button-2">
                         <div class="button-icon">
                           <img src="images/icon-kakao.svg" alt="카카오톡 아이콘">
                         </div>
@@ -512,6 +513,10 @@ function handleScroll() {
                 <div class="category-section" data-category="perilla">
                   <div class="vertical-nav"></div>
                   <div class="product-list" id="productList-perilla"></div>
+                </div>
+                <div class="category-section" data-category="seafood">
+                  <div class="vertical-nav"></div>
+                  <div class="product-list" id="productList-seafood"></div>
                 </div>
                 <div class="category-section" data-category="processed">
                   <div class="vertical-nav"></div>
@@ -574,6 +579,7 @@ function handleScroll() {
                     Promise.all([
                         loadProducts('red-pepper'),
                         loadProducts('perilla'),
+                        loadProducts('seafood'),
                         loadProducts('processed')
                     ]).then(() => {
                         updateNavigationDots('red-pepper');
@@ -882,6 +888,46 @@ function handleScroll() {
         // 현장 사진/지도 미리 로딩
         loadGalleryImages();
         loadMap();
+    });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 메뉴 오버레이 현장사진(갤러리) 이미지 클릭 시 오버레이로 확대
+        const galleryContainer = document.getElementById('galleryContainer');
+        const imageOverlay = document.querySelector('.image-overlay');
+        const enlargedImage = document.querySelector('.image-overlay .enlarged-image');
+        const closeButton = document.querySelector('.image-overlay .close-button');
+        if (galleryContainer && imageOverlay && enlargedImage && closeButton) {
+            galleryContainer.addEventListener('click', function(e) {
+                const target = e.target;
+                if (target && target.classList.contains('gallery-image')) {
+                    // 이미지 src로 오버레이에 이미지 삽입
+                    enlargedImage.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = target.src;
+                    img.alt = target.alt || '';
+                    img.style.width = '360px';
+                    img.style.height = 'auto';
+                    img.style.borderRadius = '8px';
+                    img.style.display = 'block';
+                    enlargedImage.appendChild(img);
+                    // 오버레이 열기
+                    imageOverlay.style.display = 'flex';
+                    setTimeout(() => imageOverlay.classList.add('active'), 10);
+                    document.body.style.overflow = 'hidden';
+                }
+            });
+            // 닫기 버튼 클릭 시 오버레이 닫기
+            closeButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                imageOverlay.classList.remove('active');
+                setTimeout(() => {
+                    imageOverlay.style.display = 'none';
+                    enlargedImage.innerHTML = '';
+                    document.body.style.overflow = '';
+                }, 200);
+            });
+        }
     });
     </script>
 </body>

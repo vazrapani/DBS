@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mainGroup.style.display = 'flex';
             mainGroup.style.flexDirection = 'row';
             mainGroup.style.alignItems = 'center';
-            mainGroup.style.gap = '8px';
+            mainGroup.style.gap = '12px';
             mainGroup.style.margin = '0';
             mainGroup.style.padding = '12px';
             // 이미지 영역 생성
@@ -590,13 +590,13 @@ document.addEventListener('DOMContentLoaded', function() {
             let priceLines = '';
             if (Array.isArray(product.prices) && product.prices.length > 0) {
                 priceLines = product.prices.map((p) => `
-                    <div style='display:flex;align-items:center;gap:4px;font-size:14px;font-weight:400;color:rgba(247,249,244,0.4);'>
+                    <div style='display:flex;align-items:center;gap:4px;font-size:16px;font-weight:400;color:rgba(247,249,244,0.4);'>
                         <span style='display:inline-flex;align-items:center;justify-content:center;width:8px;height:8px;font-size:10px;'>•</span>
                         <span>${p.amount} : ${p.price}</span>
                     </div>
                 `).join('');
             }
-            infoDiv.innerHTML = `<div style='font-weight:400;font-size:20px;color:rgba(247,249,244,0.9);'>${product.title}</div>${priceLines ? `<div style='display:flex;flex-direction:column;gap:4px;'>${priceLines}</div>` : ''}`;
+            infoDiv.innerHTML = `<div style='font-weight:400;font-size:16px;color:rgba(247,249,244,0.9);'>${product.title}</div>${priceLines ? `<div style='display:flex;flex-direction:column;gap:6px;'>${priceLines}</div>` : ''}`;
             infoDiv.style.flex = '1';
             infoDiv.style.width = '100%';
             mainGroup.appendChild(infoDiv);
@@ -699,12 +699,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 상품 리스트 최초 로드 시 서버에서 받아와서 productListData에 저장 후 렌더링
     function loadProductList() {
+        const productListDiv = document.getElementById('productList');
+        if (productListDiv) {
+            productListDiv.innerHTML = '<div class="loading-text" style="width:100%;text-align:center;color:rgba(247,249,244,0.2);font-size:18px;padding:32px 0;">데이터 로딩중...</div>';
+        }
         const category = document.getElementById('productListCategory').value;
         fetch(`/api/products/${category}`)
             .then(res => res.json())
             .then(data => {
                 if (!data.success || !data.products) return;
-                // 최신순으로 productListData 저장
                 productListData = data.products.slice().reverse();
                 renderProductList(productListData);
             });
@@ -718,102 +721,148 @@ document.addEventListener('DOMContentLoaded', function() {
     if (productUploadBtn && productForm && productAddMsg) {
         productAddMsg.style.opacity = 0;
         productAddMsg.style.transition = 'opacity 0.5s';
+        // 업로드 버튼 클릭 시 '처리중' 메시지 즉시 출력, setTimeout으로 fetch 등 나머지 로직 실행
         productUploadBtn.addEventListener('click', function() {
-            // 업로드 버튼 클릭 시 스크롤 위치 저장
-            const prevScrollY = window.scrollY;
-            // 메시지 초기화: 텍스트만 비우지 않고 opacity만 0으로
-            productAddMsg.style.opacity = 0;
-            productAddMsg.style.display = 'block';
-            productAddMsg.style.color = '';
-            // 입력값 검증
-            const category = productForm.querySelector('#productCategory').value.trim();
-            const title = productForm.querySelector('#productTitle').value.trim();
-            const desc = productForm.querySelector('#productDesc').value.trim();
-            const amountInputs = productForm.querySelectorAll('.amount');
-            const priceInputs = productForm.querySelectorAll('.price');
-            const imageInput = productForm.querySelector('#productImage');
-            let valid = true;
-            let msg = '';
-            if (!title) {
-                valid = false;
-                msg = '상품명을 입력하세요.';
-            } else if (!amountInputs[0].value.trim() || !priceInputs[0].value.trim()) {
-                valid = false;
-                msg = '가격 정보를 입력하세요.';
-            } else if (!imageInput.files || imageInput.files.length === 0) {
-                valid = false;
-                msg = '상품 이미지를 선택하세요.';
-            }
-            if (!valid) {
-                productAddMsg.textContent = msg.replace(/\.$/, '');
-                productAddMsg.style.color = '#ff6b6b';
-                productAddMsg.style.opacity = 1;
-                setTimeout(() => {
-                    productAddMsg.style.opacity = 0;
-                    setTimeout(() => { productAddMsg.textContent = ''; }, 500);
-                }, 3000);
-                return;
-            }
-            // FormData 생성
-            const formData = new FormData();
-            formData.append('category', category);
-            formData.append('title', title);
-            formData.append('description', desc);
-            // 가격 정보 배열
-            const prices = [];
-            for (let i = 0; i < amountInputs.length; i++) {
-                const amount = amountInputs[i].value.trim();
-                const price = priceInputs[i].value.trim();
-                if (amount && price) {
-                    prices.push({ amount, price });
+            // 1. '처리중' 메시지 먼저 표시
+            productAddMsg.textContent = '처리중';
+            productAddMsg.style.color = 'rgba(255,255,255,0.2)';
+            productAddMsg.style.opacity = 1;
+            // 2. 아주 짧은 시간 뒤에 나머지 로직 실행
+            setTimeout(() => {
+                // 입력값 검증
+                const category = productForm.querySelector('#productCategory').value.trim();
+                const title = productForm.querySelector('#productTitle').value.trim();
+                const desc = productForm.querySelector('#productDesc').value.trim();
+                const amountInputs = productForm.querySelectorAll('.amount');
+                const priceInputs = productForm.querySelectorAll('.price');
+                const imageInput = productForm.querySelector('#productImage');
+                let valid = true;
+                let msg = '';
+                // 1. 상품명
+                if (!title) {
+                    valid = false;
+                    msg = '상품명을 입력하세요';
                 }
-            }
-            formData.append('prices', JSON.stringify(prices));
-            formData.append('image', imageInput.files[0]);
-            // 업로드 요청
-            fetch(`/api/products/${category}`, {
-                method: 'POST',
-                body: formData,
-                credentials: 'include'
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    productAddMsg.textContent = '저장 완료';
-                    productAddMsg.style.color = '#4a90e2';
-                    productAddMsg.style.opacity = 1;
-                    setTimeout(() => {
-                        productAddMsg.style.opacity = 0;
-                        setTimeout(() => { productAddMsg.textContent = ''; }, 500);
-                    }, 3000);
-                    productForm.reset();
-                    // 이미지 미리보기까지 완전히 비움
-                    const productImagePreview = document.getElementById('productImagePreview');
-                    if (productImagePreview) productImagePreview.innerHTML = '';
-                    if (window.loadProductList) window.loadProductList();
-                    // 스크롤 위치 복원 (상품 목록 갱신 후)
-                    setTimeout(() => {
-                        window.scrollTo({ top: prevScrollY, behavior: 'auto' });
-                    }, 0);
-                } else {
-                    productAddMsg.textContent = (data.message || '저장 실패').replace(/\.$/, '');
+                // 2. 상품 가격
+                else {
+                    for (let i = 0; i < amountInputs.length; i++) {
+                        const amount = amountInputs[i].value.trim();
+                        const price = priceInputs[i].value.trim();
+                        if (!amount || !price) {
+                            valid = false;
+                            msg = '상품의 가격 / 용량 정보를 입력하세요';
+                            break;
+                        }
+                    }
+                }
+                // 3. 상품 설명
+                if (valid && !desc) {
+                    valid = false;
+                    msg = '상품 설명을 입력하세요';
+                }
+                // 4. 상품 이미지
+                if (valid && (!imageInput.files || imageInput.files.length === 0)) {
+                    valid = false;
+                    msg = '상품 이미지를 선택하세요';
+                }
+                if (!valid) {
+                    productAddMsg.textContent = msg.replace(/\.$/, '');
                     productAddMsg.style.color = '#ff6b6b';
                     productAddMsg.style.opacity = 1;
                     setTimeout(() => {
                         productAddMsg.style.opacity = 0;
                         setTimeout(() => { productAddMsg.textContent = ''; }, 500);
                     }, 3000);
+                    return;
                 }
-            })
-            .catch(() => {
-                productAddMsg.textContent = '저장 중 오류가 발생했습니다'.replace(/\.$/, '');
-                productAddMsg.style.color = '#ff6b6b';
-                productAddMsg.style.opacity = 1;
-                setTimeout(() => {
-                    productAddMsg.style.opacity = 0;
-                    setTimeout(() => { productAddMsg.textContent = ''; }, 500);
-                }, 3000);
-            });
+                // FormData 생성
+                const formData = new FormData();
+                formData.append('category', category);
+                formData.append('title', title);
+                formData.append('description', desc);
+                // 가격 정보 배열
+                const prices = [];
+                for (let i = 0; i < amountInputs.length; i++) {
+                    const amount = amountInputs[i].value.trim();
+                    const price = priceInputs[i].value.trim();
+                    if (amount && price) {
+                        prices.push({ amount, price });
+                    }
+                }
+                formData.append('prices', JSON.stringify(prices));
+                formData.append('image', imageInput.files[0]);
+                // 업로드 버튼 클릭 시 스크롤 위치 저장
+                const prevScrollY = window.scrollY;
+                // 업로드 요청
+                fetch(`/api/products/${category}`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        productAddMsg.textContent = '상품이 추가 되었습니다';
+                        productAddMsg.style.color = '#4a90e2';
+                        productAddMsg.style.opacity = 1;
+                        setTimeout(() => {
+                            productAddMsg.style.opacity = 0;
+                            setTimeout(() => { productAddMsg.textContent = ''; }, 500);
+                        }, 3000);
+                        productForm.reset();
+                        // 이미지 미리보기 완전 초기화
+                        const productImagePreview = document.getElementById('productImagePreview');
+                        if (productImagePreview) productImagePreview.innerHTML = '';
+                        const productImageLabel = document.getElementById('productImageLabel');
+                        if (productImageLabel) {
+                            const previewWrapper = productImageLabel.querySelector('.preview-image-wrapper');
+                            if (previewWrapper) previewWrapper.remove();
+                            // 파일 선택 UI 다시 보이게
+                            const fileUploadContent = productImageLabel.querySelector('.file-upload-content');
+                            if (fileUploadContent) fileUploadContent.style.display = '';
+                        }
+                        if (imageInput) imageInput.value = '';
+                        // 가격 입력폼 리셋: 동적 행 모두 삭제, 1개만 남기기
+                        const priceInputsGroup = productForm.querySelector('.price-inputs-group');
+                        if (priceInputsGroup) {
+                            const rows = priceInputsGroup.querySelectorAll('div');
+                            rows.forEach((row, idx) => {
+                                if (idx > 0) row.remove();
+                                else {
+                                    // 첫 번째 행 value만 비움
+                                    const amount = row.querySelector('.amount');
+                                    const price = row.querySelector('.price');
+                                    if (amount) amount.value = '';
+                                    if (price) price.value = '';
+                                }
+                            });
+                            updateRemoveRowBtns();
+                        }
+                        if (window.loadProductList) window.loadProductList();
+                        // 스크롤 위치 복원 (상품 목록 갱신 후)
+                        setTimeout(() => {
+                            window.scrollTo({ top: prevScrollY, behavior: 'auto' });
+                        }, 0);
+                    } else {
+                        productAddMsg.textContent = (data.message || '상품 추가에 실패했습니다').replace(/\.$/, '');
+                        productAddMsg.style.color = '#ff6b6b';
+                        productAddMsg.style.opacity = 1;
+                        setTimeout(() => {
+                            productAddMsg.style.opacity = 0;
+                            setTimeout(() => { productAddMsg.textContent = ''; }, 500);
+                        }, 3000);
+                    }
+                })
+                .catch(() => {
+                    productAddMsg.textContent = '상품 추가 중 오류가 발생했습니다'.replace(/\.$/, '');
+                    productAddMsg.style.color = '#ff6b6b';
+                    productAddMsg.style.opacity = 1;
+                    setTimeout(() => {
+                        productAddMsg.style.opacity = 0;
+                        setTimeout(() => { productAddMsg.textContent = ''; }, 500);
+                    }, 3000);
+                });
+            }, 30); // 30ms 후 실행
         });
     }
 
@@ -896,16 +945,16 @@ document.addEventListener('DOMContentLoaded', function() {
         productListMsg.style.opacity = 0;
         productListMsg.style.transition = 'opacity 0.5s';
         productListSaveBtn.addEventListener('click', function() {
+            // 저장 버튼 클릭 시 '처리중' 메시지 먼저 표시
+            productListMsg.textContent = '처리중';
+            productListMsg.style.color = 'rgba(255,255,255,0.2)';
+            productListMsg.style.opacity = 1;
             const productListDiv = document.getElementById('productList');
             const items = productListDiv.querySelectorAll('.product-list-item');
             const currentOrder = Array.from(items).map(item => item.getAttribute('data-id') || item.querySelector('.product-info > div')?.textContent?.trim());
             const isSame = currentOrder.length === originalProductOrder.length && currentOrder.every((id, idx) => id === originalProductOrder[idx]);
-            // 메시지 초기화
-            productListMsg.textContent = '';
-            productListMsg.style.display = 'block';
-            productListMsg.style.opacity = 0;
             if (isSame) {
-                productListMsg.textContent = '변경된 내용이 없습니다';
+                productListMsg.textContent = '변경된 상품 목록 내용이 없습니다';
                 productListMsg.style.color = '#ff6b6b';
                 productListMsg.style.opacity = 1;
                 setTimeout(() => {
@@ -926,10 +975,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    productListMsg.textContent = '저장 완료';
+                    productListMsg.textContent = '상품 목록이 저장 되었습니다';
                     productListMsg.style.color = '#4a90e2';
                 } else {
-                    productListMsg.textContent = (data.message || '저장 실패').replace(/\.$/, '');
+                    productListMsg.textContent = (data.message || '상품 목록 저장에 실패했습니다').replace(/\.$/, '');
                     productListMsg.style.color = '#ff6b6b';
                 }
                 productListMsg.style.opacity = 1;
@@ -939,7 +988,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 3000);
             })
             .catch(() => {
-                productListMsg.textContent = '저장 중 오류가 발생했습니다'.replace(/\.$/, '');
+                productListMsg.textContent = '상품 목록 저장 중 오류가 발생했습니다'.replace(/\.$/, '');
                 productListMsg.style.color = '#ff6b6b';
                 productListMsg.style.opacity = 1;
                 setTimeout(() => {
@@ -1341,12 +1390,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 delBtn.style.display = 'flex';
                 delBtn.style.alignItems = 'center';
                 delBtn.style.justifyContent = 'center';
-                delBtn.style.background = 'rgba(0,0,0,0.4)';
+                delBtn.style.background = 'rgba(255,255,255,0.75)';
                 delBtn.style.borderRadius = '50%';
                 delBtn.style.cursor = 'pointer';
                 delBtn.innerHTML = '<img src="images/icon-trash.svg" alt="삭제" style="width:16px;height:16px;">';
-                delBtn.onclick = function() {
-                    imageInput.value = '';
+                delBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    productImageInput.value = '';
                     renderImagePreview(null);
                 };
                 wrapper.appendChild(img);
@@ -1596,4 +1647,81 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.head.appendChild(style);
     })();
+
+    // 기존 productImagePreview div를 사용하지 않고, productImageLabel 내부에 이미지/삭제버튼을 동적으로 표시
+    const productImageInput = document.getElementById('productImage');
+    const productImageLabel = document.getElementById('productImageLabel');
+    if (productImageInput && productImageLabel) {
+        productImageInput.addEventListener('change', function(e) {
+            const file = this.files && this.files[0];
+            const content = productImageLabel.querySelector('.file-upload-content');
+            // 기존 업로드 UI 복구 함수
+            function showUploadUI() {
+                if (content) content.style.display = '';
+                // 기존 미리보기/삭제 버튼 제거
+                const preview = productImageLabel.querySelector('.preview-image-wrapper');
+                if (preview) preview.remove();
+            }
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    if (content) content.style.display = 'none';
+                    // 기존 미리보기/삭제 버튼 제거
+                    const oldPreview = productImageLabel.querySelector('.preview-image-wrapper');
+                    if (oldPreview) oldPreview.remove();
+                    // 미리보기/삭제 버튼 추가
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'preview-image-wrapper';
+                    wrapper.style.position = 'absolute';
+                    wrapper.style.top = '0';
+                    wrapper.style.left = '0';
+                    wrapper.style.width = '100%';
+                    wrapper.style.height = '100%';
+                    wrapper.style.display = 'flex';
+                    wrapper.style.alignItems = 'center';
+                    wrapper.style.justifyContent = 'center';
+                    wrapper.style.overflow = 'hidden';
+                    // 미리보기 이미지
+                    const img = document.createElement('img');
+                    img.src = ev.target.result;
+                    img.alt = '미리보기';
+                    img.style.width = '270px';
+                    img.style.height = '270px';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '3px';
+                    img.style.background = 'none';
+                    img.style.border = 'none';
+                    img.style.display = 'block';
+                    img.style.margin = '0 auto';
+                    wrapper.appendChild(img);
+                    // 삭제 버튼
+                    const delBtn = document.createElement('div');
+                    delBtn.className = 'preview-delete-btn';
+                    delBtn.style.position = 'absolute';
+                    delBtn.style.top = '8px';
+                    delBtn.style.right = '8px';
+                    delBtn.style.width = '30px';
+                    delBtn.style.height = '30px';
+                    delBtn.style.display = 'flex';
+                    delBtn.style.alignItems = 'center';
+                    delBtn.style.justifyContent = 'center';
+                    delBtn.style.background = 'rgba(255,255,255,0.75)';
+                    delBtn.style.borderRadius = '50%';
+                    delBtn.style.cursor = 'pointer';
+                    delBtn.innerHTML = '<img src="images/icon-trash.svg" alt="삭제" style="width:16px;height:16px;">';
+                    delBtn.onclick = function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        productImageInput.value = '';
+                        showUploadUI();
+                    };
+                    wrapper.appendChild(delBtn);
+                    productImageLabel.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showUploadUI();
+            }
+        });
+    }
 });

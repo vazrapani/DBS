@@ -1,9 +1,9 @@
 {
   "red-pepper": [
     {
-      "id": "54b435f3-943a-4b02-9d96-fd8fbb3fcc2e",
-      "title": "매운고추가루",
       "description": "엄청 맛있어요 돈주고 사고 싶어도 살수가 없는 아주 그런 기가맥힌 맛이라고 할 수 있지요 이걸 사려면 어딜가도 살 수가 없는 아주굿!",
+      "id": "54b435f3-943a-4b02-9d96-fd8fbb3fcc2e",
+      "image": "images/products/54b435f3-943a-4b02-9d96-fd8fbb3fcc2e.png",
       "prices": [
         {
           "amount": "500ml",
@@ -14,14 +14,14 @@
           "price": "2만원"
         }
       ],
-      "image": "images/products/54b435f3-943a-4b02-9d96-fd8fbb3fcc2e.png"
+      "title": "매운고추가루"
     }
   ],
   "perilla": [
     {
-      "id": "perilla2",
-      "title": "들깨가루 상품 2",
       "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.",
+      "id": "perilla1",
+      "image": "images/img_product_perilla_01.png",
       "prices": [
         {
           "amount": "500ml",
@@ -32,12 +32,12 @@
           "price": "60,000"
         }
       ],
-      "image": "images/img_product_perilla_02.png"
+      "title": "들깨가루 상품 1"
     },
     {
-      "id": "perilla1",
-      "title": "들깨가루 상품 1",
       "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.",
+      "id": "perilla2",
+      "image": "images/img_product_perilla_02.png",
       "prices": [
         {
           "amount": "500ml",
@@ -48,7 +48,7 @@
           "price": "60,000"
         }
       ],
-      "image": "images/img_product_perilla_01.png"
+      "title": "들깨가루 상품 2"
     }
   ],
   "processed": [
@@ -99,6 +99,56 @@
         }
       ],
       "image": "images/img_product_goods_02.png"
+    }
+  ],
+  "seafood": [
+    {
+      "id": "4b0d5c3d-c23b-4f5f-9982-da7974bb99d5",
+      "title": "테스트",
+      "description": "1",
+      "prices": [
+        {
+          "amount": "1",
+          "price": "1"
+        }
+      ],
+      "image": "images/products/4b0d5c3d-c23b-4f5f-9982-da7974bb99d5.jpg"
+    },
+    {
+      "id": "eac24b5b-c624-46f9-9c74-151402711d83",
+      "title": "수산물테스트",
+      "description": "테스트 테스트",
+      "prices": [
+        {
+          "amount": "111",
+          "price": "2222"
+        },
+        {
+          "amount": "333",
+          "price": "444"
+        }
+      ],
+      "image": "images/products/eac24b5b-c624-46f9-9c74-151402711d83.jpg"
+    },
+    {
+      "id": "f863c987-a6a2-4758-a0e4-402f50958c2c",
+      "title": "azzz",
+      "description": "zzzzzzzzzzzzzzz",
+      "prices": [
+        {
+          "amount": "zzz",
+          "price": "zzzzz"
+        },
+        {
+          "amount": "z",
+          "price": "zz"
+        },
+        {
+          "amount": "zzz",
+          "price": "zzz"
+        }
+      ],
+      "image": "images/products/f863c987-a6a2-4758-a0e4-402f50958c2c.jpg"
     }
   ]
 }
