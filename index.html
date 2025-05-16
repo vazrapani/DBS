@@ -70,7 +70,7 @@ function updateActiveByScroll(category) {
     if (activeIdx !== currentActiveDot) {
         const dots = document.querySelectorAll('.vertical-nav .nav-dot');
         dots.forEach((dot, idx) => {
-            dot.classList.toggle('active', idx === activeIdx);
+            if (dot) dot.classList.toggle('active', idx === activeIdx);
         });
         currentActiveDot = activeIdx;
     }
@@ -166,7 +166,7 @@ function handleScroll() {
             if (currentActiveDotMap[category] !== activeIdx) {
                 const dots = verticalNav.querySelectorAll('.nav-dot');
                 dots.forEach((dot, idx) => {
-                    dot.classList.toggle('active', idx === activeIdx);
+                    if (dot) dot.classList.toggle('active', idx === activeIdx);
                 });
                 currentActiveDotMap[category] = activeIdx;
             }
@@ -180,9 +180,9 @@ function handleScroll() {
             });
             
             // 선택된 메뉴 아이템 활성화
-            const selectedMenuItem = document.querySelector(`.menu-link[data-category="${selectedCategory}"]`).parentElement;
-            if (selectedMenuItem) {
-                selectedMenuItem.classList.add('active');
+            const selectedMenuItem = document.querySelector(`.menu-link[data-category="${selectedCategory}"]`);
+            if (selectedMenuItem && selectedMenuItem.parentElement) {
+                selectedMenuItem.parentElement.classList.add('active');
             }
         }
 
@@ -245,7 +245,7 @@ function handleScroll() {
                 if (activeIdx !== currentActiveDot) {
                     const dots = document.querySelectorAll('.vertical-nav .nav-dot');
                     dots.forEach((dot, idx) => {
-                        dot.classList.toggle('active', idx === activeIdx);
+                        if (dot) dot.classList.toggle('active', idx === activeIdx);
                     });
                     currentActiveDot = activeIdx;
                 }
@@ -597,10 +597,10 @@ function handleScroll() {
 
     <!-- 메뉴 오버레이 -->
     <div class="menu-overlay">
-        <div class="menu-sections">
+        <div class="menu-section-group">
             <div class="menu-section active" data-section="greeting">
                 <div class="section-header">
-                    <span class="section-title">대표 인사말</span>
+                    <span class="section-title">동빈 스토어 소개</span>
                     <img src="images/icon-arrow-down.svg" alt="펼치기" class="icon-arrow">
                 </div>
                 <div class="section-content">
