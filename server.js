@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 8888;
+const PORT = 8000;
 
 const isProduction = process.env.RENDER === 'true' || process.env.NODE_ENV === 'production';
 
@@ -59,6 +59,13 @@ app.use('/api', (req, res, next) => {
         pathRewrite: { '^/api': '/api' },
         onProxyReq: (proxyReq, req, res) => {
             console.log(`[PROXY] ${req.method} ${req.originalUrl} -> ${proxyReq.path}`);
+            // 헤더 강제 전달
+            if (req.headers['content-type']) {
+                proxyReq.setHeader('content-type', req.headers['content-type']);
+            }
+            if (req.headers['content-length']) {
+                proxyReq.setHeader('content-length', req.headers['content-length']);
+            }
         },
         onError: (err, req, res) => {
             console.error('[PROXY ERROR]', err);

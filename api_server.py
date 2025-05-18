@@ -132,6 +132,36 @@ def gallery_upload():
             file.save(save_path)
             saved_files.append(filename)
     if saved_files:
+        print('=== gallery_upload 디버깅 ===')
+        print('saved_files:', saved_files)
+        order = []
+        if os.path.exists(GALLERY_ORDER_FILE):
+            try:
+                with open(GALLERY_ORDER_FILE, 'r', encoding='utf-8') as f:
+                    order = json.load(f)
+            except Exception:
+                order = []
+        print('기존 order:', order)
+        # order 배열을 완전히 새로 만듦
+        new_order = []
+        # 1. 업로드된 파일(여러 장이면 reversed) → 맨 앞
+        for filename in reversed(saved_files):
+            new_order.append(filename)
+        # 2. 기존 order에서 업로드된 파일을 뺀 나머지
+        for f in order:
+            if f not in saved_files and f not in new_order:
+                new_order.append(f)
+        # 3. 폴더 내 실제 파일 중 new_order에 없는 파일(정렬 없이 append)
+        actual_files = [f for f in os.listdir(GALLERY_FOLDER) if allowed_file(f)]
+        print('actual_files:', actual_files)
+        for f in actual_files:
+            if f not in new_order:
+                new_order.append(f)
+        print('new_order:', new_order)
+        order = new_order
+        with open(GALLERY_ORDER_FILE, 'w', encoding='utf-8') as f:
+            json.dump(order, f, ensure_ascii=False)
+        print('=== gallery_upload 디버깅 끝 ===')
         return jsonify({'success': True, 'filenames': saved_files})
     else:
         return jsonify({'success': False, 'message': '허용되지 않는 파일 형식입니다.'}), 400
@@ -181,30 +211,50 @@ def get_products(category):
 def add_product(category):
     # if not session.get('admin'):
     #     return jsonify({'success': False, 'message': '관리자 인증 필요'}), 403
-    data = load_products()
-    if category not in data:
-        return jsonify({'success': False, 'message': '잘못된 카테고리'}), 400
     title = request.form.get('title', '').strip()
     description = request.form.get('description', '').strip()
     prices_json = request.form.get('prices', '[]')
     try:
         prices = json.loads(prices_json)
-    except:
+    except Exception as e:
+        print('prices 파싱 오류:', e, flush=True)
         prices = []
+    print('prices:', prices, flush=True)
     image_file = request.files.get('image')
-    if not title or not image_file or not allowed_file(image_file.filename):
+    image_url = request.form.get('imageUrl')
+    print('==== 상품 추가 요청(FormData) ====', flush=True)
+    print('title:', title, flush=True)
+    print('description:', description, flush=True)
+    print('prices_json:', prices_json, flush=True)
+    print('image_file:', image_file, flush=True)
+    print('image_url:', image_url, flush=True)
+    print('request.form:', dict(request.form), flush=True)
+    print('request.files:', dict(request.files), flush=True)
+    print('==============================', flush=True)
+    if not title:
         return jsonify({'success': False, 'message': '필수 정보 누락 또는 이미지 형식 오류'}), 400
-    product_id = str(uuid.uuid4())
-    ext = image_file.filename.rsplit('.', 1)[1].lower()
-    image_filename = f'{product_id}.{ext}'
-    image_path = os.path.join(PRODUCTS_IMAGE_FOLDER, image_filename)
-    image_file.save(image_path)
+    data = load_products()
+    if category not in data:
+        return jsonify({'success': False, 'message': '잘못된 카테고리'}), 400
+    if not image_file and not image_url:
+        # 기본 이미지로 대체
+        image_url = '/images/no-image.png'
+    if image_file and allowed_file(image_file.filename):
+        product_id = request.form.get('id') or str(uuid.uuid4())
+        ext = image_file.filename.rsplit('.', 1)[1].lower()
+        image_filename = f'{product_id}.{ext}'
+        image_path = os.path.join(PRODUCTS_IMAGE_FOLDER, image_filename)
+        image_file.save(image_path)
+        image_path_for_save = f'images/products/{image_filename}'
+    else:
+        product_id = request.form.get('id') or str(uuid.uuid4())
+        image_path_for_save = image_url
     product = {
         'id': product_id,
         'title': title,
         'description': description,
         'prices': prices,
-        'image': f'images/products/{image_filename}'
+        'image': image_path_for_save
     }
     data[category].append(product)
     save_products(data)

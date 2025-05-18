@@ -121,6 +121,42 @@ class ProxyRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Credentials', 'true')
         self.end_headers()
 
+    def do_PATCH(self):
+        if self.path.startswith('/api/'):
+            try:
+                print(f'Proxying PATCH request to: http://localhost:5000{self.path}')
+                content_length = int(self.headers.get('Content-Length', 0))
+                body = self.rfile.read(content_length) if content_length > 0 else None
+                headers = {key: value for key, value in self.headers.items()}
+                if 'Host' in headers:
+                    del headers['Host']
+                response = requests.patch(
+                    f'http://localhost:5000{self.path}',
+                    data=body,
+                    headers=headers,
+                    cookies=self.parse_cookies()
+                )
+                self.send_response(response.status_code)
+                for key, value in response.headers.items():
+                    if key.lower() not in ['server', 'date', 'transfer-encoding']:
+                        self.send_header(key, value)
+                origin = self.headers.get('Origin')
+                if origin:
+                    self.send_header('Access-Control-Allow-Origin', origin)
+                else:
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Vary', 'Origin')
+                self.send_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type, Cookie')
+                self.send_header('Access-Control-Allow-Credentials', 'true')
+                self.end_headers()
+                self.wfile.write(response.content)
+            except Exception as e:
+                print(f'Error proxying PATCH request: {str(e)}')
+                self.send_error(500, f"Error: {str(e)}")
+        else:
+            self.send_error(404, "File not found")
+
     def parse_cookies(self):
         cookies = {}
         cookie_header = self.headers.get('Cookie')

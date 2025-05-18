@@ -15,6 +15,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (textarea) {
                     textarea.value = '데이터 로딩중...';
                     textarea.classList.add('loading-text');
+                    textarea.style.color = 'rgba(247,249,244,0.2)';
+                    textarea.style.fontSize = '18px';
+                    textarea.style.textAlign = 'center';
+                    textarea.style.display = '';
+                    textarea.style.justifyContent = '';
+                    textarea.style.alignItems = '';
+                    textarea.style.height = 'auto';
+                    textarea.style.height = (textarea.scrollHeight) + 'px';
                 }
                 fetch('/api/greeting')
                     .then(res => res.json())
@@ -23,6 +31,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (textarea) {
                                 textarea.value = data.greeting;
                                 textarea.classList.remove('loading-text');
+                                textarea.style.color = '#fff';
+                                textarea.style.fontSize = '16px';
+                                textarea.style.textAlign = 'left';
+                                textarea.style.display = '';
+                                textarea.style.justifyContent = '';
+                                textarea.style.alignItems = '';
+                                textarea.style.height = 'auto';
+                                textarea.style.height = (textarea.scrollHeight) + 'px';
                             }
                         }
                     })
@@ -30,6 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (textarea) {
                             textarea.value = '데이터 로딩중...';
                             textarea.classList.add('loading-text');
+                            textarea.style.color = 'rgba(247,249,244,0.2)';
+                            textarea.style.fontSize = '18px';
+                            textarea.style.textAlign = 'center';
+                            textarea.style.display = '';
+                            textarea.style.justifyContent = '';
+                            textarea.style.alignItems = '';
+                            textarea.style.height = 'auto';
+                            textarea.style.height = (textarea.scrollHeight) + 'px';
                         }
                     });
             }
@@ -51,47 +75,54 @@ document.addEventListener('DOMContentLoaded', function() {
             if (timer) clearTimeout(timer);
             msgArea.style.opacity = 0;
             msgArea.textContent = '';
-            const value = textarea ? textarea.value.trim() : '';
-            if (!value) {
-                msgArea.textContent = '인사말을 입력해 주세요.';
-                msgArea.style.color = '#ff6b6b';
-                msgArea.style.opacity = 1;
-                msgArea._timer = setTimeout(() => {
-                    msgArea.style.opacity = 0;
-                    setTimeout(() => { msgArea.textContent = ''; }, 500);
-                }, 3000);
-                return;
-            }
-            fetch('/api/greeting', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ greeting: value }),
-                credentials: 'include'
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    msgArea.textContent = '저장되었습니다';
-                    msgArea.style.color = '#4a90e2';
-                } else {
-                    msgArea.textContent = (data.message || '저장에 실패했습니다').replace(/\.$/, '');
+            // 처리중 메시지 먼저 표시
+            msgArea.textContent = '처리중';
+            msgArea.style.color = 'rgba(255,255,255,0.2)';
+            msgArea.style.opacity = 1;
+            // 아주 짧은 시간 뒤에 나머지 로직 실행
+            setTimeout(() => {
+                const value = textarea ? textarea.value.trim() : '';
+                if (!value || value === '데이터 로딩중...') {
+                    msgArea.textContent = '인사말을 입력해 주세요.';
                     msgArea.style.color = '#ff6b6b';
+                    msgArea.style.opacity = 1;
+                    msgArea._timer = setTimeout(() => {
+                        msgArea.style.opacity = 0;
+                        setTimeout(() => { msgArea.textContent = ''; }, 500);
+                    }, 3000);
+                    return;
                 }
-                msgArea.style.opacity = 1;
-                msgArea._timer = setTimeout(() => {
-                    msgArea.style.opacity = 0;
-                    setTimeout(() => { msgArea.textContent = ''; }, 500);
-                }, 3000);
-            })
-            .catch(() => {
-                msgArea.textContent = '저장 중 오류가 발생했습니다'.replace(/\.$/, '');
-                msgArea.style.color = '#ff6b6b';
-                msgArea.style.opacity = 1;
-                setTimeout(() => {
-                    msgArea.style.opacity = 0;
-                    setTimeout(() => { msgArea.textContent = ''; }, 500);
-                }, 3000);
-            });
+                fetch('/api/greeting', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ greeting: value }),
+                    credentials: 'include'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        msgArea.textContent = '저장되었습니다';
+                        msgArea.style.color = '#4a90e2';
+                    } else {
+                        msgArea.textContent = (data.message || '저장에 실패했습니다').replace(/\.$/, '');
+                        msgArea.style.color = '#ff6b6b';
+                    }
+                    msgArea.style.opacity = 1;
+                    msgArea._timer = setTimeout(() => {
+                        msgArea.style.opacity = 0;
+                        setTimeout(() => { msgArea.textContent = ''; }, 500);
+                    }, 3000);
+                })
+                .catch(() => {
+                    msgArea.textContent = '저장 중 오류가 발생했습니다'.replace(/\.$/, '');
+                    msgArea.style.color = '#ff6b6b';
+                    msgArea.style.opacity = 1;
+                    setTimeout(() => {
+                        msgArea.style.opacity = 0;
+                        setTimeout(() => { msgArea.textContent = ''; }, 500);
+                    }, 3000);
+                });
+            }, 30); // 30ms 후 실행
         });
     }
 
@@ -126,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
         galleryTabBtn.addEventListener('click', function() {
             const galleryList = document.getElementById('galleryList');
             if (galleryList) {
-                galleryList.innerHTML = '<div class="loading-text" style="width:100%;text-align:center;color:rgba(247,249,244,0.2);font-size:18px;padding:32px 0;">데이터 로딩중...</div>';
+                galleryList.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:rgba(247,249,244,0.2);font-size:18px;padding:32px 0;">데이터 로딩중...</div>';
                 fetch('/api/gallery/list', { credentials: 'include' })
                     .then(res => res.json())
                     .then(data => {
@@ -135,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         renderGalleryList();
                     })
                     .catch(() => {
-                        galleryList.innerHTML = '<div style="width:100%;text-align:center;color:#ff6b6b;font-size:16px;padding:32px 0;">사진 목록을 불러오는 중 오류가 발생했습니다.</div>';
+                        galleryList.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:rgba(247,249,244,0.2);font-size:18px;padding:32px 0;">등록된 현장 사진이 없습니다</div>';
                     });
             }
         });
@@ -166,10 +197,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const img = document.createElement('img');
                 img.src = `images/gallery/${filename}`;
                 img.alt = `현장 사진 ${idx + 1}`;
-                img.style.width = '274px';
-                img.style.height = '274px';
+                img.style.width = '100%';
+                img.style.height = '100%';
                 img.style.background = 'none';
-                img.style.border = '1px solid rgba(255,255,255,0.05)';
+                img.style.border = 'none';
                 mainDiv.appendChild(img);
 
                 // 액션(버튼/컨트롤) 영역
@@ -193,10 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (idx !== 0) {
                     upArrow.onclick = function(e) {
                         e.stopPropagation();
-                        const temp = galleryImages[idx-1];
-                        galleryImages[idx-1] = galleryImages[idx];
-                        galleryImages[idx] = temp;
-                        renderGalleryList();
+                        galleryAnimateSwap(idx, idx-1);
                     };
                 }
                 orderControls.appendChild(upArrow);
@@ -209,10 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (idx !== galleryImages.length-1) {
                     downArrow.onclick = function(e) {
                         e.stopPropagation();
-                        const temp = galleryImages[idx+1];
-                        galleryImages[idx+1] = galleryImages[idx];
-                        galleryImages[idx] = temp;
-                        renderGalleryList();
+                        galleryAnimateSwap(idx, idx+1);
                     };
                 }
                 orderControls.appendChild(downArrow);
@@ -248,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 galleryList.appendChild(item);
             });
         } else {
-            galleryList.innerHTML = '<div style="width:100%;text-align:center;color:rgba(247,249,244,0.4);font-size:16px;padding:32px 0;">등록된 사진이 없습니다.</div>';
+            galleryList.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:rgba(247,249,244,0.2);font-size:18px;padding:32px 0;">등록된 현장 사진이 없습니다</div>';
         }
     }
 
@@ -267,110 +292,113 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 파일 선택 시 미리보기 표시 (여러 장 지원, 삭제 버튼 포함)
     const galleryFileInput = document.getElementById('galleryFile');
+    const galleryFileLabel = document.getElementById('galleryFileLabel');
     const galleryPreviewArea = document.getElementById('galleryPreviewArea');
-    let selectedFiles = [];
-    const fileCountBadge = document.getElementById('fileCountBadge');
-    function updateFileCountBadge() {
-        if (fileCountBadge) {
-            fileCountBadge.textContent = selectedFiles.length > 0 ? selectedFiles.length : '0';
-        }
-    }
-    // 페이지 로드 시 0으로 초기화
-    updateFileCountBadge();
-    function renderGalleryPreview() {
-        galleryPreviewArea.innerHTML = '';
-        galleryPreviewArea.classList.remove('has-preview');
-        const galleryUploadErr = document.getElementById('galleryUploadErr');
-        if (galleryUploadErr) galleryUploadErr.style.display = 'none';
-        const previewFiles = selectedFiles.slice().reverse();
-        if (previewFiles.length > 0) {
-            galleryPreviewArea.classList.add('has-preview');
-            if (previewFiles.length === 1) {
-                const file = previewFiles[0];
-                if (file.type.startsWith('image/')) {
+    if (galleryFileInput && galleryFileLabel && galleryPreviewArea) {
+        galleryFileInput.addEventListener('change', function() {
+            const files = this.files;
+            const fileUploadContent = galleryFileLabel.querySelector('.file-upload-content');
+            function showUploadUI() {
+                if (fileUploadContent) fileUploadContent.style.display = '';
+                galleryPreviewArea.innerHTML = '';
+                galleryPreviewArea.style.display = 'none';
+                galleryPreviewArea.className = '';
+            }
+            if (files && files.length > 0) {
+                if (fileUploadContent) fileUploadContent.style.display = 'none';
+                galleryPreviewArea.innerHTML = '';
+                galleryPreviewArea.style.display = 'block';
+                galleryPreviewArea.style.width = '100%';
+                galleryPreviewArea.style.height = '100%';
+                if (files.length === 1) {
+                    galleryPreviewArea.className = 'single-preview';
+                    const cell = document.createElement('div');
+                    cell.style.position = 'relative';
+                    cell.style.width = '100%';
+                    cell.style.height = '100%';
+                    cell.style.display = 'flex';
+                    cell.style.alignItems = 'center';
+                    cell.style.justifyContent = 'center';
+                    const img = document.createElement('img');
+                    img.className = 'gallery-preview-img';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.style.margin = 'auto';
                     const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const wrapper = document.createElement('div');
-                        wrapper.style.position = 'relative';
-                        wrapper.style.width = '100%';
-                        wrapper.style.display = 'inline-block';
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = 'preview-single';
-                        // 삭제 버튼
-                        const delBtn = document.createElement('div');
-                        delBtn.setAttribute('role', 'button');
-                        delBtn.setAttribute('tabindex', '0');
-                        delBtn.className = 'preview-delete-btn';
-                        delBtn.innerHTML = `<img src="images/icon-trash.svg" alt="삭제" style="width:16px;height:16px;">`;
-                        delBtn.onclick = function() {
-                            selectedFiles.splice(selectedFiles.indexOf(file), 1);
-                            updateFileCountBadge();
-                            renderGalleryPreview();
-                        };
-                        wrapper.appendChild(img);
-                        wrapper.appendChild(delBtn);
-                        galleryPreviewArea.appendChild(wrapper);
+                    reader.onload = function(ev) {
+                        img.src = ev.target.result;
                     };
-                    reader.readAsDataURL(file);
-                }
-            } else if (previewFiles.length > 1) {
-                const row = document.createElement('div');
-                row.className = 'preview-row has-preview';
-                previewFiles.forEach((file) => {
-                    if (file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const wrapper = document.createElement('div');
-                            wrapper.style.position = 'relative';
-                            wrapper.style.width = 'calc(50% - 4px)';
-                            wrapper.style.display = 'inline-block';
+                    reader.readAsDataURL(files[0]);
+                    // 삭제 버튼
+                    const delBtn = document.createElement('div');
+                    delBtn.className = 'preview-delete-btn';
+                    delBtn.innerHTML = '<img src="images/icon-trash.svg" alt="삭제" style="width:16px;height:16px;">';
+                    delBtn.style.position = 'absolute';
+                    delBtn.style.top = '8px';
+                    delBtn.style.right = '8px';
+                    delBtn.style.zIndex = '2';
+                    delBtn.onclick = function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        galleryFileInput.value = '';
+                        galleryFileInput.dispatchEvent(new Event('change'));
+                    };
+                    cell.appendChild(img);
+                    cell.appendChild(delBtn);
+                    galleryPreviewArea.appendChild(cell);
+                } else {
+                    galleryPreviewArea.className = 'grid-preview';
+                    galleryPreviewArea.style.display = 'grid';
+                    galleryPreviewArea.style.gridTemplateColumns = '134px 134px';
+                    galleryPreviewArea.style.gap = '2px';
+                    galleryPreviewArea.style.justifyContent = 'center';
+                    galleryPreviewArea.style.alignItems = 'start';
+                    galleryPreviewArea.style.width = '100%';
+                    galleryPreviewArea.style.height = '100%';
+                    Array.from(files).forEach((file, idx) => {
+                        if (file.type.startsWith('image/')) {
+                            const cell = document.createElement('div');
+                            cell.style.position = 'relative';
+                            cell.style.width = '134px';
+                            cell.style.height = '134px';
                             const img = document.createElement('img');
-                            img.src = e.target.result;
-                            img.style.width = '274px';
-                            img.style.height = '274px';
-                            img.style.borderRadius = '6px';
+                            img.className = 'gallery-preview-img';
+                            img.style.width = '134px';
+                            img.style.height = '134px';
                             img.style.objectFit = 'cover';
-                            img.style.background = 'none';
-                            img.style.border = '1px solid rgba(255,255,255,0.05)';
+                            const reader = new FileReader();
+                            reader.onload = function(ev) {
+                                img.src = ev.target.result;
+                            };
+                            reader.readAsDataURL(file);
                             // 삭제 버튼
                             const delBtn = document.createElement('div');
-                            delBtn.setAttribute('role', 'button');
-                            delBtn.setAttribute('tabindex', '0');
                             delBtn.className = 'preview-delete-btn';
-                            delBtn.innerHTML = `<img src="images/icon-trash.svg" alt="삭제" style="width:16px;height:16px;">`;
-                            delBtn.onclick = function() {
-                                selectedFiles.splice(selectedFiles.indexOf(file), 1);
-                                updateFileCountBadge();
-                                renderGalleryPreview();
+                            delBtn.innerHTML = '<img src="images/icon-trash.svg" alt="삭제" style="width:16px;height:16px;">';
+                            delBtn.style.position = 'absolute';
+                            delBtn.style.top = '8px';
+                            delBtn.style.right = '8px';
+                            delBtn.style.zIndex = '2';
+                            delBtn.onclick = function(e) {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                const dt = new DataTransfer();
+                                Array.from(files).forEach((f, i) => {
+                                    if (i !== idx) dt.items.add(f);
+                                });
+                                galleryFileInput.files = dt.files;
+                                galleryFileInput.dispatchEvent(new Event('change'));
                             };
-                            wrapper.appendChild(img);
-                            wrapper.appendChild(delBtn);
-                            row.appendChild(wrapper);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-                galleryPreviewArea.appendChild(row);
+                            cell.appendChild(img);
+                            cell.appendChild(delBtn);
+                            galleryPreviewArea.appendChild(cell);
+                        }
+                    });
+                }
+            } else {
+                showUploadUI();
             }
-        }
-    }
-    if (galleryFileInput && galleryPreviewArea) {
-        galleryFileInput.addEventListener('change', function() {
-            if (this.files && this.files.length > 0) {
-                // 새로 선택한 파일들을 기존 selectedFiles에 누적
-                const newFiles = Array.from(this.files);
-                // 중복 방지: 이름+사이즈 기준으로 필터링
-                const fileKey = f => f.name + '_' + f.size;
-                const existingKeys = new Set(selectedFiles.map(fileKey));
-                newFiles.forEach(f => {
-                    if (!existingKeys.has(fileKey(f))) {
-                        selectedFiles.push(f);
-                    }
-                });
-            }
-            updateFileCountBadge();
-            renderGalleryPreview();
         });
     }
 
@@ -390,40 +418,52 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         galleryUploadBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            if (!selectedFiles.length) {
-                showGalleryMsg('업로드할 파일을 선택해 주세요', false);
-                return;
-            }
-            const formData = new FormData();
-            selectedFiles.forEach(f => formData.append('files', f));
-            fetch('/api/gallery/upload', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include'
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const count = (data.filenames && data.filenames.length) ? data.filenames.length : selectedFiles.length;
-                    showGalleryMsg(`${count}개의 사진이 업로드 완료되었습니다`, true);
-                    setTimeout(() => {
-                        selectedFiles = [];
-                        updateFileCountBadge();
-                        renderGalleryPreview();
-                        fetch('/api/gallery/list', { credentials: 'include' })
-                          .then(res => res.json())
-                          .then(data => {
-                              galleryImages = (data.images && data.images.length > 0) ? data.images.slice() : [];
-                              renderGalleryList();
-                          });
-                    }, 1000);
-                } else {
-                    showGalleryMsg((data.message || '업로드 실패').replace(/\.$/, ''), false);
+            // 처리중 메시지 먼저 표시
+            galleryMsgArea.textContent = '처리중';
+            galleryMsgArea.style.color = 'rgba(255,255,255,0.2)';
+            galleryMsgArea.style.opacity = 1;
+            // 아주 짧은 시간 뒤에 나머지 로직 실행
+            setTimeout(() => {
+                const files = galleryFileInput && galleryFileInput.files;
+                if (!files || files.length === 0) {
+                    showGalleryMsg('업로드할 파일을 선택해 주세요', false);
+                    return;
                 }
-            })
-            .catch(() => {
-                showGalleryMsg('업로드 중 오류가 발생했습니다', false);
-            });
+                const formData = new FormData();
+                Array.from(files).forEach(file => {
+                    formData.append('files', file);
+                });
+                fetch('/api/gallery/upload', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showGalleryMsg('사진이 업로드 완료되었습니다', true);
+                        setTimeout(() => {
+                            galleryFileInput.value = '';
+                            const fileUploadContent = galleryFileLabel.querySelector('.file-upload-content');
+                            if (fileUploadContent) fileUploadContent.style.display = '';
+                            galleryPreviewArea.innerHTML = '';
+                            galleryPreviewArea.style.display = 'none';
+                            galleryImagesCache = null; // 업로드 후 캐시 초기화
+                            fetch('/api/gallery/list', { credentials: 'include' })
+                              .then(res => res.json())
+                              .then(data => {
+                                  galleryImages = (data.images && data.images.length > 0) ? data.images.slice() : [];
+                                  renderGalleryList();
+                              });
+                        }, 1000);
+                    } else {
+                        showGalleryMsg((data.message || '업로드 실패').replace(/\.$/, ''), false);
+                    }
+                })
+                .catch(() => {
+                    showGalleryMsg('업로드 중 오류가 발생했습니다', false);
+                });
+            }, 30); // 30ms 후 실행
         });
     }
 
@@ -441,7 +481,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (galleryListSaveBtn) {
         galleryListSaveBtn.addEventListener('click', function() {
-            if (galleryListSaveMsg) { galleryListSaveMsg.style.display = 'none'; galleryListSaveMsg.textContent = ''; }
+            if (galleryListSaveMsg) {
+                galleryListSaveMsg.style.display = 'block';
+                galleryListSaveMsg.textContent = '처리중';
+                galleryListSaveMsg.style.color = 'rgba(255,255,255,0.2)';
+                galleryListSaveMsg.style.opacity = 1;
+            }
             if (galleryListSaveErr) { galleryListSaveErr.style.display = 'none'; galleryListSaveErr.textContent = ''; }
             fetch('/api/gallery/save', {
                 method: 'POST',
@@ -455,6 +500,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (galleryListSaveMsg) {
                         galleryListSaveMsg.textContent = '저장 완료';
                         galleryListSaveMsg.style.display = 'block';
+                        galleryListSaveMsg.style.color = '#4a90e2';
                         galleryListSaveMsg.style.opacity = 1;
                         setTimeout(() => {
                             galleryListSaveMsg.style.opacity = 0;
@@ -472,6 +518,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (galleryListSaveErr) {
                         galleryListSaveErr.textContent = (data.message || '저장 실패').replace(/\.$/, '');
                         galleryListSaveErr.style.display = 'block';
+                        galleryListSaveErr.style.color = '#ff6b6b';
                         galleryListSaveErr.style.opacity = 1;
                         setTimeout(() => {
                             galleryListSaveErr.style.opacity = 0;
@@ -484,6 +531,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (galleryListSaveErr) {
                     galleryListSaveErr.textContent = '저장 중 오류가 발생했습니다'.replace(/\.$/, '');
                     galleryListSaveErr.style.display = 'block';
+                    galleryListSaveErr.style.color = '#ff6b6b';
                     galleryListSaveErr.style.opacity = 1;
                     setTimeout(() => {
                         galleryListSaveErr.style.opacity = 0;
@@ -567,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const imageDiv = document.createElement('div');
             imageDiv.className = 'product-admin-image';
             const img = document.createElement('img');
-            img.className = 'product-admin-image';
+            img.className = 'product-admin-image-thumb';
             let imageUrl = product.image || product.imageUrl;
             if (!imageUrl) {
                 imageUrl = '/images/no-image.png';
@@ -578,8 +626,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             img.src = imageUrl;
             img.alt = product.title;
-            img.style.width = '274px';
-            img.style.height = '274px';
+            img.style.width = '100%';
+            img.style.height = '100%';
             img.style.background = 'none';
             img.style.border = '1px solid rgba(255,255,255,0.05)';
             imageDiv.appendChild(img);
@@ -665,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function() {
             editBtn.style.borderColor = 'rgba(255,255,255,0.03)';
             editBtn.onclick = function(e) {
                 e.stopPropagation();
-                openEditOverlay(product, idx);
+                openEditOverlay(product, idx, document.getElementById('productListCategory').value);
             };
             const delBtn = document.createElement('div');
             delBtn.className = 'product-delete-btn';
@@ -701,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadProductList() {
         const productListDiv = document.getElementById('productList');
         if (productListDiv) {
-            productListDiv.innerHTML = '<div class="loading-text" style="width:100%;text-align:center;color:rgba(247,249,244,0.2);font-size:18px;padding:32px 0;">데이터 로딩중...</div>';
+            productListDiv.innerHTML = '<div class="loading-text" style="width:100%;height:274px;display:flex;align-items:center;justify-content:center;text-align:center;color:rgba(247,249,244,0.2);font-size:18px;padding:32px 0;">데이터 로딩중...</div>';
         }
         const category = document.getElementById('productListCategory').value;
         fetch(`/api/products/${category}`)
@@ -914,7 +962,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 상품 목록 드롭박스 변경 시 자동 갱신
     const productListCategory = document.getElementById('productListCategory');
-    const productListSelectWrap = document.querySelector('.product-list-select-wrap');
+    const productListSelectWrap = productListCategory.closest('.select-wrap');
     if (productListCategory && productListSelectWrap) {
         productListCategory.addEventListener('mousedown', function(e) {
             if (productListSelectWrap.classList.contains('open')) {
@@ -952,8 +1000,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const productListDiv = document.getElementById('productList');
             const items = productListDiv.querySelectorAll('.product-list-item');
             const currentOrder = Array.from(items).map(item => item.getAttribute('data-id') || item.querySelector('.product-info > div')?.textContent?.trim());
+            const isAllDeleted = originalProductOrder.length > 0 && currentOrder.length === 0;
+            const isAllEmpty = originalProductOrder.length === 0 && currentOrder.length === 0;
             const isSame = currentOrder.length === originalProductOrder.length && currentOrder.every((id, idx) => id === originalProductOrder[idx]);
-            if (isSame) {
+            // 상품이 모두 삭제된 경우(원래 1개 이상 → 0개) 또는 원래도 0개(최초) → 무조건 저장 요청
+            if ((!isAllDeleted && !isAllEmpty) && isSame) {
                 productListMsg.textContent = '변경된 상품 목록 내용이 없습니다';
                 productListMsg.style.color = '#ff6b6b';
                 productListMsg.style.opacity = 1;
@@ -1004,7 +1055,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let editForm = null;
     let editingProductIdx = null;
 
-    function openEditOverlay(product, idx) {
+    function openEditOverlay(product, idx, categoryFromList) {
         // 오버레이 생성
         editOverlay = document.createElement('div');
         editOverlay.className = 'admin-product-edit-overlay';
@@ -1022,19 +1073,24 @@ document.addEventListener('DOMContentLoaded', function() {
         editOverlay.style.overflowY = 'auto'; // 오버레이에만 스크롤 적용
         editOverlay.style.borderRadius = '0';
 
+        // [정정] 오버레이 최상단에 타이틀 div 추가 (adminProductEdit 위)
+        const editTitleDiv = document.createElement('div');
+        editTitleDiv.className = 'product-add-title';
+        editTitleDiv.textContent = '상품 수정';
+        editOverlay.appendChild(editTitleDiv);
+
         // 전체 폼 컨테이너 div (기존 코드 그대로)
         const adminProductEdit = document.createElement('div');
         adminProductEdit.className = 'admin-product-edit';
         adminProductEdit.style.background = 'none';
         adminProductEdit.style.borderRadius = '8px';
         adminProductEdit.style.border = '1px solid rgba(255,255,255,0.03)';
-        adminProductEdit.style.padding = '28px 24px';
+        adminProductEdit.style.padding = '24px 28px'; // 좌우 28, 상하 24
         adminProductEdit.style.maxWidth = '332px';
         adminProductEdit.style.width = '100%';
         adminProductEdit.style.boxSizing = 'border-box';
         adminProductEdit.style.display = 'flex';
         adminProductEdit.style.flexDirection = 'column';
-        // 절대 gap, margin, padding 등 자의적 추가 금지 (사용자 지시 외 금지)
         adminProductEdit.style.position = 'relative';
         adminProductEdit.style.margin = '0 auto';
         adminProductEdit.style.alignSelf = 'flex-start';
@@ -1061,7 +1117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         nameLabel.className = 'admin-product-edit-name-label';
         nameLabel.textContent = '상품명';
         nameLabel.style.width = '90px';
-        nameLabel.style.fontSize = '15px';
+        nameLabel.style.fontSize = '16px';
         nameLabel.style.color = 'rgba(247,249,244,0.9)';
         nameLabel.style.display = 'flex';
         nameLabel.style.alignItems = 'center';
@@ -1077,16 +1133,16 @@ document.addEventListener('DOMContentLoaded', function() {
         nameInput.style.flex = '1';
         nameInput.style.background = 'none';
         nameInput.style.borderRadius = '4px';
-        nameInput.style.border = '1px solid rgba(255,255,255,0.05)';
+        nameInput.style.border = '1px solid rgba(255,255,255,0.10)';
         nameInput.style.color = '#fff';
         nameInput.style.padding = '10px 16px';
         nameInput.style.fontSize = '15px';
         nameInput.style.boxSizing = 'border-box';
         nameInput.style.minWidth = '0';
-        nameInput.onfocus = nameInput.onmouseover = function(){ this.style.background = 'rgba(16,16,16,0.2)'; this.style.borderColor = 'rgba(255,255,255,0.1)'; };
-        nameInput.onblur = nameInput.onmouseout = function(){ this.style.background = 'none'; this.style.borderColor = 'rgba(255,255,255,0.05)'; };
+        nameInput.onfocus = nameInput.onmouseover = function(){ this.style.background = 'rgba(16,16,16,0.2)'; this.style.borderColor = 'rgba(255,255,255,0.60)'; this.style.outline = 'none'; this.style.boxShadow = 'none'; };
+        nameInput.onblur = nameInput.onmouseout = function(){ this.style.background = 'none'; this.style.borderColor = 'rgba(255,255,255,0.10)'; this.style.outline = 'none'; this.style.boxShadow = 'none'; };
         nameInput.style.transition = 'border-color 0.2s, background 0.2s';
-        nameInput.setAttribute('style', nameInput.getAttribute('style') + ';' + '::placeholder { color: rgba(247,249,244,0.10); }');
+        nameInput.setAttribute('style', nameInput.getAttribute('style') + ';' + '::placeholder { color: rgba(247,249,244,0.10); font-size: 16px; }');
         nameDiv.appendChild(nameInput);
 
         // 상품 설명 영역
@@ -1099,11 +1155,11 @@ document.addEventListener('DOMContentLoaded', function() {
         infoDiv.style.padding = '0';
         // 라벨 (label 태그로)
         const infoLabel = document.createElement('label');
-        infoLabel.className = 'admin-product-edit-info-label';
+        infoLabel.className = 'product-add-label'; // 상품 추가와 동일하게
         infoLabel.textContent = '상품 설명';
         infoLabel.setAttribute('for', 'adminProductEditDesc');
         infoLabel.style.width = '90px';
-        infoLabel.style.fontSize = '15px';
+        infoLabel.style.fontSize = '16px';
         infoLabel.style.color = 'rgba(247,249,244,0.9)';
         infoLabel.style.display = 'flex';
         infoLabel.style.alignItems = 'center';
@@ -1113,28 +1169,27 @@ document.addEventListener('DOMContentLoaded', function() {
         infoDiv.appendChild(infoLabel);
         // 인풋 그룹 div
         const descInputGroup = document.createElement('div');
-        descInputGroup.className = 'admin-product-edit-desc-input-group';
+        descInputGroup.className = 'desc-input-group'; // 상품 추가와 동일하게
         descInputGroup.style.width = '100%';
         descInputGroup.style.display = 'flex';
         descInputGroup.style.flexDirection = 'column';
         descInputGroup.style.position = 'relative';
-        descInputGroup.style.border = '1px solid rgba(255,255,255,0.10)';
+        descInputGroup.style.border = '1px solid rgba(255,255,255,0.10)'; // 스트로크는 그룹 div에만
         descInputGroup.style.borderRadius = '4px';
         descInputGroup.style.transition = 'border-color 0.2s';
         // textarea
         const infoTextarea = document.createElement('textarea');
         infoTextarea.id = 'adminProductEditDesc';
-        infoTextarea.className = 'admin-product-edit-info-input';
+        infoTextarea.className = 'product-add-input'; // 상품 추가와 동일하게
         infoTextarea.rows = 3;
         infoTextarea.placeholder = '상품 설명을 입력해 주세요';
         infoTextarea.maxLength = 75;
         infoTextarea.value = product.description || '';
         infoTextarea.style.background = 'none';
-        infoTextarea.style.border = 'none';
+        infoTextarea.style.border = 'none'; // textarea에는 border 없음
         infoTextarea.style.outline = 'none';
         infoTextarea.style.color = '#fff';
-        infoTextarea.style.padding = '10px 16px';
-        infoTextarea.style.fontSize = '15px';
+        infoTextarea.style.fontSize = '16px';
         infoTextarea.style.boxSizing = 'border-box';
         infoTextarea.style.minWidth = '0';
         infoTextarea.style.minHeight = '110px';
@@ -1142,19 +1197,21 @@ document.addEventListener('DOMContentLoaded', function() {
         infoTextarea.style.lineHeight = '1.5';
         infoTextarea.style.resize = 'none';
         infoTextarea.style.transition = 'background 0.2s';
-        infoTextarea.setAttribute('style', infoTextarea.getAttribute('style') + ';' + '::placeholder { color: rgba(247,249,244,0.10); }');
+        infoTextarea.setAttribute('style', infoTextarea.getAttribute('style') + ';' + '::placeholder { color: rgba(247,249,244,0.10); font-size: 16px; }');
         descInputGroup.appendChild(infoTextarea);
-        infoDiv.appendChild(descInputGroup);
         // 글자 제한 div (인풋 그룹 div 아래에 따로)
         const descCharCounter = document.createElement('div');
-        descCharCounter.className = 'admin-product-edit-desc-char-counter';
+        descCharCounter.className = 'desc-char-counter'; // 상품 추가와 동일하게
         descCharCounter.style.fontSize = '12px';
         descCharCounter.style.color = 'rgba(247,249,244,0.4)';
-        descCharCounter.style.textAlign = 'right';
+        descCharCounter.style.textAlign = 'left'; // 상품 추가와 동일하게
         descCharCounter.style.width = '100%';
-        descCharCounter.style.marginTop = '4px';
+        descCharCounter.style.marginTop = '0';
+        descCharCounter.style.borderTop = '1px solid rgba(255,255,255,0.03)'; // 카운터는 border-top만
+        descCharCounter.style.background = 'rgba(16,16,16,0.2)';
         descCharCounter.innerHTML = '글자 제한&nbsp;<span id="adminProductEditDescCharCount">0</span> / 75';
-        infoDiv.appendChild(descCharCounter);
+        descInputGroup.appendChild(descCharCounter);
+        infoDiv.appendChild(descInputGroup);
         // 카운터 동작
         function updateEditDescCounter() {
             let val = infoTextarea.value;
@@ -1171,7 +1228,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         infoTextarea.addEventListener('input', updateEditDescCounter);
         infoTextarea.addEventListener('focus', function() {
-            descInputGroup.style.border = '1.5px solid rgba(255,255,255,0.60)';
+            descInputGroup.style.border = '1px solid rgba(255,255,255,0.60)';
         });
         infoTextarea.addEventListener('blur', function() {
             descInputGroup.style.border = '1px solid rgba(255,255,255,0.10)';
@@ -1192,7 +1249,7 @@ document.addEventListener('DOMContentLoaded', function() {
         priceLabel.className = 'admin-product-edit-price-label';
         priceLabel.textContent = '상품 가격';
         priceLabel.style.width = '90px';
-        priceLabel.style.fontSize = '15px';
+        priceLabel.style.fontSize = '16px';
         priceLabel.style.color = 'rgba(247,249,244,0.9)';
         priceLabel.style.display = 'flex';
         priceLabel.style.alignItems = 'center';
@@ -1231,10 +1288,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 amountInput.style.fontSize = '15px';
                 amountInput.style.boxSizing = 'border-box';
                 amountInput.style.minWidth = '0';
-                amountInput.onfocus = amountInput.onmouseover = function(){ this.style.background = 'rgba(16,16,16,0.2)'; this.style.borderColor = 'rgba(255,255,255,0.60)'; };
-                amountInput.onblur = amountInput.onmouseout = function(){ this.style.background = 'none'; this.style.borderColor = 'rgba(255,255,255,0.10)'; };
+                amountInput.onfocus = amountInput.onmouseover = function(){ this.style.background = 'rgba(16,16,16,0.2)'; this.style.borderColor = 'rgba(255,255,255,0.60)'; this.style.outline = 'none'; this.style.boxShadow = 'none'; };
+                amountInput.onblur = amountInput.onmouseout = function(){ this.style.background = 'none'; this.style.borderColor = 'rgba(255,255,255,0.10)'; this.style.outline = 'none'; this.style.boxShadow = 'none'; };
                 amountInput.style.transition = 'border-color 0.2s, background 0.2s';
-                amountInput.setAttribute('style', amountInput.getAttribute('style') + ';' + '::placeholder { color: rgba(247,249,244,0.10); }');
+                amountInput.setAttribute('style', amountInput.getAttribute('style') + ';' + '::placeholder { color: rgba(247,249,244,0.10); font-size: 16px; }');
                 row.appendChild(amountInput);
                 const priceInput = document.createElement('input');
                 priceInput.type = 'text';
@@ -1251,10 +1308,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 priceInput.style.fontSize = '15px';
                 priceInput.style.boxSizing = 'border-box';
                 priceInput.style.minWidth = '0';
-                priceInput.onfocus = priceInput.onmouseover = function(){ this.style.background = 'rgba(16,16,16,0.2)'; this.style.borderColor = 'rgba(255,255,255,0.60)'; };
-                priceInput.onblur = priceInput.onmouseout = function(){ this.style.background = 'none'; this.style.borderColor = 'rgba(255,255,255,0.10)'; };
+                priceInput.onfocus = priceInput.onmouseover = function(){ this.style.background = 'rgba(16,16,16,0.2)'; this.style.borderColor = 'rgba(255,255,255,0.60)'; this.style.outline = 'none'; this.style.boxShadow = 'none'; };
+                priceInput.onblur = priceInput.onmouseout = function(){ this.style.background = 'none'; this.style.borderColor = 'rgba(255,255,255,0.10)'; this.style.outline = 'none'; this.style.boxShadow = 'none'; };
                 priceInput.style.transition = 'border-color 0.2s, background 0.2s';
-                priceInput.setAttribute('style', priceInput.getAttribute('style') + ';' + '::placeholder { color: rgba(247,249,244,0.10); }');
+                priceInput.setAttribute('style', priceInput.getAttribute('style') + ';' + '::placeholder { color: rgba(247,249,244,0.10); font-size: 16px; }');
                 row.appendChild(priceInput);
                 // 삭제 버튼
                 const removeBtn = document.createElement('button');
@@ -1272,7 +1329,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 removeBtn.style.border = '1px solid rgba(255,255,255,0.05)';
                 removeBtn.style.padding = '0';
                 removeBtn.style.marginLeft = '8px';
-                removeBtn.style.display = 'flex';
+                removeBtn.style.display = prices.length > 1 ? 'flex' : 'none';
                 removeBtn.style.alignItems = 'center';
                 removeBtn.style.justifyContent = 'center';
                 removeBtn.style.cursor = 'pointer';
@@ -1330,7 +1387,7 @@ document.addEventListener('DOMContentLoaded', function() {
         imageLabel.className = 'admin-product-edit-image-label';
         imageLabel.textContent = '상품 사진';
         imageLabel.style.width = '90px';
-        imageLabel.style.fontSize = '15px';
+        imageLabel.style.fontSize = '16px';
         imageLabel.style.color = 'rgba(247,249,244,0.9)';
         imageLabel.style.display = 'flex';
         imageLabel.style.alignItems = 'center';
@@ -1359,40 +1416,34 @@ document.addEventListener('DOMContentLoaded', function() {
             imageArea.innerHTML = '';
             if (fileOrUrl) {
                 const wrapper = document.createElement('div');
-                wrapper.style.position = 'relative';
-                wrapper.style.display = 'inline-block';
-                wrapper.style.width = '274px';
+                wrapper.className = 'preview-image-wrapper';
+                wrapper.style.width = '100%';
                 wrapper.style.height = '274px';
+                wrapper.style.border = '1px dashed rgba(255,255,255,0.10)';
+                wrapper.style.borderRadius = '4px';
+                wrapper.style.display = 'flex';
+                wrapper.style.alignItems = 'center';
+                wrapper.style.justifyContent = 'center';
+                wrapper.style.position = 'relative';
+                // 미리보기 이미지
                 const img = document.createElement('img');
-                img.style.width = '274px';
-                img.style.height = '274px';
+                img.className = 'product-preview-image';
+                img.style.width = '270px';
+                img.style.height = '270px';
                 img.style.objectFit = 'cover';
-                img.style.borderRadius = '8px';
-                img.style.background = 'none';
-                img.style.border = '1px solid rgba(255,255,255,0.05)';
-                if (typeof fileOrUrl === 'string') {
-                    img.src = fileOrUrl;
-                } else {
-                    const reader = new FileReader();
-                    reader.onload = function(e) { img.src = e.target.result; };
-                    reader.readAsDataURL(fileOrUrl);
-                }
+                img.style.borderRadius = '3px';
+                img.style.display = 'block';
+                img.style.margin = '0';
+                img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
                 // 삭제 버튼
                 const delBtn = document.createElement('div');
-                delBtn.className = 'admin-product-edit-image-remove-btn';
-                delBtn.setAttribute('role', 'button');
-                delBtn.setAttribute('tabindex', '0');
+                delBtn.className = 'preview-delete-btn';
                 delBtn.style.position = 'absolute';
-                delBtn.style.top = '4px';
-                delBtn.style.right = '4px';
-                delBtn.style.width = '28px';
-                delBtn.style.height = '28px';
-                delBtn.style.display = 'flex';
-                delBtn.style.alignItems = 'center';
-                delBtn.style.justifyContent = 'center';
+                delBtn.style.top = '8px';
+                delBtn.style.right = '8px';
+                delBtn.style.zIndex = '2';
                 delBtn.style.background = 'rgba(255,255,255,0.75)';
-                delBtn.style.borderRadius = '50%';
-                delBtn.style.cursor = 'pointer';
+                delBtn.style.border = '2px solid rgba(255,255,255,0.4)';
                 delBtn.innerHTML = '<img src="images/icon-trash.svg" alt="삭제" style="width:16px;height:16px;">';
                 delBtn.onclick = function(e) {
                     e.stopPropagation();
@@ -1400,27 +1451,48 @@ document.addEventListener('DOMContentLoaded', function() {
                     productImageInput.value = '';
                     renderImagePreview(null);
                 };
-                wrapper.appendChild(img);
-                wrapper.appendChild(delBtn);
-                imageArea.appendChild(wrapper);
+                if (typeof fileOrUrl === 'string') {
+                    let url = fileOrUrl;
+                    if (url && !/^https?:\/\//.test(url)) {
+                        if (!url.startsWith('/')) url = '/' + url;
+                    }
+                    img.onerror = function() {
+                        img.src = '/images/no-image.png';
+                    };
+                    img.src = url;
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(delBtn);
+                    imageArea.appendChild(wrapper);
+                } else if (fileOrUrl instanceof File) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        img.src = e.target.result;
+                        wrapper.appendChild(img);
+                        wrapper.appendChild(delBtn);
+                        imageArea.appendChild(wrapper);
+                    };
+                    reader.readAsDataURL(fileOrUrl);
+                }
             } else {
-                // 파일 선택 버튼
                 const uploadLabel = document.createElement('label');
-                uploadLabel.className = 'admin-product-edit-image-upload-btn';
+                uploadLabel.className = 'product-image-file-btn';
                 uploadLabel.setAttribute('for', 'productEditImageInput');
-                uploadLabel.style.display = 'inline-block';
-                uploadLabel.style.width = '274px';
                 uploadLabel.style.height = '274px';
-                uploadLabel.style.background = 'rgba(16,16,16,0.1)';
-                uploadLabel.style.border = '1px dashed #aaa';
-                uploadLabel.style.borderRadius = '8px';
-                uploadLabel.style.cursor = 'pointer';
-                uploadLabel.style.display = 'flex';
-                uploadLabel.style.alignItems = 'center';
-                uploadLabel.style.justifyContent = 'center';
-                uploadLabel.innerHTML = '<span style="color:#aaa;font-size:13px;">파일 선택</span>';
-                imageArea.appendChild(uploadLabel);
+                const fileUploadContent = document.createElement('span');
+                fileUploadContent.className = 'file-upload-content';
+                fileUploadContent.style.height = '274px';
+                const icon = document.createElement('img');
+                icon.src = 'images/icon-upload.svg';
+                icon.alt = '업로드';
+                icon.className = 'product-upload-icon';
+                fileUploadContent.appendChild(icon);
+                const btnText = document.createElement('span');
+                btnText.className = 'btn-text';
+                btnText.textContent = '파일 선택';
+                fileUploadContent.appendChild(btnText);
+                uploadLabel.appendChild(fileUploadContent);
                 uploadLabel.appendChild(imageInput);
+                imageArea.appendChild(uploadLabel);
             }
         }
         imageInput.onchange = function() {
@@ -1461,8 +1533,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const cancelBtn = document.createElement('button');
         cancelBtn.type = 'button';
         cancelBtn.className = 'admin-product-edit-btn-cancel';
-        cancelBtn.textContent = '취소';
-        cancelBtn.style.background = '#333';
+        cancelBtn.textContent = '닫기';
+        cancelBtn.style.background = 'rgba(255,255,255,0.03)';
         cancelBtn.style.color = '#fff';
         cancelBtn.style.border = 'none';
         cancelBtn.style.borderRadius = '6px';
@@ -1489,51 +1561,180 @@ document.addEventListener('DOMContentLoaded', function() {
         messageDiv.style.fontSize = '12px';
         messageDiv.style.display = 'block';
 
+        // 라벨 라인 생성 함수 (상품 추가와 동일하게)
+        function createLabelLine() {
+            const line = document.createElement('div');
+            line.className = 'label-line';
+            line.style.width = '100%';
+            line.style.height = '1px';
+            line.style.background = 'rgba(255,255,255,0.02)';
+            line.style.margin = '16px 0';
+            return line;
+        }
         // form 조립
         editForm.innerHTML = '';
+        // 카테고리
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'admin-product-edit-category';
+        categoryDiv.style.display = 'flex';
+        categoryDiv.style.alignItems = 'center';
+        categoryDiv.style.marginBottom = '16px';
+        categoryDiv.style.height = 'auto';
+        categoryDiv.style.margin = '0';
+        categoryDiv.style.padding = '0';
+        // 라벨
+        const categoryLabel = document.createElement('span');
+        categoryLabel.className = 'product-add-label';
+        categoryLabel.textContent = '카테고리';
+        categoryLabel.style.minWidth = '90px';
+        categoryLabel.style.maxWidth = '90px';
+        categoryLabel.style.flexShrink = '0';
+        categoryLabel.style.color = 'rgba(247,249,244,0.9)';
+        categoryLabel.style.fontSize = '16px';
+        categoryLabel.style.fontWeight = '400';
+        categoryLabel.style.textAlign = 'left';
+        categoryLabel.style.marginRight = '0';
+        categoryLabel.style.marginLeft = '4px';
+        categoryLabel.style.display = 'flex';
+        categoryLabel.style.alignItems = 'center';
+        categoryLabel.style.height = '100%';
+        categoryDiv.appendChild(categoryLabel);
+        // select wrap
+        const selectWrap = document.createElement('div');
+        selectWrap.className = 'select-wrap';
+        selectWrap.style.position = 'relative';
+        selectWrap.style.flex = '1';
+        selectWrap.style.width = '100%';
+        selectWrap.style.display = 'flex';
+        selectWrap.style.alignItems = 'center';
+        // select
+        const categorySelect = document.createElement('select');
+        categorySelect.className = 'product-add-input';
+        categorySelect.style.width = '100%';
+        categorySelect.style.paddingLeft = '16px';
+        categorySelect.style.paddingRight = '32px';
+        categorySelect.style.appearance = 'none';
+        categorySelect.style.background = 'none';
+        categorySelect.style.border = '1px solid rgba(255,255,255,0.10)';
+        categorySelect.style.transition = 'border-color 0.2s, background 0.2s';
+        categorySelect.style.fontSize = '16px';
+        categorySelect.style.color = 'rgba(255,255,255,0.9)';
+        categorySelect.style.height = '40px';
+        categorySelect.style.borderRadius = '4px';
+        categorySelect.style.boxSizing = 'border-box';
+        // 옵션 추가
+        const options = [
+            { value: 'red-pepper', text: '고추가루' },
+            { value: 'perilla', text: '들깨가루' },
+            { value: 'seafood', text: '수산물' },
+            { value: 'processed', text: '공산품' }
+        ];
+        options.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt.value;
+            option.textContent = opt.text;
+            if ((product.category || '').toLowerCase() === opt.value) option.selected = true;
+            option.style.background = 'rgba(16,16,16,0.1)';
+            option.style.color = 'rgba(16,16,16,0.4)';
+            option.style.fontSize = '16px';
+            categorySelect.appendChild(option);
+        });
+        // 화살표 회전 갱신 함수
+        function updateArrowRotation() {
+            if (selectWrap.classList.contains('open')) {
+                arrowImg.style.transform = 'translateY(-50%) rotate(180deg)';
+            } else {
+                arrowImg.style.transform = 'translateY(-50%) rotate(0deg)';
+            }
+        }
+        // select focus/hover 스타일
+        categorySelect.addEventListener('focus', function(){ this.style.background = 'rgba(16,16,16,0.2)'; this.style.borderColor = 'rgba(255,255,255,0.40)'; this.style.outline = 'none'; this.style.boxShadow = 'none'; selectWrap.classList.add('open'); updateArrowRotation(); });
+        categorySelect.addEventListener('blur', function(){ this.style.background = 'none'; this.style.borderColor = 'rgba(255,255,255,0.10)'; this.style.outline = 'none'; this.style.boxShadow = 'none'; selectWrap.classList.remove('open'); updateArrowRotation(); });
+        categorySelect.addEventListener('mouseover', function(){ this.style.background = 'rgba(16,16,16,0.2)'; this.style.borderColor = 'rgba(255,255,255,0.40)'; });
+        categorySelect.addEventListener('mouseout', function(){ if(document.activeElement !== this) { this.style.background = 'none'; this.style.borderColor = 'rgba(255,255,255,0.10)'; }});
+        // 마우스 클릭 시 open 토글
+        categorySelect.addEventListener('mousedown', function(e) {
+            if (selectWrap.classList.contains('open')) {
+                selectWrap.classList.remove('open');
+                categorySelect.blur();
+                updateArrowRotation();
+                e.preventDefault();
+            } else {
+                selectWrap.classList.add('open');
+                setTimeout(() => { categorySelect.focus(); updateArrowRotation(); }, 0);
+            }
+        });
+        // open 상태에서 화살표 회전 (MutationObserver 보조)
+        // const observer = new MutationObserver(updateArrowRotation);
+        // observer.observe(selectWrap, { attributes: true, attributeFilter: ['class'] });
+        // 화살표 아이콘
+        const arrowImg = document.createElement('img');
+        arrowImg.src = 'images/icon-arrow-down.svg';
+        arrowImg.className = 'custom-select-arrow';
+        arrowImg.alt = '아래 화살표';
+        arrowImg.style.position = 'absolute';
+        arrowImg.style.right = '16px';
+        arrowImg.style.top = '50%';
+        arrowImg.style.transform = 'translateY(-50%) rotate(0deg)';
+        arrowImg.style.width = '10px';
+        arrowImg.style.height = '10px';
+        arrowImg.style.pointerEvents = 'none';
+        arrowImg.style.transition = 'transform 0.2s';
+        arrowImg.style.zIndex = '2';
+        selectWrap.appendChild(categorySelect);
+        selectWrap.appendChild(arrowImg);
+        // open 상태에서 화살표 회전
+        selectWrap.addEventListener('classChange', function() {
+            if (selectWrap.classList.contains('open')) {
+                arrowImg.style.transform = 'translateY(-50%) rotate(180deg)';
+            } else {
+                arrowImg.style.transform = 'translateY(-50%) rotate(0deg)';
+            }
+        });
+        // open 상태 감지(클래스 변경 감지)
+        const observer = new MutationObserver(() => {
+            if (selectWrap.classList.contains('open')) {
+                arrowImg.style.transform = 'translateY(-50%) rotate(180deg)';
+            } else {
+                arrowImg.style.transform = 'translateY(-50%) rotate(0deg)';
+            }
+        });
+        observer.observe(selectWrap, { attributes: true, attributeFilter: ['class'] });
+        categoryDiv.appendChild(selectWrap);
+        // 상품명 입력란(nameDiv)보다 먼저 추가
+        editForm.appendChild(categoryDiv);
+        editForm.appendChild(createLabelLine()); // 카테고리와 상품명 사이 라벨 라인 추가
         editForm.appendChild(nameDiv);
+        editForm.appendChild(createLabelLine());
         editForm.appendChild(infoDiv);
+        editForm.appendChild(createLabelLine());
         editForm.appendChild(priceDiv);
+        editForm.appendChild(createLabelLine());
         editForm.appendChild(imageDiv);
         // 버튼그룹을 form 내부에 추가 (submit 이벤트 정상 동작)
         editForm.appendChild(btnGroupDiv);
         // adminProductEdit에 form만 append
         adminProductEdit.innerHTML = '';
-        // 라벨 라인 생성 함수
-        function createLabelLine() {
-            const line = document.createElement('div');
-            line.style.width = '100%';
-            line.style.height = '1px';
-            line.style.background = 'rgba(255,255,255,0.02)';
-            line.style.margin = '12px 0';
-            return line;
-        }
-        // 입력 그룹(div) 배열
-        const editSections = [nameDiv, infoDiv, priceDiv, imageDiv];
-        for (let i = 0; i < editSections.length; i++) {
-            adminProductEdit.appendChild(editSections[i]);
-            // 마지막 요소 전까지만 라벨 라인 추가
-            if (i < editSections.length - 1) {
-                adminProductEdit.appendChild(createLabelLine());
-            }
-        }
         adminProductEdit.appendChild(editForm);
+
         // 오버레이에 폼, 버튼그룹, 메시지를 세로로 추가
         editOverlay.innerHTML = '';
-        editOverlay.appendChild(adminProductEdit);
-        editOverlay.appendChild(btnGroupDiv);
-        editOverlay.appendChild(messageDiv);
+        editOverlay.appendChild(editTitleDiv);      // 타이틀 div
+        editOverlay.appendChild(adminProductEdit);  // 폼 div
+        editOverlay.appendChild(btnGroupDiv);       // 버튼그룹
+        editOverlay.appendChild(messageDiv);        // 메시지
         editingProductIdx = idx;
         document.body.appendChild(editOverlay);
         document.body.style.overflow = 'hidden';
 
         // 저장 버튼 직접 클릭 이벤트 연결 (폼 submit 사용 안 함)
-        saveBtn.onclick = function(e) {
+        saveBtn.onclick = async function(e) {
             e.preventDefault();
             if (messageDiv._timer) clearTimeout(messageDiv._timer);
             messageDiv.style.display = 'block';
-            messageDiv.style.opacity = 0;
-            messageDiv.textContent = '';
+            messageDiv.style.opacity = 1;
+            messageDiv.textContent = '처리중';
+            messageDiv.style.color = 'rgba(255,255,255,0.2)';
             // 입력값 검증
             const title = nameInput.value.trim();
             const desc = infoTextarea.value.trim();
@@ -1551,13 +1752,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 msg = '상품명을 입력하세요.';
             } else if (!prices.length) {
                 valid = false;
-                msg = '가격 정보를 입력하세요.';
+                msg = '상품의 가격 / 용량 정보를 입력하세요';
             }
             // productId 체크
             const productId = product.id || product._id;
             if (!productId) {
                 valid = false;
-                msg = '상품 ID가 없습니다. 저장할 수 없습니다.';
+                msg = '상품 ID가 없어서 저장할 수 없습니다';
             }
             if (!valid) {
                 messageDiv.textContent = msg;
@@ -1569,30 +1770,97 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 3000);
                 return;
             }
+            // 카테고리 변경 감지
+            const prevCategory = product.category || document.getElementById('productListCategory').value;
+            const newCategory = categorySelect.value;
             // FormData 생성
             const formData = new FormData();
             formData.append('title', title);
             formData.append('description', desc);
             formData.append('prices', JSON.stringify(prices));
-            // 이미지 파일이 있으면 추가
             if (imageInput.files && imageInput.files[0]) {
                 formData.append('image', imageInput.files[0]);
+            } else if (product.image || product.imageUrl) {
+                // 기존 이미지 경로 전달(새 카테고리 추가 시 필요)
+                formData.append('imageUrl', product.image || product.imageUrl);
             }
-            // 상품 수정(업데이트) 요청: PATCH /api/products/<category> + id 필드 포함
-            const category = product.category || document.getElementById('productListCategory').value;
-            formData.append('id', product.id || product._id);
-            fetch(`/api/products/${category}`, {
-                method: 'PATCH',
-                body: formData,
-                credentials: 'include'
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('서버 응답 오류');
-                return res.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    messageDiv.textContent = '저장 완료';
+            formData.append('id', productId);
+            if (prevCategory === newCategory) {
+                // 기존과 동일한 카테고리면 PATCH
+                fetch(`/api/products/${prevCategory}`, {
+                    method: 'PATCH',
+                    body: formData,
+                    credentials: 'include'
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('서버 응답 오류');
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        messageDiv.textContent = '상품 정보가 저장 되었습니다';
+                        messageDiv.style.color = '#4a90e2';
+                        messageDiv.style.opacity = 1;
+                        messageDiv._timer = setTimeout(() => {
+                            messageDiv.style.opacity = 0;
+                            setTimeout(() => { messageDiv.textContent = ''; }, 500);
+                        }, 3000);
+                        if (window.loadProductList) window.loadProductList();
+                    } else {
+                        messageDiv.textContent = (data.message || '상품 정보 저장에 실패 했습니다');
+                        messageDiv.style.color = '#ff6b6b';
+                        messageDiv.style.opacity = 1;
+                        messageDiv._timer = setTimeout(() => {
+                            messageDiv.style.opacity = 0;
+                            setTimeout(() => { messageDiv.textContent = ''; }, 500);
+                        }, 3000);
+                    }
+                })
+                .catch((err) => {
+                    messageDiv.textContent = '상품 정보 저장 중 오류가 발생했습니다';
+                    messageDiv.style.color = '#ff6b6b';
+                    messageDiv.style.opacity = 1;
+                    messageDiv._timer = setTimeout(() => {
+                        messageDiv.style.opacity = 0;
+                        setTimeout(() => { messageDiv.textContent = ''; }, 500);
+                    }, 3000);
+                });
+            } else {
+                // 카테고리가 변경된 경우: 새 카테고리에 먼저 추가(복제) → 기존 카테고리에서 삭제
+                const addFormData = new FormData();
+                addFormData.append('title', title);
+                addFormData.append('description', desc);
+                addFormData.append('prices', JSON.stringify(prices));
+                if (imageInput.files && imageInput.files[0]) {
+                    addFormData.append('image', imageInput.files[0]);
+                } else if (product.image && typeof product.image === 'string' && product.image.trim() !== '') {
+                    addFormData.append('imageUrl', product.image);
+                } else {
+                    // 기본 이미지로 대체
+                    addFormData.append('imageUrl', '/images/no-image.png');
+                }
+                // 새 상품에도 기존 id 유지
+                addFormData.append('id', productId);
+                fetch(`/api/products/${newCategory}`, {
+                    method: 'POST',
+                    body: addFormData,
+                    credentials: 'include'
+                })
+                .then(res => res.json())
+                .then(addData => {
+                    if (!addData.success) throw new Error(addData.message || '카테고리 이동 실패');
+                    // 추가 성공 시 기존 카테고리에서 삭제
+                    return fetch(`/api/products/${prevCategory}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: productId }),
+                        credentials: 'include'
+                    });
+                })
+                .then(delRes => delRes.json())
+                .then(delData => {
+                    if (!delData.success) throw new Error(delData.message || '기존 카테고리 삭제 실패');
+                    messageDiv.textContent = '상품 카테고리 이동이 완료되었습니다';
                     messageDiv.style.color = '#4a90e2';
                     messageDiv.style.opacity = 1;
                     messageDiv._timer = setTimeout(() => {
@@ -1600,26 +1868,25 @@ document.addEventListener('DOMContentLoaded', function() {
                         setTimeout(() => { messageDiv.textContent = ''; }, 500);
                     }, 3000);
                     if (window.loadProductList) window.loadProductList();
-                } else {
-                    messageDiv.textContent = (data.message || '저장 실패').replace(/\.$/, '');
+                })
+                .catch((err) => {
+                    messageDiv.textContent = '상품 카테고리 이동 / 삭제 중 오류가 발생했습니다';
                     messageDiv.style.color = '#ff6b6b';
                     messageDiv.style.opacity = 1;
                     messageDiv._timer = setTimeout(() => {
                         messageDiv.style.opacity = 0;
                         setTimeout(() => { messageDiv.textContent = ''; }, 500);
                     }, 3000);
-                }
-            })
-            .catch((err) => {
-                messageDiv.textContent = '저장 중 오류가 발생했습니다: ' + (err.message || '');
-                messageDiv.style.color = '#ff6b6b';
-                messageDiv.style.opacity = 1;
-                messageDiv._timer = setTimeout(() => {
-                    messageDiv.style.opacity = 0;
-                    setTimeout(() => { messageDiv.textContent = ''; }, 500);
-                }, 3000);
-            });
+                });
+            }
         };
+
+        // 상품의 실제 카테고리 정보 보정
+        if (!product.category && categoryFromList) {
+            product.category = categoryFromList;
+        }
+        // select 옵션 생성 후, value를 상품의 실제 카테고리로 맞춤
+        categorySelect.value = (product.category || '').toLowerCase();
     }
 
     function closeEditOverlay() {
@@ -1685,14 +1952,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     const img = document.createElement('img');
                     img.src = ev.target.result;
                     img.alt = '미리보기';
-                    img.style.width = '270px';
-                    img.style.height = '270px';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
                     img.style.objectFit = 'cover';
                     img.style.borderRadius = '3px';
                     img.style.background = 'none';
                     img.style.border = 'none';
                     img.style.display = 'block';
-                    img.style.margin = '0 auto';
+                    img.style.margin = '0';
+                    img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
+                    img.className = 'gallery-preview-img';
                     wrapper.appendChild(img);
                     // 삭제 버튼
                     const delBtn = document.createElement('div');
@@ -1700,14 +1969,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     delBtn.style.position = 'absolute';
                     delBtn.style.top = '8px';
                     delBtn.style.right = '8px';
-                    delBtn.style.width = '30px';
-                    delBtn.style.height = '30px';
-                    delBtn.style.display = 'flex';
-                    delBtn.style.alignItems = 'center';
-                    delBtn.style.justifyContent = 'center';
+                    delBtn.style.zIndex = '2';
                     delBtn.style.background = 'rgba(255,255,255,0.75)';
-                    delBtn.style.borderRadius = '50%';
-                    delBtn.style.cursor = 'pointer';
+                    delBtn.style.border = '2px solid rgba(255,255,255,0.4)';
                     delBtn.innerHTML = '<img src="images/icon-trash.svg" alt="삭제" style="width:16px;height:16px;">';
                     delBtn.onclick = function(e) {
                         e.stopPropagation();
@@ -1723,5 +1987,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 showUploadUI();
             }
         });
+    }
+
+    // 갤러리(현장 사진) 순서 변경 애니메이션 함수
+    function galleryAnimateSwap(idx, toIdx) {
+        const galleryList = document.getElementById('galleryList');
+        const items = Array.from(galleryList.children);
+        const fromElem = items[idx];
+        const toElem = items[toIdx];
+        const fromRect = fromElem.getBoundingClientRect();
+        const toRect = toElem.getBoundingClientRect();
+        const dy = toRect.top - fromRect.top;
+        fromElem.style.transition = 'transform 0.2s cubic-bezier(0.4,0,0.2,1)';
+        toElem.style.transition = 'transform 0.2s cubic-bezier(0.4,0,0.2,1), scale 0.2s cubic-bezier(0.4,0,0.2,1)';
+        fromElem.style.transform = `translateY(${dy}px)`;
+        toElem.style.transform = `translateY(${-dy}px) scale(0.9)`;
+        let ended = 0;
+        function onEnd() {
+            ended++;
+            if (ended === 2) {
+                fromElem.style.transition = '';
+                fromElem.style.transform = '';
+                toElem.style.transition = '';
+                toElem.style.transform = '';
+                // 실제 배열/DOM 갱신 (자리 바꿈)
+                [galleryImages[toIdx], galleryImages[idx]] = [galleryImages[idx], galleryImages[toIdx]];
+                renderGalleryList();
+            }
+        }
+        fromElem.addEventListener('transitionend', onEnd, { once: true });
+        toElem.addEventListener('transitionend', onEnd, { once: true });
+    }
+
+    const greetingTextarea = document.getElementById('greetingText');
+    if (greetingTextarea) {
+        function autoResizeTextarea() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        }
+        greetingTextarea.addEventListener('input', autoResizeTextarea);
+        // 페이지 진입 시에도 적용
+        greetingTextarea.style.height = 'auto';
+        greetingTextarea.style.height = (greetingTextarea.scrollHeight) + 'px';
+        // 패딩 인라인 스타일 제거
+        greetingTextarea.style.padding = '';
     }
 });

@@ -529,7 +529,16 @@ function handleScroll() {
                         const data = await res.json();
                         const container = document.getElementById(`productList-${category}`);
                         container.innerHTML = '';
-                        if (!data.success || !data.products) return;
+                        const section = container.closest('.category-section');
+                        if (!data.success || !data.products) {
+                            return;
+                        }
+                        if (data.products.length === 0) {
+                            if (section) section.classList.add('empty');
+                            return;
+                        } else {
+                            if (section) section.classList.remove('empty');
+                        }
                         
                         const template = document.getElementById('productCardTemplate');
                         data.products.slice().reverse().forEach((product, idx) => {
@@ -734,7 +743,7 @@ function handleScroll() {
             .then(data => {
                 const greetingText = document.getElementById('greetingText');
                 if (greetingText && data.greeting) {
-                    greetingText.textContent = data.greeting;
+                    greetingText.innerHTML = data.greeting.replace(/\n/g, '<br>');
                 }
             })
             .catch(() => {

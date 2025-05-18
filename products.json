@@ -1,123 +1,79 @@
 {
   "red-pepper": [
     {
-      "description": "엄청 맛있어요 돈주고 사고 싶어도 살수가 없는 아주 그런 기가맥힌 맛이라고 할 수 있지요 이걸 사려면 어딜가도 살 수가 없는 아주굿!",
-      "id": "54b435f3-943a-4b02-9d96-fd8fbb3fcc2e",
-      "image": "images/products/54b435f3-943a-4b02-9d96-fd8fbb3fcc2e.png",
+      "description": "엄청 좋아요",
+      "id": "8c8f3d06-f37c-43bf-8eca-b0fc28d61df1",
+      "image": "images/products/8c8f3d06-f37c-43bf-8eca-b0fc28d61df1.jpg",
       "prices": [
         {
-          "amount": "500ml",
-          "price": "1만원"
+          "amount": "500g",
+          "price": "15,000"
         },
         {
-          "amount": "1키로",
-          "price": "2만원"
+          "amount": "1kg",
+          "price": "20,000"
         }
       ],
-      "title": "매운고추가루"
-    }
-  ],
-  "perilla": [
-    {
-      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.",
-      "id": "perilla1",
-      "image": "images/img_product_perilla_01.png",
-      "prices": [
-        {
-          "amount": "500ml",
-          "price": "35,000"
-        },
-        {
-          "amount": "1000ml",
-          "price": "60,000"
-        }
-      ],
-      "title": "들깨가루 상품 1"
+      "title": "고추가루상품명1"
     },
     {
-      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.",
-      "id": "perilla2",
-      "image": "images/img_product_perilla_02.png",
-      "prices": [
-        {
-          "amount": "500ml",
-          "price": "35,000"
-        },
-        {
-          "amount": "1000ml",
-          "price": "60,000"
-        }
-      ],
-      "title": "들깨가루 상품 2"
-    }
-  ],
-  "processed": [
-    {
-      "id": "goods3",
-      "title": "공산품 상품 3",
-      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.",
-      "prices": [
-        {
-          "amount": "500ml",
-          "price": "35,000"
-        },
-        {
-          "amount": "1000ml",
-          "price": "60,000"
-        }
-      ],
-      "image": "images/img_product_goods_03.png"
-    },
-    {
-      "id": "goods1",
-      "title": "공산품 상품 1",
-      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.",
-      "prices": [
-        {
-          "amount": "500ml",
-          "price": "35,000"
-        },
-        {
-          "amount": "1000ml",
-          "price": "60,000"
-        }
-      ],
-      "image": "images/img_product_goods_01.png"
-    },
-    {
-      "id": "goods2",
-      "title": "공산품 상품 2",
-      "description": "동빈스토어에서 추천하는 상품입니다. 가성비 높은 원료를 사용하여 저렴한 가격에 높은 품질을 보장합니다.",
-      "prices": [
-        {
-          "amount": "500ml",
-          "price": "35,000"
-        },
-        {
-          "amount": "1000ml",
-          "price": "60,000"
-        }
-      ],
-      "image": "images/img_product_goods_02.png"
-    }
-  ],
-  "seafood": [
-    {
-      "id": "4b0d5c3d-c23b-4f5f-9982-da7974bb99d5",
-      "title": "테스트",
-      "description": "1",
+      "description": "44455566666667777",
+      "id": "7a63093e-f874-487d-99bf-638ec6c50672",
+      "image": "images/products/7a63093e-f874-487d-99bf-638ec6c50672.jpg",
       "prices": [
         {
           "amount": "1",
           "price": "1"
+        },
+        {
+          "amount": "2",
+          "price": "2"
+        },
+        {
+          "amount": "3",
+          "price": "3"
         }
       ],
-      "image": "images/products/4b0d5c3d-c23b-4f5f-9982-da7974bb99d5.jpg"
-    },
+      "title": "고2"
+    }
+  ],
+  "perilla": [
     {
-      "id": "eac24b5b-c624-46f9-9c74-151402711d83",
-      "title": "수산물테스트",
+      "description": "ㅇ1111",
+      "id": "f48a7f6e-ccd9-45ce-85f9-b968ba9df20b",
+      "image": "images/products/f48a7f6e-ccd9-45ce-85f9-b968ba9df20b.jpg",
+      "prices": [
+        {
+          "amount": "ㅇㅇ",
+          "price": "ㅇ"
+        },
+        {
+          "amount": "2",
+          "price": "2"
+        }
+      ],
+      "title": "들깨가루 상품"
+    }
+  ],
+  "processed": [
+    {
+      "id": "d393dd10-2b72-44bd-a3b7-bb0acee3f6e9",
+      "title": "공공산산품",
+      "description": "얼마게",
+      "prices": [
+        {
+          "amount": "비싸",
+          "price": "싸"
+        }
+      ],
+      "image": "images/products/d393dd10-2b72-44bd-a3b7-bb0acee3f6e9.jpg"
+    }
+  ],
+  "seafood": [
+    {
       "description": "테스트 테스트",
+      "id": "eac24b5b-c624-46f9-9c74-151402711d83",
+      "image": "images/products/eac24b5b-c624-46f9-9c74-151402711d83.jpg",
       "prices": [
         {
           "amount": "111",
@@ -128,27 +84,7 @@
           "price": "444"
         }
       ],
-      "image": "images/products/eac24b5b-c624-46f9-9c74-151402711d83.jpg"
-    },
-    {
-      "id": "f863c987-a6a2-4758-a0e4-402f50958c2c",
-      "title": "azzz",
-      "description": "zzzzzzzzzzzzzzz",
-      "prices": [
-        {
-          "amount": "zzz",
-          "price": "zzzzz"
-        },
-        {
-          "amount": "z",
-          "price": "zz"
-        },
-        {
-          "amount": "zzz",
-          "price": "zzz"
-        }
-      ],
-      "image": "images/products/f863c987-a6a2-4758-a0e4-402f50958c2c.jpg"
+      "title": "수산물테스트"
     }
   ]
 }

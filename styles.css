@@ -949,7 +949,6 @@ main {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    height: 400px;
     margin-bottom: 0;
 }
 .greeting-form-group textarea {
@@ -963,7 +962,7 @@ main {
     outline: none;
     border-radius: 6px;
     resize: none;
-    padding: 12px 16px;
+    padding: 12px 16px 16px 16px;
     box-sizing: border-box;
 }
 .greeting-save-btn {
@@ -1016,7 +1015,7 @@ main {
     width: 100%;
     border: 1px solid rgba(255,255,255,0.05);
     border-radius: 8px;
-    padding: 12px;
+    padding: 24px 28px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -1027,7 +1026,7 @@ main {
     width: 100%;
     border: 1px solid rgba(255,255,255,0.05);
     border-radius: 8px;
-    padding: 12px;
+    padding: 24px 28px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -1049,7 +1048,7 @@ main {
 #galleryUploadErr {
     margin-top: 12px !important;
     margin-bottom: 12px !important;
-    font-size: 12px;
+    font-size: 16px;
     text-align: center;
     display: block;
     min-height: 24px;
@@ -1061,10 +1060,9 @@ main {
 
 #galleryList {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
     border-radius: 8px;
-    min-height: 120px;
     margin-top: 0;
 }
 
@@ -1085,7 +1083,6 @@ main {
     border-radius: 8px;
 }
 
-/* 갤러리 업로드 폼과 업로드 버튼 사이 간격 */
 #tab-gallery .gallery-form-group1 + #galleryUploadBtn {
     margin-top: 12px !important;
 }
@@ -1168,10 +1165,7 @@ main {
     object-fit: cover;
 }
 
-.preview-delete-btn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
+.preview-delete-btn, .gallery-delete-btn {
     width: 32px;
     height: 32px;
     background: rgba(16,16,16,0.75);
@@ -1189,10 +1183,10 @@ main {
     border: 2px solid rgba(247,249,244,0.05);
     background: rgba(16,16,16,0.7);
 }
-.preview-delete-btn:focus {
+.preview-delete-btn:focus, .gallery-delete-btn:focus {
     outline: none;
 }
-.preview-delete-btn svg {
+.preview-delete-btn svg, .gallery-delete-btn svg {
     width: 16px;
     height: 16px;
     fill: #1A1A1A;
@@ -1245,12 +1239,6 @@ main {
     margin-top: 12px;
     margin-bottom: 12px;
     position: relative;
-}
-#galleryUploadMsg, #galleryListSaveMsg {
-    color: #4a90e2 !important;
-}
-#galleryUploadErr, #galleryListSaveErr {
-    color: #ff6b6b !important;
 }
 
 .gallery-order-controls {
@@ -1343,7 +1331,7 @@ main {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 16px 32px;
+    padding: 12px 22px;
     gap: 8px;
 }
 
@@ -1590,4 +1578,18 @@ main {
 
 .admin-product-edit .admin-product-edit-desc-char-counter {
     font-size: 12px;
+}
+
+.single-preview {
+    padding: 2px;
+    border-radius: 3px;
+}
+
+.grid-preview {
+    padding: 2px;
+    border-radius: 3px;
+}
+
+.gallery-preview-img {
+    border-radius: 2px;
 } 

@@ -574,7 +574,6 @@
             border: 1px solid rgba(255,255,255,0.10);
             color: #fff;
             border-radius: 4px;
-            padding: 10px 16px;
             box-sizing: border-box;
             transition: border-color 0.2s, background 0.2s;
         }
@@ -720,9 +719,6 @@
             margin-top: 12px;
             margin-bottom: 12px;
         }
-        .product-list-success, #galleryUploadMsg, #galleryListSaveMsg, .product-add-message.success {
-            color: #4a90e2 !important;
-        }
         .product-list-error, #galleryUploadErr, #galleryListSaveErr, .product-add-message.error {
             color: #ff6b6b !important;
         }
@@ -794,9 +790,9 @@
         <!-- 메뉴 영역 -->
         <div class="admin-menu-area">
             <div class="admin-menu-group">
-                <button class="admin-menu-btn active" data-tab="product">상품카드</button>
+                <button class="admin-menu-btn active" data-tab="product">상품 관리</button>
                 <button class="admin-menu-btn" data-tab="greeting">인사말</button>
-                <button class="admin-menu-btn" data-tab="gallery">현장사진</button>
+                <button class="admin-menu-btn" data-tab="gallery">현장 사진</button>
             </div>
         </div>
         <!-- 컨텐츠 영역 -->
@@ -877,7 +873,7 @@
                                 <div class="label-line-margin"></div>
                             </div>
                             <div class="form-section form-section--image">
-                                <div class="product-add-row" style="flex-direction: column; align-items: flex-start;">
+                                <div class="product-add-row" style="width:100%; height:100%; flex-direction: column; align-items: center; position:relative;">
                                     <span class="product-add-label">상품 사진</span>
                                     <label for="productImage" class="product-image-file-btn" id="productImageLabel" style="position:relative;overflow:hidden;">
                                         <span class="file-upload-content">
@@ -902,13 +898,15 @@
                     <div class="product-list-group">
                         <div>
                             <div class="product-list-select-wrap" style="position:relative;flex:1;width:100%;display:flex;align-items:center;">
-                                <select id="productListCategory" class="product-list-select" style="width:100%;padding-left:16px;padding-right:32px;appearance:none;-webkit-appearance:none;-moz-appearance:none;background:none;border:1px solid rgba(255,255,255,0.10);transition:border-color 0.2s,background 0.2s;font-size:16px;color:#fff;height:40px;border-radius:4px;box-sizing:border-box;">
-                                    <option value="red-pepper" selected>고추가루</option>
-                                    <option value="perilla">들깨가루</option>
-                                    <option value="seafood">수산물</option>
-                                    <option value="processed">공산품</option>
-                                </select>
-                                <img src="images/icon-arrow-down.svg" class="product-list-custom-select-arrow" alt="아래 화살표" style="position:absolute;right:16px;top:50%;transform:translateY(-50%) rotate(0deg);width:10px;height:10px;pointer-events:none;transition:transform 0.2s;z-index:2;">
+                                <div class="select-wrap">
+                                    <select id="productListCategory" class="product-add-input" style="width:100%;padding-left:16px;padding-right:32px;appearance:none;-webkit-appearance:none;-moz-appearance:none;background:none;border:1px solid rgba(255,255,255,0.10);transition:border-color 0.2s,background 0.2s;font-size:16px;color:#fff;height:40px;border-radius:4px;box-sizing:border-box;">
+                                        <option value="red-pepper" selected>고추가루</option>
+                                        <option value="perilla">들깨가루</option>
+                                        <option value="seafood">수산물</option>
+                                        <option value="processed">공산품</option>
+                                    </select>
+                                    <img src="images/icon-arrow-down.svg" class="custom-select-arrow" alt="아래 화살표">
+                                </div>
                             </div>
                         </div>
                         <div id="productList"></div>
@@ -920,39 +918,44 @@
                 </div>
             </div>
             <div id="tab-greeting" class="admin-tab-section" style="display:none;">
-                <span class="greeting-title">인사말 입력</span>
+                <span class="greeting-title">인사말 수정</span>
                 <form id="greetingForm">
                     <div class="greeting-form-group">
                         <textarea id="greetingText" rows="7"></textarea>
                     </div>
-                    <button type="submit" class="greeting-save-btn">저장</button>
+                    <button type="submit" class="greeting-save-btn">인사말 수정</button>
                     <div class="greeting-message-area" style="min-height:24px;margin-top:10px;text-align:center;transition:opacity 0.5s;opacity:0;"></div>
                 </form>
             </div>
             <div id="tab-gallery" class="admin-tab-section" style="display:none;">
-                <span class="gallery-section-title" id="galleryUploadTitle">현장 사진 등록</span>
+                <span class="gallery-section-title" id="galleryUploadTitle">현장 사진 추가</span>
                 <div class="gallery-form-group1">
                     <form id="galleryUploadForm" enctype="multipart/form-data" style="margin-bottom:0;">
-                        <input type="file" id="galleryFile" style="display:none;" accept="image/*" multiple>
-                        <label for="galleryFile" id="galleryFileLabel" class="gallery-image-file-btn" style="position:relative;">
-                            <img src="images/icon-upload.svg" alt="업로드" class="product-upload-icon" style="position:absolute;left:20px;top:50%;transform:translateY(-50%);width:24px;height:24px;">
-                            <span class="btn-text">파일 선택</span>
-                            <span class="file-count-badge" id="fileCountBadge"></span>
-                        </label>
-                        <div id="galleryPreviewArea"></div>
+                        <div class="form-section form-section--image">
+                            <div class="product-add-row" style="width:100%; height:100%; flex-direction: column; align-items: center; position:relative;">
+                                <label for="galleryFile" class="product-image-file-btn" id="galleryFileLabel" style="position:relative;overflow:hidden;width:274px;height:274px;">
+                                    <span class="file-upload-content">
+                                        <img src="images/icon-upload.svg" alt="업로드" class="product-upload-icon" style="width:40px;height:40px;display:block;margin-bottom:8px;">
+                                        <span class="btn-text" style="display:block;width:100%;text-align:center;">파일 선택</span>
+                                    </span>
+                                    <input type="file" id="galleryFile" class="product-add-input" accept="image/*" style="display:none;" multiple>
+                                </label>
+                                <div class="preview-image-wrapper" id="galleryPreviewArea" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;"></div>
+                            </div>
+                        </div>
                     </form>
                 </div>
-                <button id="galleryUploadBtn" class="greeting-save-btn" type="submit">업로드</button>
+                <button id="galleryUploadBtn" class="greeting-save-btn" type="submit" style="width:100%;height:60px;margin-top:12px;background:#4a90e2;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;">현장 사진 추가</button>
                 <div class="gallery-upload-message-area" style="min-height:24px;margin:12px 0;text-align:center;transition:opacity 0.5s;opacity:0;font-size:12px;"></div>
                 <div id="galleryUploadBottomSpacer"></div>
-                <span class="gallery-section-title" id="galleryListTitle">현장 사진 리스트</span>
+                <span class="gallery-section-title" id="galleryListTitle">현장 사진 목록</span>
                 <div class="gallery-form-group2">
                     <div id="galleryList"></div>
                 </div>
-                <button id="galleryListSaveBtn" class="greeting-save-btn" type="button">저장</button>
+                <button id="galleryListSaveBtn" class="greeting-save-btn" type="button">현장 사진 목록 저장</button>
                 <div class="gallery-list-message-area">
-                    <span id="galleryListSaveMsg" style="display:none; color:#4a90e2;">저장 완료</span>
-                    <span id="galleryListSaveErr" style="display:none; color:#ff6b6b;">저장 실패</span>
+                    <span id="galleryListSaveMsg" style="display:none;">저장 완료</span>
+                    <span id="galleryListSaveErr" style="display:none;">저장 실패</span>
                 </div>
                 <div id="galleryListBottomSpacer"></div>
             </div>
